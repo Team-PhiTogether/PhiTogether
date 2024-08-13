@@ -1,0 +1,657 @@
+{
+    "info": {
+        "info": "提示",
+        "cancel": "取消",
+        "confirm": "确认",
+        "mod": "修改",
+        "error": "错误",
+        "colon": "：",
+        "yes": "是",
+        "no": "否",
+        "ok": "好",
+        "failure": "错误",
+        "warning": "警告"
+    },
+    "pages": {
+        "/startpage": "主页",
+        "/chartselect": "谱面选择",
+        "/playing": "游玩",
+        "/login": "登录到 PhiZone",
+        "/calibrate": "延迟校准",
+        "/cachemanage": "缓存管理",
+        "/aboutpage": "关于",
+        "/chartupload": "谱面上传",
+        "/chartedit": "信息编辑",
+        "/playerb20": "玩家 B20",
+        "/pzranksingle": "???",
+        "/replaypage": "回放",
+        "/changelogs": "更新日志",
+        "/multipanel": "多人游戏面板",
+        "/settings": "设置",
+        "/loading": "正在加载",
+        "/multiindex": "联机大厅"
+    },
+    "startPage": {
+        "viewB20": "查看B20",
+        "retryLogin": "重试登录",
+        "switch": "切换",
+        "logout": "登出",
+        "login": "登录",
+        "unLogined": "未登录",
+        "singleGame": "单人游戏",
+        "multiGame": "多人游戏",
+        "caches": "缓存",
+        "replay": "回放",
+        "gameSettings": "游戏设置",
+        "forcedFullscreen": "强制全屏",
+        "about": "关于",
+        "serviceStatus": "服务状态",
+        "updateLogs": "更新日志",
+        "redirectToCustomURL": "请输入自定义 sim-phi 链接来跳转",
+        "logoutConfirm": "您确定要登出账号吗？",
+        "logoutSuccessfully": "您已登出，现在您已进入离线模式。",
+        "offlineNotice": "您没有连接到互联网，将只能游玩本地缓存谱面。",
+        "askForLogin": "您当前处于离线模式，所有游玩数据将不会保存，要登录账号吗？",
+        "askForRelogin": "您当前处于离线模式，所有游玩数据将不会保存，要登录账号吗？",
+        "offlineMPNotice": "您没有连接到互联网，无法进行多人游戏！",
+        "noaccountmodeMPNotice": "您没有登录账号或账号状态异常，无法进行多人游戏，请重新登录后再试！",
+        "loadingUserConfig": "正在加载用户设置",
+        "judgeRangeMPNotice": "若要进行多人游戏，请将您的判定范围设置为 Perfect±80ms Good±160ms",
+        "fullscreenjudgeMPNotice": "若要进行多人游戏，关闭全屏判定",
+        "errLoadingUserConfig": "获取用户配置时出错",
+        "restoreMP": "检测到您有未正常退出的多人游戏，您需要恢复吗？",
+        "recoverMP": "正在恢复多人游戏",
+        "recoverMPFailed": "尝试恢复未正常退出的多人游戏失败，如需开启新的多人游戏请重新点击多人游戏按钮。",
+        "recoverMPNetProblem": "恢复未正常退出的多人游戏时遇到网络错误，请点击多人游戏按钮重试",
+        "mpMaintainanceNotice": "多人游戏正在维护",
+        "antiAddictionIssue": "实名认证错误"
+    },
+    "multiIndex": {
+        "join": "加入房间",
+        "create": "创建房间",
+        "roomId": "房间号码",
+        "goPublic": "公开房间",
+        "description": "房间描述",
+        "roomId_cannot_be_empty": "房间ID不得为空",
+        "loadRoomInfo": "加载房间信息",
+        "owner": "房主",
+        "roomListEmpty": "找不到房间",
+        "roomFull": "房间满员",
+        "roomLocked": "房间已锁定",
+        "byId": "根据ID",
+        "byRks": "根据rks",
+        "byPlayerNumber": "根据人数",
+        "search": "搜索",
+        "refresh": "刷新",
+        "avgRks": "平均rks",
+        "err": "操作失败",
+        "joining": "正在验证身份信息并联机",
+        "roomIdCantContainsDollar": "房间ID中不得含有 $"
+    },
+    "aboutPage": {
+        "life": "自上线起已运行 {0} 天",
+        "QQGuild": "QQ 频道:PhiTogether233",
+        "bio": "PhiTogether 是一款玩法基于 Phigros 的 <b> 非商业性 </b> 社区音乐游戏，集成 PhiZone",
+        "supportUs": "如果您喜欢我们，欢迎支持我们的运营！您的支持是我们最大的动力！",
+        "relationshipWithPG": "此项目与 厦门鸽游网络有限公司 没有任何关系",
+        "roles": {
+            "projectCreator": "主创",
+            "developers": "开发",
+            "soundDesigner": "音效",
+            "visualEffects": "特效",
+            "communityManager": "社区",
+            "gameArtist": "美术"
+        },
+        "thanksToOther": "并在此感谢所有为此项目提出宝贵建议的玩家和共建者们！",
+        "externalLinks": "友情链接",
+        "sponsors": "赞助者列表",
+        "supportus": "在爱发电支持我们"
+    },
+    "cacheManage": {
+        "manageAll": "全部缓存管理",
+        "deleteAllCharts": "删除全部谱面",
+        "forceVersionUpdate": "强制版本更新",
+        "clearAllData": "清空 PhiTogether 数据",
+        "deletedSuccessfully": "删除成功",
+        "confirmBeforeDeleteData": "您确定要删除数据吗？",
+        "confirmBeforeDelete": "您确定要删除吗？",
+        "delete": "删除",
+        "allDataDeleted": "PhiTogether 已完成移除在您设备上存储的所有数据，请直接关闭 PhiTogether，在您下次打开 PhiTogether 时仍会在您设备上缓存新的数据！",
+        "separate": "孤立",
+        "cachedFileTitle": "{0}的缓存文件",
+        "deleteThisGroupOfFiles": "删除本组",
+        "file": "文件",
+        "type": "类型",
+        "operation": "操作",
+        "music_illustration": "音乐和曲绘",
+        "chart": "谱面",
+        "additionRes": "额外资源"
+    },
+    "calibrate": {
+        "title": "偏移率设置",
+        "description1": "在每个第三拍(重拍)点击按钮",
+        "description2": "本结果仅供参考，不同输入方式(键盘/鼠标/触摸)的延迟可能会有所不同",
+        "click": "点击",
+        "start": "开始",
+        "loadFile": "正在加载校准音频...",
+        "loadSuccess": "校准音频加载成功。",
+        "loadError": "校准音频加载失败。",
+        "decodeError": "错误：校准音频解码失败。",
+        "confirm": "您要把延迟值设置为 {c} 吗？"
+    },
+    "changelogs": {
+        "title": "更新日志"
+    },
+    "chartSelect": {
+        "jumpto": "请输入您要跳转的页码 (1 - {0})",
+        "inputDosentMatchRequirement": "您的输入不合法",
+        "favourites": {
+            "add": "收藏",
+            "addedSuccessfully": "{0} 收藏成功",
+            "remove": "取消收藏",
+            "removedSuccessfully": "{0} 取消收藏成功"
+        },
+        "multiSyncChart": {
+            "sync": "正在同步谱面",
+            "failed": "同步谱面失败"
+        },
+        "songSource": {
+            "local": "本地谱面",
+            "favourites": "收藏谱面",
+            "pz": "&nbsp;PZ&nbsp;&nbsp;社区&nbsp;",
+            "pt": "&nbsp;PT&nbsp;&nbsp;社区&nbsp;"
+        },
+        "search": "搜索曲名",
+        "import": "导入",
+        "chartListIsEmpty": "谱面列表为空",
+        "pageCount": "第{page}页 共{pageAll}页",
+        "playConfig": {
+            "mirror": "谱面镜像",
+            "adjustOffset": "调整延迟",
+            "previewMode": "预览模式",
+            "practiseMode": "练习模式",
+            "videoRecorder": "视频录制",
+            "speed": "速度",
+            "speeds": {
+                "slowest": "极慢",
+                "slower": "较慢",
+                "normal": "正常",
+                "faster": "较快",
+                "fastest": "极快"
+            }
+        },
+        "previewLoadFailed": "音频预览加载失败。",
+        "loadingChartList": "正在加载谱面列表",
+        "loadingChapterList": "正在加载章节列表",
+        "loadFailed": "加载失败",
+        "pgmChartNote": "该谱面为 Phigrim 官方谱面！关注 Phigrim 喵，关注 Phigrim 谢谢喵！",
+        "unableToSelectDueToCopyrightReasons": "抱歉，由于版权原因，您无法选择本谱面，请更换其它谱面游玩！",
+        "loadingChart": "正在加载谱面",
+        "edit": "编辑",
+        "delete": "删除",
+        "select": "选择",
+        "rankings": "排行",
+        "thisSongHasNoPlayableCharts": "该歌曲暂无可游玩谱面！",
+        "chartSelect": "谱面选择",
+        "config": "游玩配置"
+    },
+    "loadingPage": {
+        "loadingRes": "正在加载资源"
+    },
+    "login": {
+        "usernameAndPasswordCantBeEmpty": "用户名和密码不得为空！",
+        "loggingin": "正在登录",
+        "email": "邮箱",
+        "passwd": "密码",
+        "signin": "登录",
+        "signup": "注册",
+        "noTapTapBinding": "无法找到当前 TapTap 账号绑定的 PhiZone 账号，请使用 PhiZone 账号登录",
+        "askTapTapBinding": "您要将此 PhiZone 账号与 TapTap 账号（{username}）绑定吗？",
+        "bindingTapTap": "正在绑定 TapTap",
+        "bindTapTapSuccess": "绑定 TapTap 成功",
+        "bindTapTapFailure": "绑定 TapTap 失败，请确保 PhiZone 账号与 TapTap 账号一对一绑定"
+    },
+    "multiplayer": {
+        "liveRanking": "实时排名",
+        "connection": {
+            "error": "连接联机服务器失败，正在重试",
+            "wsRec": "联机服务器连接断开，重连中...",
+            "reconnected": "已成功重连至联机服务器",
+            "forcedBroken": "服务器强制关闭了您的连接请求，这可能是因为服务器维护或版本更新，您无法继续多人游戏。您的多人游戏将被强制退出。",
+            "sendDataFailed": "尝试发送 {action} 数据失败"
+        },
+        "downloadPlayBack": {
+            "roomClosed": "无法下载已关闭房间的游玩回放",
+            "noAccess": "您没有权限下载游玩回放",
+            "iOSUnavailable": "iOS版PhiTogether App暂不支持批量导出游玩回放"
+        },
+        "downloadAllPlayBack": {
+            "confirm": "您确定要下载所有游玩回放吗？",
+            "done": "已完成所有游玩回放的下载"
+        },
+        "wrappedSinglePlayBack": {
+            "confirm": "您确定要下载此条游玩回放吗？"
+        },
+        "downloadSinglePlayBack": {
+            "cheating": "无法下载：{player}在第{round}轮游戏中可能存在作弊行为，游玩记录无效"
+        },
+        "tips": {
+            "afterCreated": {
+                "roomOwner": "您可以在多人面板中查看玩家信息，确认后可以锁定该房间并开始游戏。",
+                "player": "等待房主{0}开始游戏...（您可以在联机面板中查看玩家信息）"
+            },
+            "selectChart": {
+                "roomOwner": "请选择谱面并同步给房间成员。",
+                "player": "房主正在选择谱面中，请耐心等待。"
+            },
+            "loadingChart": "正在加载谱面，游戏即将开始！",
+            "waitingForOthers": "等待其他玩家完成游戏并上传成绩...",
+            "chartLoaded": "正在加载谱面，游戏即将开始！",
+            "thisRoundIsOver": "本轮游戏结束，您可以查看成绩统计。",
+            "becameRoomOwner": "您已成为新房主",
+            "locked": "房间玩家锁定，游戏即将开始。在多人游戏中，您可以点击标题中绿色的 Together 字样打开联机面板。",
+            "waitingToStart": "等待游戏开始...",
+            "scoreAllUploaded": "所有玩家已完成分数上传，您可以查看成绩统计。10秒后跳转成绩统计。",
+            "nextRoundStarted": {
+                "roomOwner": "下一轮游戏已开始，请选择谱面载入后点击同步。",
+                "player": "下一轮游戏已开始，房主正在选择谱面中，请耐心等待。"
+            },
+            "exitRankFull": "您可以通过点击 PhiTogether 标题或logo退出全屏统计展示。"
+        },
+        "recoverMultiFailed": "尝试恢复未正常退出的多人游戏失败，如需开启新的多人游戏请重新点击多人游戏按钮。",
+        "doCreateRoom": {
+            "shareInfo": "【PhiTogether】我创建了一个联机房间，复制本条消息并打开 {0}//{1}，点击多人游戏按钮并粘贴本条消息来和我一起联机！$$${2}$$$",
+            "copyShareInfoConfirm": "分享信息如下，点击确定来复制到剪贴板。<br>{shareInfo}",
+            "copyShareInfo": "复制分享信息",
+            "autoCopyFailed": "自动复制失败，请长按下方文字手动复制！<br>{shareInfo}",
+            "failed": "创建房间失败，请重试"
+        },
+        "joinRoom": {
+            "failed": "加入房间失败，请重试"
+        },
+        "actionPlayer": {
+            "confirm": "您要操作玩家 {name} 吗？",
+            "askForAction": "您要对玩家 {name} 执行什么操作？",
+            "actions": {
+                "kickPlayer": "踢出",
+                "transferOwnerShip": "转移房主"
+            },
+            "error_competeMode": "您无法在比赛模式下转让房主。"
+        },
+        "exitRoom": {
+            "error_competeMode": "您无法在比赛模式下退出房间。",
+            "exited": "您已退出游戏！"
+        },
+        "lockRoom": {
+            "locking": "锁定房间中",
+            "locked": "房间已经锁定，请选择谱面并点击同步！",
+            "err": "错误，请重试"
+        },
+        "sendMsg": {
+            "cantBeEmpty": "消息不得为空",
+            "success": "发送成功",
+            "failed": "发送失败，请重试"
+        },
+        "roomClosed": "房间已关闭",
+        "cantFindChartLocally": "未在您的本地谱面库中找到 {0} 的谱面 {1}，请上传指定谱面后继续",
+        "multiWaitLoadChart": "正在等待所有人完成加载...",
+        "failed_tryAfter3Sec": "失败，3秒后重试",
+        "uploadFailed_tryAfter3Sec": "上传失败，3秒后重试",
+        "gameStartedWarning": {
+            "body": "游戏已经开始，请准备好点击确定立即开始！",
+            "title": "游戏开始",
+            "chartStillLoading": "抱歉，谱面仍在加载中，请稍后重试。"
+        },
+        "waitToStartGame": "谱面已同步，请耐心等待其他玩家完成加载。",
+        "gameStartUI": {
+            "title": "游戏可以开始！",
+            "body": "所有玩家已经完成谱面加载，在您点击下方按钮后将为所有玩家启动游戏。",
+            "start": "开始"
+        },
+        "panels": {
+            "messages": {
+                "title": "信息",
+                "messagesList": "信息列表",
+                "msgInputPlaceholder": "消息内容...",
+                "send": "发送"
+            },
+            "playerList": {
+                "title": "玩家列表"
+            },
+            "roundRank": {
+                "title": "成绩（按歌曲）"
+            },
+            "playerRank": {
+                "title": "成绩（按玩家）",
+                "my": "我 ({0}) 的游戏记录",
+                "others": "{0} 的游戏记录"
+            },
+            "rank": {
+                "genVer": "v{verStr} 生成于",
+                "totalRanking": "综合排名"
+            }
+        },
+        "operations": "操作",
+        "multiActions": {
+            "switchToRankByAcc": "切换到依据Acc排名",
+            "switchToRankByScore": "切换到依据分数排名",
+            "rankedByAcc": "依据Acc排名",
+            "rankedByScore": "依据分数排名",
+            "nextTrack": "下一首歌",
+            "lockRoom": "锁定房间并开始",
+            "closeRoom": "关闭房间",
+            "exitRoom": "退出房间",
+            "rankFull": "全屏展示成绩统计",
+            "downloadAllPlayBack": "下载全部游玩回放",
+            "backToSingle": "回到单人游戏"
+        }
+    },
+    "playerB20": {
+        "loadB20": "正在加载数据...",
+        "error": "加载数据时遇到错误"
+    },
+    "replayPage": {
+        "toBeOptimized": "很抱歉，该功能正在处于不稳定状态，您很可能无法正常播放游玩回放。",
+        "title": "播放游玩回放",
+        "description": "请在下方选择您要播放的游玩回放文件。请注意，若该谱面为本地谱面，则该回放对应的本地谱面必须在您的谱面库中。",
+        "recordFile": "回放文件",
+        "play": "播放",
+        "invalidPtr": "无法播放：无效的游玩记录文件",
+        "chartNotFound": "未在您的本地谱面库中找到 {0} 的谱面 {1}，无法播放该游玩记录"
+    },
+    "userChartEdit": {
+        "title": "修改谱面信息",
+        "askToFillWithUK": "您未填写完所有信息，要将未填写信息全部使用“unknown”代替吗？",
+        "success": "修改成功",
+        "error": "修改出错",
+        "songName": "曲名",
+        "composer": "曲师",
+        "illustrator": "画师",
+        "charter": "谱师",
+        "level": "等级",
+        "difficulty": "定数",
+        "save": "保存"
+    },
+    "userChartUpload": {
+        "title": "上传本地谱面",
+        "description": {
+            "line0": "请点击【加载本地文件】按钮选择本地谱面添加到 PhiTogether（一个 zip 内只能含有一个谱面文件，若有额外资源，请先选择额外资源再上传谱面本体包）。",
+            "line1": "在一般情况下，PhiTogether会自动完成谱面的添加。",
+            "line2": "如果无法自动填充信息，您可能需要手动填写信息后点击下方【添加入库】按钮添加。",
+            "line3": "如果您选择了错误的文件，请点击【重置填写】按钮。"
+        },
+        "target": "您需要上传的谱面为 {0} {1} {2} by {3}（谱面md5：{4}）请确保上传正确谱面。",
+        "extraRes": "额外资源",
+        "add": "添加入库",
+        "clear": "重置填写",
+        "success": "添加成功！",
+        "fileDoesntMatch": "您上传的文件 {0} 与要求上传的谱面 {1} 不符，请更换文件后重试。",
+        "chartAdded": "此谱面已在库中",
+        "saving": "正在保存谱面",
+        "err": {
+            "haveMultipleCharts": "错误：不支持同时导入多张谱面",
+            "noChartSelected": "错误：未选择任何谱面",
+            "noSongSelected": "错误：未选择任何音乐",
+            "noImageSelected": "错误：未选择任何图片"
+        }
+    },
+    "loadChart": {
+        "info": "正在下载文件：{loaded}/{resNum}",
+        "failed": "加载失败",
+        "loading": "正在加载谱面",
+        "failedFromPZRedirect": "加载谱面失败，若要重新游玩，可在 PhiTogether 中重新登录您的 PhiZone 账户。",
+        "simphiLoading": "正在加载资源"
+    },
+    "requestFullscreen": {
+        "requestDownloadiOSApp": "检测到您使用的是苹果设备，可能无法正常进行游戏，您是否要安装 PhiTogether iOS APP 获得更好体验？",
+        "unsupported": "您的设备或浏览器不支持 PhiTogether 进入全屏模式，您的游戏体验可能受到影响",
+        "requestFullscreen": "PhiTogether 需要在全屏状态下运行，请点击下方按钮使 PhiTogether 全屏，如果您取消全屏可能会遇到问题。",
+        "clickToFullscreen": "点击全屏"
+    },
+    "update": {
+        "newVersionNotify": "将从本地版本 v{0} 更新到最新版本 v{1}，用时最长可能达一分钟，现在更新吗？",
+        "autoUpdateCheckFailed": "自动更新检查失败"
+    },
+    "askPermission": {
+        "notification": {
+            "msg": "您是否同意 PhiTogether 在后台给您推送通知？（我们只使用此权限推送多人游戏最新动态）",
+            "err": "您拒绝了通知请求或您的设备不支持后台通知，PhiTogether 将无法在后台通知您多人游戏的最新信息。"
+        }
+    },
+    "phizone": {
+        "scoreUpload": {
+            "getToken": "正在上报 PhiZone 游玩配置",
+            "getTokenErr": "错误：无法与服务器通讯",
+            "uploading": "正在上传成绩",
+            "failed": "成绩上传失败，是否重试？"
+        },
+        "modJudgment": {
+            "offline": "您无法在离线模式下修改判定范围",
+            "current": "您当前的设置为：Perfect±{0} Good±{1}，您要修改吗？",
+            "enterPJ": "请输入新的Perfect判定范围（±25~±100 整数 单位: ms）",
+            "enterGJ": "请输入新的Good判定范围（±60~±180 整数 单位: ms）",
+            "inputDosentMatchRequirement": "输入不符合要求",
+            "error": "操作配置文件出错",
+            "success": "判定范围修改成功",
+            "modifying": "修改配置文件中..."
+        },
+        "login": {
+            "autologinFailed": "自动登录失败，您已进入离线模式。您可以正常离线游玩，但所有记录将不会被保存。若要重新上线，请尝试刷新页面或重新登录。",
+            "updatingUserInfo": "正在更新用户信息",
+            "success": "{userName}，欢迎登入 PhiTogether！",
+            "autologgingin": "正在自动登录到PhiZone",
+            "withPhiZone": "使用 PhiZone 账号登录",
+            "withTapTap": "使用 TapTap 快速登录"
+        },
+        "err": {
+            "retriveToken": {
+                "invalidPswd": "密码错误",
+                "unableToFindUser": "用户名错误"
+            },
+            "unknown": "未知错误",
+            "network": "网络连接不畅，请稍后重试"
+        }
+    },
+    "respack": {
+        "customResApplied": "自定义资源包应用成功",
+        "requestReload": "切换 PhiTogether 资源包预设需要刷新页面生效，现在刷新页面吗？",
+        "err": "自定义资源设置有误",
+        "unavailableNow": "prpr自定义资源包暂不可用",
+        "customResRemoved": "删除成功",
+        "customResRemoveFailed": "删除失败"
+    },
+    "simphi": {
+        "askActionForSound": "请单击下方按钮允许播放声音",
+        "compatibilityWarning": {
+            "miBrowser": "检测到小米浏览器且版本低于17.4，可能存在切后台声音消失的问题"
+        },
+        "loadLib": {
+            "err": {
+                "msg1": "错误：{name}组件加载失败（点击查看详情）",
+                "msg2": "{name}组件加载失败，请检查您的网络连接然后重试：",
+                "msg3": "{name}组件加载失败，请检查浏览器兼容性"
+            },
+            "libNames": {
+                "createImageBitmap": "ImageBitmap兼容",
+                "oggmentedBundle": "ogg格式兼容",
+                "webp": "webp格式兼容"
+            }
+        },
+        "handleFile": {
+            "unsupportedFile": "不支持的文件：{0}",
+            "loadingFile": "正在加载文件：{uploader_done}/{uploader_total}"
+        },
+        "loading": {
+            "imgLoadingError": "检测到图片加载异常，请关闭所有应用程序然后重试",
+            "resLoadFailed1": "错误：{0}个资源加载失败（点击查看不了详情）",
+            "resLoadFailed2": "资源加载失败，请检查您的网络连接然后重试：\n{0}"
+        },
+        "prprCustomRes": {
+            "applied": "自定义资源包应用完成",
+            "err": "错误：无法应用自定义资源包，界面显示可能异常，请检查设置"
+        },
+        "adjustOffset": {
+            "title": "延迟调整",
+            "reset": "恢复",
+            "save": "保存",
+            "confirmSave": "是否保存谱面延迟",
+            "offsetSaved": "更改后的谱面延迟已保存",
+            "errorWhenSavingOffset": "保存已设置延迟失败",
+            "adjustedChartSaved": "调整后的谱面文件已下载",
+            "onlyRPESupport": "仅支持导出 RPE 谱面"
+        },
+        "playErr": {
+            "noChartSelected": "错误：未选择任何谱面",
+            "noMusicSelected": "错误：未选择任何音乐",
+            "judgeLineDoesentExist": "指定id的判定线不存在：{0}",
+            "imageDoesentExist": "图片不存在：{0}"
+        }
+    },
+    "skin": {
+        "haveCommon": "已有同名资源包,是否继续导入",
+        "saved": "资源包保存成功"
+    },
+    "playing": {
+        "iOSCannotExport": "iOS 设备暂时无法导出游玩记录"
+    },
+    "settings": {
+        "uploader": {
+            "loadFile": "加载本地文件",
+            "loadFileType": {
+                "file": "加载文件",
+                "folder": "加载文件夹"
+            },
+            "chart": "谱面",
+            "music": "音乐",
+            "illustration": "图片",
+            "info": {
+                "name": "曲名",
+                "artist": "曲师",
+                "illustrator": "画师",
+                "charter": "谱师",
+                "difficulty": "等级",
+                "level": "定数"
+            }
+        },
+        "settings": {
+            "display": {
+                "title": "显示",
+                "showAcc": "显示Acc",
+                "highLight": "多押高亮",
+                "lineColor": "FC/AP指示器",
+                "feedback": "触摸反馈",
+                "imageBlur": "背景模糊",
+                "showCE2": "Early/Late特效",
+                "enableVP": "隐藏距离较远的音符",
+                "enableFR": "使用单精度浮点运算",
+                "JITSOpen": "联机实时排名",
+                "enhanceRankVis": "增强实时排名能见度",
+                "enableFilter": "启用滤镜",
+                "filterInputPlaceholder": "在此输入着色器代码",
+                "aspectRatio": "宽高比",
+                "followAspectRatio": "遵循宽高比",
+                "noteScale": "按键缩放",
+                "noteScaleOptions": {
+                    "smaller": "极小",
+                    "small": "较小",
+                    "default": "默认",
+                    "large": "较大",
+                    "larger": "极大"
+                },
+                "backgroundDim": "背景变暗",
+                "backgroundDimOptions": {
+                    "dark": "黑暗",
+                    "dim": "昏暗",
+                    "default": "默认",
+                    "bright": "较亮",
+                    "light": "明亮"
+                },
+                "defaultRankMethod": "排名依据偏好",
+                "defaultRankMethodOptions": {
+                    "score": "按分数",
+                    "acc": "按ACC"
+                },
+                "enableLife": "显示血量条"
+            },
+            "performance": {
+                "title": "性能",
+                "noUIBlur": "禁用界面模糊",
+                "lowRes": "降低渲染精度",
+                "autoDelay": "实时延迟矫正（音频卡顿请取消勾选）",
+                "isMaxFrame": "帧率锁定",
+                "useRecommendConfigurationsForLowPerformanceDevices": "使用低性能设备推荐配置"
+            },
+            "resources": {
+                "title": "资源",
+                "usekwlevelOverbgm": "使用旧版结算音乐",
+                "resourcesType": "资源包类型",
+                "resourceTypes": {
+                    "preset1": "预设1",
+                    "preset2": "预设2",
+                    "prprCustom": "自定义资源包",
+                    "PTCustom": "PT在线资源包"
+                },
+                "respack": "资源包",
+                "uploadCustomRespack": "上传自定义资源包",
+                "ptTutorialMessage": "视频:av998035635 也可在 飞机上的长电视 的B站主页查找",
+                "ptTutorialTitle": "在B站观看使用与设计教程",
+                "ptTutorial": "使用教程",
+                "customResourceLinkPlaceholder": "输入资源的json文件地址",
+                "loadResButton": "加载",
+                "inputOffset": "输入延迟",
+                "doCalibrate": "校准输入延迟",
+                "volume": "音效音量",
+                "volumeOptions": {
+                    "off": "关闭",
+                    "low": "蚊子叫（？",
+                    "veryLow": "极轻",
+                    "mediumLow": "较轻",
+                    "regular": "常规",
+                    "high": "较响",
+                    "veryHigh": "极响"
+                },
+                "removeThisRespack": "删除"
+            },
+            "experimental": {
+                "title": "试验",
+                "adjustJudgmentRangeButton": "调整判定范围",
+                "enableDebugToolsButton": "启用调试工具",
+                "disableDebugToolsButton": "关闭调试工具",
+                "fullScreenJudge": "全屏判定",
+                "stopWhenNoLife": "血量为0自动停止",
+                "reviewWhenResume": "恢复时预览前3秒",
+                "isForcedMaxFrame": "强制锁定帧率(可能导致画面卡顿)"
+            }
+        }
+    },
+    "serverMsg": {
+        "error": "发生未知错误",
+        "updatePTApp": "您必须升级您的 PhiTogether 以进行多人游戏",
+        "roomAvailable": "该房间可以加入",
+        "competetionStarted": "该房间比赛已开始",
+        "noServersAvailable": "未找到可用的联机服务器",
+        "canCreateRoom": "房间不存在，您可以创建房间",
+        "roomIDOccupied": "该房间id已被占用",
+        "centerServerNA": "请求中心服务器出错",
+        "alreadyJoin": "该账号已加入此房间，无法加入",
+        "alreadyKicked": "您已经被移出该房间，无法加入",
+        "roomFull": "该房间已达到最大人数",
+        "roomDoesntExist": "房间不存在",
+        "roomCreatedMsg": "{0} 创建了 {1} 房间",
+        "roomJoinMsg": "{0} 加入了房间",
+        "reOnlineMsg": "玩家 {0} 已重连",
+        "userMsg": "{0} 说：{1}",
+        "ownerChangedMsg": "{0} 成为新的房主",
+        "roomLockMsg": "房间玩家名单锁定，游戏即将开始",
+        "exitMsg": "{0} 退出房间",
+        "chartSelectedMsg": "谱面 {0} {1} Lv.{2} {3} 已被选定",
+        "sbChartLoadedMsg": "玩家 {0} 已完成谱面加载，加载人数 {1}/{2}",
+        "gameStartMsg": "游戏开始",
+        "nextTrackMsg": "下一轮游戏开始",
+        "sbScoreUploadedMsg": "玩家 {0} 已完成分数上传，上传人数 {1}/{2}",
+        "offlineMsg": "玩家 {0} 断开连接",
+        "roomClosedMsg": "房间关闭",
+        "allScoreUploadedMsg": "所有玩家已经完成分数上传",
+        "allLoadFinishMsg": "所有玩家已经完成谱面加载，游戏可以开始"
+    }
+}

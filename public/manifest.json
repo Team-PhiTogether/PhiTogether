@@ -1,0 +1,14 @@
+{
+	"name": "PhiTogether",
+	"short_name": "PhiTogether",
+	"theme_color": "#3662af",
+	"background_color": "#3662af",
+	"icons": [{
+		"src": "/src/core/lg512y512.png",
+		"sizes": "512x512",
+		"type": "image/png"
+	}],
+	"start_url": "/",
+	"display": "standalone",
+	"id": "PhiTogether"
+}
