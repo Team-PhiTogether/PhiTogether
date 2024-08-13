@@ -1,0 +1,3 @@
+[submodule "golang_backend"]
+	path = golang_backend
+	url = https://github.com/Team-PhiTogether/pt-backend
