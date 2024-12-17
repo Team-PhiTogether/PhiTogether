@@ -1,6 +1,6 @@
-import { replayMgr } from "../../components/recordMgr/replayMgr.js";
-import shared from "../js/shared.js";
-import ptdb from "../ptdb";
+// import { replayMgr } from "@components/recordMgr/replayMgr.js";
+import shared from "@utils/js/shared.js";
+import ptdb from "@utils/ptdb";
 
 /**
  * @typedef {Object} NoteExtends

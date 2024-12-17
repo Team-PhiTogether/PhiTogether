@@ -1,6 +1,6 @@
-import { audio } from "../../js/aup";
+import { audio } from "@utils/js/aup";
 import { imgShader, hex2rgba } from "../assetsProcessor/imgProcessor.js";
-import ptdb from "../../ptdb";
+import ptdb from "@utils/ptdb";
 
 //plugin(skin)
 export function loadSkinFromBuffer(buffer, init = false, callback) {

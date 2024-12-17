@@ -5,20 +5,20 @@ import eruda from "eruda";
 
 import packageConfig from "../package.json";
 
-import { routes } from "./components/router";
-import multiplayerinst from "./components/multiplayer.vue";
+import { routes } from "@components/router";
+import multiplayerinst from "@components/multiplayer.vue";
 
-import { uploader } from "./utils/sim-phi/assetsProcessor/reader";
-import shared from "./utils/js/shared.js";
-import i18n from "./locales";
-import { PhiZoneAPI as phizoneApi, getUserColor } from "./utils/phizone";
-import ploading from "./utils/js/ploading.js";
-import { full } from "./utils/js/common.js";
-import { tipsHandler } from "./components/tips";
-import { recordMgr } from "./components/recordMgr/recordMgr.js";
-import { replayMgr } from "./components/recordMgr/replayMgr.js";
-import ptdb from "./utils/ptdb";
-import "./utils/js/errHandler";
+import { uploader } from "@renderers/sim-phi/assetsProcessor/reader";
+import shared from "@utils/js/shared.js";
+import i18n from "@locales";
+import { PhiZoneAPI as phizoneApi, getUserColor } from "@utils/phizone";
+import ploading from "@utils/js/ploading.js";
+import { full } from "@utils/js/common.js";
+import { tipsHandler } from "@components/tips";
+import { recordMgr } from "@components/recordMgr/recordMgr.js";
+import { replayMgr } from "@components/recordMgr/replayMgr.js";
+import ptdb from "@utils/ptdb";
+import "@utils/js/errHandler";
 if (import.meta.env.DEV) self.ptdb = ptdb;
 
 var searchParams;
@@ -259,13 +259,13 @@ router.beforeEach((to, from) => {
           );
       break;
   }
-  if(s) {
+  if (s) {
     s.classList.remove("out");
     s.classList.remove("to");
     s.classList.add("from");
     s.classList.add("in");
     s.style.display = "block";
-    setTimeout(()=>{s.classList.remove("from");}, 50); 
+    setTimeout(() => { s.classList.remove("from"); }, 50);
   }
   let s2;
   switch (from.path) {
@@ -297,8 +297,8 @@ router.beforeEach((to, from) => {
     s2.classList.remove("in");
     s2.classList.remove("from");
     s2.classList.add("out");
-    setTimeout(()=>{s2.classList.add("to");}, 50); 
-    setTimeout(()=>{s2.style.display = "none";}, 400); 
+    setTimeout(() => { s2.classList.add("to"); }, 50);
+    setTimeout(() => { s2.style.display = "none"; }, 400);
   }
   if (to.path != "/playing") {
     stage.style.display = "none";
@@ -416,11 +416,10 @@ const ptAppInstance = createApp({
       this.localeValue = navigator.language.replace("-", "_") || "zh_CN";
     this.localeValue = this.localeValue.startsWith("en")
       ? "en_US"
-      : `zh_${
-          this.localeValue.endsWith("HK") || this.localeValue.endsWith("TW")
-            ? "TW"
-            : "CN"
-        }`;
+      : `zh_${this.localeValue.endsWith("HK") || this.localeValue.endsWith("TW")
+        ? "TW"
+        : "CN"
+      }`;
 
     this.$i18n.locale = this.localeValue;
   },
@@ -541,7 +540,7 @@ const ptAppInstance = createApp({
               const cache = await caches.open("PTv0-User");
               await cache.delete("/PTVirtual/user/respack.zip");
             }
-          } catch (e) {}
+          } catch (e) { }
           if (
             newVal.startsWith("together-pack") &&
             (await msgHandler.confirm(this.$t("respack.requestReload")))
@@ -1230,7 +1229,7 @@ const ptAppInstance = createApp({
               const assets = searchParams.get("assets").split(",");
               for (const asset of assets)
                 resources.push(asset + "?nocacahe=nocache");
-            } catch {}
+            } catch { }
           }
 
           // 清 加载完的东西
@@ -1285,7 +1284,7 @@ const ptAppInstance = createApp({
           loadHandler.r("playChart");
           loadHandler.r("loadChart");
           msgHandler.info(this.$t("simphi.askActionForSound"))
-            .then(()=>{
+            .then(() => {
               shared.game.ptmain.$router.push({
                 path: "/playing",
                 query: { auto: 1 },
@@ -1337,11 +1336,10 @@ const ptAppInstance = createApp({
     },
     update() {
       caches.delete("PTv0-Main").then(() => {
-        const url = `/#${
-          searchParams
+        const url = `/#${searchParams
             ? `/updateAndPlayChart?${searchParams.toString()}`
             : "update"
-        }`;
+          }`;
         fetch(url, {
           headers: {
             Pragma: "no-cache",
