@@ -1,6 +1,6 @@
-import { csv2array } from "../../js/common.js";
+import { csv2array } from "@utils/js/common.js";
 import chartConverter from "../extends/chartConverter";
-import zipWorker from "/src/utils/sim-phi/assetsProcessor/external/zip.js?url";
+import zipWorker from "@renderers/sim-phi/assetsProcessor/external/zip.js?url";
 import md5 from "md5";
 class FileEmitter extends EventTarget {
   // files: [],
