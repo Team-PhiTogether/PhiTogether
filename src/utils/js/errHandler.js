@@ -37,7 +37,7 @@ const sysError = (e, error, message) => {
         formData.append("uid", shared.game.ptmain.gameConfig.account.userBasicInfo ? shared.game.ptmain.gameConfig.account.userBasicInfo.id.toString() : "0");
     
         if (navigator.onLine)
-            fetch(`https://api.phitogether.realtvop.eu.org/errReport`, {
+            fetch(`https://api.phitogether.realtvop.top/errReport`, {
                 method: 'POST',
                 body: formData,
             })
@@ -63,7 +63,7 @@ self.addEventListener("unhandledrejection", (e) => sysError(e, e.reason));
 //         formData.append("uid", shared.game.ptmain.gameConfig.account.userBasicInfo ? shared.game.ptmain.gameConfig.account.userBasicInfo.id.toString() : "0");
     
 //         if (navigator.onLine)
-//             fetch(`https://api.phitogether.realtvop.eu.org/errReport`, {
+//             fetch(`https://api.phitogether.realtvop.top/errReport`, {
 //                 method: 'POST',
 //                 body: formData,
 //             })
@@ -80,7 +80,7 @@ window.addEventListener("online", () => {
     for (const formData of errsToReport) {
         try {
             if (formData) {
-                fetch(`https://api.phitogether.realtvop.eu.org/errReport`, {
+                fetch(`https://api.phitogether.realtvop.top/errReport`, {
                     method: 'POST',
                     body: formData,
                 })
@@ -94,7 +94,7 @@ window.addEventListener("online", () => {
 });
 
 window.addEventListener("load", (event) => {
-    fetch(`https://api.phitogether.realtvop.eu.org/t/o`)
+    fetch(`https://api.phitogether.realtvop.top/t/o`)
         .catch(e => e);
 });
 // window.addEventListener("beforeunload", (event) => {
@@ -109,14 +109,14 @@ window.addEventListener("load", (event) => {
 //         formData.append("lastFor", performance.now());
 //         formData.append("uid", shared.game.ptmain.gameConfig.account.userBasicInfo ? shared.game.ptmain.gameConfig.account.userBasicInfo.id.toString() : "0");
     
-//         // fetch(`https://api.phitogether.realtvop.eu.org/t/c`, {
+//         // fetch(`https://api.phitogether.realtvop.top/t/c`, {
 //         //     method: 'POST',
 //         //     body: formData,
 //         // })
 //         //     .catch(e => e);
 //         const xhr = new XMLHttpRequest();
     
-//         xhr.open("POST", "https://api.phitogether.realtvop.eu.org/t/c", false);
+//         xhr.open("POST", "https://api.phitogether.realtvop.top/t/c", false);
 //         xhr.send(formData);
 //     } catch (e) { }
 // });
