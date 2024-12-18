@@ -310,28 +310,28 @@ function adjustInfo() {
         selectbg.dispatchEvent(new Event("change"));
       }
       if (isFinite((i.AspectRatio = parseFloat(i.AspectRatio)))) {
-        $id("select-aspect-ratio").value = i.AspectRatio;
+        shared.game.ptmain.gameConfig.aspectRatio = i.AspectRatio;
       }
       if (isFinite((i.ScaleRatio = parseFloat(i.ScaleRatio)))) {
         //Legacy
-        $id("select-note-scale").value = 8080 / i.ScaleRatio;
+        shared.game.ptmain.gameConfig.noteScale = 8080 / i.ScaleRatio;
         app.setNoteScale(8080 / i.ScaleRatio);
       }
       if (isFinite((i.NoteScale = parseFloat(i.NoteScale)))) {
-        $id("select-note-scale").value = i.NoteScale;
+        shared.game.ptmain.gameConfig.noteScale = i.NoteScale;
         app.setNoteScale(i.NoteScale);
       }
       if (isFinite((i.GlobalAlpha = parseFloat(i.GlobalAlpha)))) {
         //Legacy
-        $id("select-background-dim").value = i.GlobalAlpha;
+        shared.game.ptmain.gameConfig.backgroundDim = i.GlobalAlpha;
         app.brightness = Number(i.GlobalAlpha);
       }
       if (isFinite((i.BackgroundDim = parseFloat(i.BackgroundDim)))) {
-        $id("select-background-dim").value = i.BackgroundDim;
+        shared.game.ptmain.gameConfig.backgroundDim = i.BackgroundDim;
         app.brightness = Number(i.BackgroundDim);
       }
       if (isFinite((i.Offset = parseFloat(i.Offset))))
-        $id("chart-offset-surface").value = i.Offset;
+        shared.game.ptmain.chartOffsetSurface = i.Offset;
     }
   }
 }
@@ -518,12 +518,6 @@ const doFullScreen = async () => {
     stage.resize();
   }
 };
-function spClickRB() {
-  if (!fucktemp2) return;
-  if (shared.game.ptmain.$route.path !== "/multipanel" && shared.game.ptmain.gameMode === "multi" )
-    shared.game.multiInstance.showStat();
-  else shared.game.ptmain.spClickRT();
-}
 const specialDrag = {
   listeningEvts: new Map(),
   update(evt, offsetX, offsetY) {
@@ -593,10 +587,39 @@ const specialDrag = {
 const specialClick = {
   time: [0, 0, 0, 0],
   func: [
-    shared.game.ptmain.spClickLT,
-    shared.game.ptmain.spClickRT,
-    shared.game.ptmain.spClickLB,
-    spClickRB,
+    function spClickLT() {
+      if (emitter.eq("play")) btnPause.click();
+    },
+    async function spClickRT() {
+      if (this.gameMode === "multi") return;
+      btnPause.value === "暂停" && btnPause.click();
+      if (shared.game.app.pauseNextTick)
+        clearInterval(shared.game.app.pauseNextTick),
+          (shared.game.app.pauseTime = 0),
+          (shared.game.app.pauseNextTick = null);
+      await shared.game.ptmain.retry();
+      Promise.resolve().then(shared.game.qwqStop).then(shared.game.qwqStop);
+    },
+    function spClickLB() {
+      if (
+        shared.game.isPlayFinished() &&
+        shared.game.ptmain.playConfig.mode !== "preview"
+      ) {
+        shared.game.exportRecord && shared.game.exportRecord();
+      } else if (shared.game.ptmain.gameMode === "single") {
+        if (btnPause.value == "暂停") return; //btnPause.click();
+        selectflip.value = app.mirrorView([3 - selectflip.value]);
+      } else {
+        shared.game.multiInstance.JITSOpen =
+          !shared.game.multiInstance.JITSOpen;
+      }
+    },
+    function spClickRB() {
+      if (!fucktemp2) return;
+      if (shared.game.ptmain.$route.path !== "/multipanel" && shared.game.ptmain.gameMode === "multi")
+        shared.game.multiInstance.showStat();
+      else shared.game.ptmain.spClickRT();
+    },
     () => { hitManager.clear(); shared.game.ptmain.$router.back(); },
   ],
   click(id) {
@@ -1936,7 +1959,7 @@ function mainLoop() {
     ctxos.globalCompositeOperation = "source-over";
     ctxos.resetTransform();
     ctxos.globalAlpha = 1;
-    if ($id("imageBlur").checked)
+    if (shared.game.ptmain.gameConfig.imageBlur)
       ctxos.drawImage(
         app.bgImageBlur,
         ...adjustSize(app.bgImageBlur, canvasos, 1)
@@ -2011,7 +2034,7 @@ function mainLoop() {
   }
   if (canvas.width > canvasos.width || canvas.height > canvasos.height || fucktemp2) {
     ctx.globalAlpha = 1;
-    if ($id("imageBlur").checked || fucktemp2)
+    if (shared.game.ptmain.gameConfig.imageBlur || fucktemp2)
       ctx.drawImage(app.bgImageBlur, ...adjustSize(app.bgImageBlur, canvas, 1.1));
     else ctx.drawImage(app.bgImage, ...adjustSize(app.bgImage, canvas, 1.1));
     ctx.fillStyle = "#000";
@@ -2078,7 +2101,7 @@ function loopNoCanvas() {
   }
   //更新判定
   hitManager.update();
-  tmps.bgImage = $id("imageBlur").checked ? app.bgImageBlur : app.bgImage;
+  tmps.bgImage = shared.game.ptmain.gameConfig.imageBlur ? app.bgImageBlur : app.bgImage;
   tmps.bgVideo = app.bgVideo;
   tmps.progress = (main.qwqwq ? duration - timeBgm : timeBgm) / duration;
   tmps.name = inputName.value || inputName.placeholder;
@@ -2369,7 +2392,7 @@ function loopCanvas() {
   ctxos.resetTransform();
   if (qwqIn.second >= 2.5 && tmps.customForeDraw != null) tmps.customForeDraw(ctxos); // 自定义前景
   if (qwqIn.second > 3 && main.filter) main.filter(ctxos, timeBgm, nowTime_ms / 1e3); //滤镜处理
-  if ($id("feedback").checked) hitFeedbackList.animate(); //绘制打击特效0
+  if (shared.game.ptmain.gameConfig.feedback) hitFeedbackList.animate(); //绘制打击特效0
   ctxos.resetTransform();
   try {
     shared.game.graphicHandler.whilePlayingHook(ctx, ctxos, lineScale);

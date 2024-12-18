@@ -341,6 +341,7 @@ class Renderer {
   mirrorView(code = this._mirrorType) {
     const n = (this._mirrorType = 3 & code);
     this.transformView(1 & n ? -1 : 1, 2 & n ? -1 : 1, 0, 0);
+    return code;
   }
   transformView(scaleX = 1, scaleY = 1, offsetX = 0, offsetY = 0) {
     const { canvasos } = this;
