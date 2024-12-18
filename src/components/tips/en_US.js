@@ -3,7 +3,7 @@ export default [
     "sudo mkdir pt2.0",
     '"The players have developed everything the original game is supposed to have" be like: ',
     "Others play PhiTogether while I  play FalseAlone qwq",
-    "PhiTogether needs you support! Sponsor us at Afdian.net. ",
+    "PhiTogether needs you support! Sponsor us at afdian.com. ",
     "You may check our service status at status.phitogether.fun",
     "I know it's loading slow but it's better than nothing",
     "DO NOT PANIC",
