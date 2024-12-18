@@ -8,56 +8,14 @@
 
 [Team PhiTogether 的爱发电](https://afdian.net/a/PhiTogether)
 
-## 🚀 部署自己的 PhiTogether 实例
+## 💪 贡献此项目
 
-**仅使用 Linux 进行基础部署示范。**
+如有 bug 或功能提议，请[发布 issue](https://github.com/Team-PhiTogether/PhiTogether/issues/new)。
 
-1. 下载此存储库到生产环境
+若想要贡献代码，请 Fork 本项目并在修改完成后发出 Pull Request 并等候合并。
 
-   ```bash
-   git clone https://github.com/Team-PhiTogether/PhiTogether && cd PhiTogether
-   ```
+在这里预览 PhiTogether 未正式发布的最新版本: [PhiTogether-latest.realtvop.top](https://PhiTogether-latest.realtvop.top/)
 
-1. 安装环境、编译后端
-
-   - 参考：[在你的操作系统上安装 Go 环境](https://golang.google.cn/doc/install)
-
-   安装完成后执行
-
-   ```bash
-   go build main.go
-   ```
-
-1. 新建文件 `config.json` 进行以下配置 (配置完后需删除注释)
-
-   ```jsonc
-   {
-       // type: "master", "slave"
-       // 主机或从节点模式
-       "type":"master",
-       // max: interger
-       // 节点最大房间数量
-       "max":100,
-       // addr: url(string)
-       // 可以直接访问到该节点的https网址
-       "addr":"localhost",
-       // port: interger
-       // 服务器端口号
-       "port":"8081",
-       // priority: interger
-       // 服务器优先级
-       "priority":999998,
-       // key: string
-       // 服务器 key，要和主机的 key 一致
-       "key":"abcdefg1234567"
-   }
-   ```
-
-1. 运行
-
-   ```bash
-   ./main
-   ```
 
 ## 📃 许可证 LICENSE
 
