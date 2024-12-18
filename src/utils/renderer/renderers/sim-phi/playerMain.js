@@ -1,5 +1,5 @@
 import simphi from "./simphi";
-import { audio } from "../js/aup.js";
+import { audio } from "@utils/js/aup.js";
 import Notiflix from "notiflix";
 import {
   full,
@@ -10,13 +10,13 @@ import {
   time2Str,
   orientation,
   FrameAnimater,
-} from "../js/common.js";
+} from "@utils/js/common.js";
 import { urls, loadJS } from "./assetsProcessor/loader";
 import { uploader, ZipReader, readFile } from "./assetsProcessor/reader";
-import { InteractProxy } from "../js/interact.js";
-import shared from "../js/shared.js";
-import { recordMgr } from "../../components/recordMgr/recordMgr.js";
-import { replayMgr } from "../../components/recordMgr/replayMgr.js";
+import { InteractProxy } from "@utils/js/interact.js";
+import shared from "@utils/js/shared.js";
+import { recordMgr } from "@components/recordMgr/recordMgr.js";
+import { replayMgr } from "@components/recordMgr/replayMgr.js";
 
 import saveAdjustedChart from "./plugins/saveAdjustedChart";
 import videoRecorder from "./plugins/video-recorder";
@@ -25,7 +25,7 @@ import { loadSkinFromBuffer, loadSkinFromDB } from "./plugins/skin";
 import { imgBlur, imgShader, imgPainter, imgSplit, hex2rgba, rgba2hex } from "./assetsProcessor/imgProcessor.js";
 import { createCanvas } from "./utils/canvas.js";
 
-import ptdb from "../ptdb";
+import ptdb from "@utils/ptdb";
 
 const $id = (query) => document.getElementById(query);
 const $ = (query) => document.body.querySelector(query);
@@ -3687,7 +3687,7 @@ const enableFilter = $id("enableFilter");
   const input = $id("filterInput");
   input.addEventListener("change", async function () {
     if (!input.value) return;
-    const filter = await import("../js/filter.js");
+    const filter = await import("@utils/js/filter.js");
     try {
       const filter0 = new filter.default(input.value);
       main.filter = (ctx, time, now) => {

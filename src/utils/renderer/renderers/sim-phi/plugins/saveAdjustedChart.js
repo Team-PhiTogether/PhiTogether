@@ -1,6 +1,6 @@
-import shared from "../../js/shared.js";
-import ptdb from "../../ptdb";
-import { downloadText } from "../../js/fileSaver.js";
+import shared from "@utils/js/shared.js";
+import ptdb from "@utils/ptdb";
+import { downloadText } from "@utils/js/fileSaver.js";
 
 export default async function saveAdjustedChart(app, fucktemp2) {
     if (fucktemp2 && !await shared.game.msgHandler.confirm(shared.game.ptmain.$t("simphi.adjustOffset.confirmSave"))) return;

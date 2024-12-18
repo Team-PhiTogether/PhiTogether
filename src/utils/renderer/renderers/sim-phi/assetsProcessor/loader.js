@@ -1,5 +1,5 @@
-import bitmapUrl from "/src/utils/sim-phi/assetsProcessor/external/createImageBitmap.js?url";
-import webpUrl from "/src/utils/sim-phi/assetsProcessor/external/webp-bundle.js?url";
+import bitmapUrl from "@utils/sim-phi/assetsProcessor/external/createImageBitmap.js?url";
+import webpUrl from "@utils/sim-phi/assetsProcessor/external/webp-bundle.js?url";
 export const urls = {
     jszip: ["/lib/jszip.js"],
     bitmap: [bitmapUrl],
