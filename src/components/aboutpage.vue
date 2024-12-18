@@ -45,7 +45,7 @@ export default {
                     {{ $t("aboutPage.supportUs") }}
                 </div>
                 <a style="font-weight: bold;color:rgb(255, 102, 0);" target="_blank"
-                    href="https://afdian.net/a/PhiTogether">{{
+                    href="https://afdian.com/a/PhiTogether">{{
                     $t("aboutPage.supportus") }}</a><br /><br />
                 <div style="font-size:1.08em;">Based on
                     <a target="_blank" href="https://github.com/lchzh3473/sim-phi"
