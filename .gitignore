@@ -32,7 +32,7 @@ dev
 
 vite.config.local.js
 
-golang_backend/main.exe
-golang_backend/main.exe~
-golang_backend/main
-golang_backend/config.json
+# golang_backend/main.exe
+# golang_backend/main.exe~
+# golang_backend/main
+# golang_backend/config.json
