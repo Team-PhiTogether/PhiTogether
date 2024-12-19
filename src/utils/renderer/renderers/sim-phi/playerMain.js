@@ -1541,7 +1541,6 @@ const loadRes = shared.game.simphi.reloadRes = async (url, manual = false, setAs
       shared.game.i18n.t("simphi.loading.resLoadFailed1", [ errorNum ])
     );
   if (manual) defaultCRM = main.customResourceMeta;
-  console.log(newres)
   await updateRes(newres, manual);
 };
 async function updateRes(resources, manual = false) {

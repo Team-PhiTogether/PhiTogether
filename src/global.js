@@ -21,6 +21,9 @@ import ptdb from "@utils/ptdb";
 import "@utils/js/errHandler";
 if (import.meta.env.DEV) self.ptdb = ptdb;
 
+import { renderers } from "@utils/renderer";
+import { render } from "vue";
+
 var searchParams;
 
 const msgHandler = {
@@ -334,6 +337,7 @@ const ptAppInstance = createApp({
   data() {
     return {
       _pzFollowAspectRatio: false,
+      currentRenderer: renderers.simphi,
       gameConfig: {
         _followAspectRatio: false,
         account: {
@@ -542,10 +546,9 @@ const ptAppInstance = createApp({
             }
           } catch (e) { }
           if (
-            newVal.startsWith("together-pack") &&
-            (await msgHandler.confirm(this.$t("respack.requestReload")))
+            newVal.startsWith("together-pack")
           )
-            location.reload();
+            this.currentRenderer.loadRespack("/src/respack/" + newVal);
         } else if (newVal === "prpr-custom") {
           return;
         }
