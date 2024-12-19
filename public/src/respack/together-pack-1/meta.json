@@ -1,0 +1,22 @@
+{
+    "name": "PhiTogether Respack 1",
+    "author": "Team PhiTogether",
+    "includesHitSongs": true,
+    "res": {
+        "clickRaw": "/src/respack/together-pack-1/clickRaw.png",
+        "Tap": "/src/respack/together-pack-1/Tap.png",
+        "TapHL": "/src/respack/together-pack-1/TapHL.png",
+        "Drag": "/src/respack/together-pack-1/Drag.png",
+        "DragHL": "/src/respack/together-pack-1/DragHL.png",
+        "HoldHead": "/src/respack/together-pack-1/HoldHead.png",
+        "HoldHeadHL": "/src/respack/together-pack-1/HoldHeadHL.png",
+        "Hold": "/src/respack/together-pack-1/Hold.png",
+        "HoldHL": "/src/respack/together-pack-1/HoldHL.png",
+        "HoldEnd": "/src/respack/together-pack-1/HoldEnd.png",
+        "Flick": "/src/respack/together-pack-1/Flick.png",
+        "FlickHL": "/src/respack/together-pack-1/FlickHL.png",
+        "HitSong0": "/src/respack/together-pack-1/HitSong0.ogg",
+        "HitSong1": "/src/respack/together-pack-1/HitSong1.ogg",
+        "HitSong2": "/src/respack/together-pack-1/HitSong2.ogg"
+    }
+}
