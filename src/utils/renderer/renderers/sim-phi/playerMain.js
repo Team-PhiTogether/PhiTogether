@@ -1464,7 +1464,7 @@ const loadRes = shared.game.simphi.reloadRes = async (url, manual = false, setAs
   const newres = {}; //存放资源
   let errorNum = 0;
   const urlBak = url;
-  // if (!url.startsWith("http") || !url.startsWith("//")) url = "https://" + url;
+  if (!url.startsWith("/") && !url.startsWith("http")) url = "https://" + url;
   await fetch(`${url}/meta.json`).then(r => r.json().then(crm => {
     if (crm["hitEvtDrawer"] && !urlBak.startsWith(atob("cGdyZXM0cHQucmVhbHR2b3Au"))) crm["hitEvtDrawer"] = null;
     main.customResourceMeta = crm;
