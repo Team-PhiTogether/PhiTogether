@@ -1662,9 +1662,7 @@ window.addEventListener(
 
     shared.game.ptmain.playerLoaded();
 
-    loadRes(`${pth}${pack}`, false, true);
-
-    /* let ptSettings;
+    let ptSettings;
     try {
       ptSettings = await ptdb.gameConfig.get();
     } catch (e) {
@@ -1672,54 +1670,10 @@ window.addEventListener(
     }
 
     if (ptSettings.resourcesType) {
-      if (ptSettings.resourcesType === "pt-custom") {
-        const urlBak = ptSettings["customResourceLink"];
-        if (!ptSettings["customResourceLink"].startsWith("http") || !ptSettings["customResourceLink"].startsWith("//")) ptSettings["customResourceLink"] = "https://" + ptSettings["customResourceLink"];
-        await fetch(ptSettings["customResourceLink"]).then(r => r.json().then(crm => {
-          if (crm["hitEvtDrawer"] && !urlBak.startsWith(atob("cGdyZXM0cHQucmVhbHR2b3Au"))) crm["hitEvtDrawer"] = null;
-          main.customResourceMeta = crm;
-        }).then(() => main.customResourceMeta.loaded = true)).catch(e => {
-          main.customResourceMeta = {
-            name: "PhiTogether Default 1",
-            author: "Team PhiTogether",
-          };
-          ptSettings = { resourcesType: "together-pack-1" };
-          msgHandler.sendError(shared.game.i18n.t("respack.err"));
-        });
-      } else if (ptSettings.resourcesType.startsWith("together-pack")) {
-        pack = ptSettings.resourcesType;
-        const spl = ptSettings.resourcesType.split("-")[2];
-        main.customResourceMeta.name = `PhiTogether Default ${spl}`;
-      }
-      defaultCRM = main.customResourceMeta;
+      if (ptSettings.resourcesType === "pt-custom") loadRes(ptSettings["customResourceLink"], false, true);
+      else if (ptSettings.resourcesType.startsWith("together-pack")) loadRes(`/src/respack/${ptSettings.resourcesType}`, false, true);
     }
 
-    const erc = (str) => {
-      if (ptSettings.resourcesType === "pt-custom") {
-        const customRess = [
-          "clickRaw.png",
-          "Tap.png",
-          "TapHL.png",
-          "Drag.png",
-          "DragHL.png",
-          "HoldHead.png",
-          "HoldHeadHL.png",
-          "Hold.png",
-          "HoldHL.png",
-          "HoldEnd.png",
-          "Flick.png",
-          "FlickHL.png",
-        ];
-        if (customRess.indexOf(str) > -1) return main.customResourceMeta["res"][str];
-        const hitSongs = ["HitSong0.ogg", "HitSong1.ogg", "HitSong2.ogg"];
-        if (
-          main.customResourceMeta["includesHitSongs"] &&
-          hitSongs.indexOf(str) > -1
-        )
-          return main.customResourceMeta["res"][str];
-      }
-      return pth + pack + "/" + str;
-    };*/
     await Promise.all(
       Object.entries({
         JudgeLine: "JudgeLine.png",
@@ -1737,7 +1691,7 @@ window.addEventListener(
         Back: "return.png",
         Loop: "loop.png",
 
-        /* Default Respack Files, now use `loadRes` to load.
+        /* Default Respack Files, now replaced by `loadRes`.
         HitFXRaw: "clickRaw.png",
         Tap: "Tap.png",
         TapHL: "TapHL.png",
@@ -1792,20 +1746,6 @@ window.addEventListener(
       return msgHandler.sendError(
         shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [errorNum])
       );
-    /* const entries = [
-      "Tap",
-      "TapHL",
-      "Drag",
-      "DragHL",
-      "HoldHead",
-      "HoldHeadHL",
-      "Hold",
-      "HoldHL",
-      "HoldEnd",
-      "Flick",
-      "FlickHL",
-    ];
-    await updateRes(res); */
     res["NoImageBlack"] = await createImageBitmap(
       new ImageData(new Uint8ClampedArray(4).fill(0), 1, 1)
     );
