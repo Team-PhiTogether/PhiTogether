@@ -3,7 +3,7 @@
     "author": "Team PhiTogether",
     "includesHitSongs": true,
     "res": {
-        "clickRaw": "/src/respack/together-pack-2/clickRaw.png",
+        "HitFXRaw": "/src/respack/together-pack-2/clickRaw.png",
         "Tap": "/src/respack/together-pack-2/Tap.png",
         "TapHL": "/src/respack/together-pack-2/TapHL.png",
         "Drag": "/src/respack/together-pack-2/Drag.png",
