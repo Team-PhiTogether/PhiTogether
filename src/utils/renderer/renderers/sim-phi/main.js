@@ -8,6 +8,6 @@ export const rendererInterface = new ChartRenderer(
         description: "Phixos legacy version by lchzh3473",
 
         init: () => {},
-        loadRespack: shared.game.simphi.reloadRes,
+        loadRespack: (url) => shared.game.simphi.reloadRes(url),
     }
 );
