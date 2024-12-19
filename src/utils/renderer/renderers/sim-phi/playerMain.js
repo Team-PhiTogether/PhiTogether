@@ -1839,7 +1839,7 @@ function playBgm(data, offset) {
     offset: offset,
     playbackrate: app.speed,
     gainrate: app.musicVolume,
-    interval: autoDelay.checked ? 1 : 0,
+    interval: shared.game.ptmain.gameConfig.autoDelay ? 1 : 0,
   });
 }
 /**
@@ -2020,7 +2020,7 @@ function loopNoCanvas() {
   }
   timeChart = Math.max(
     timeBgm -
-    (app.chart.offset + Number(inputOffset.value) / 1e3 || 0) / app.speed,
+    (app.chart.offset + Number(shared.game.ptmain.gameConfig.inputOffset) / 1e3 || 0) / app.speed,
     0
   );
   //遍历判定线events和Note
@@ -2108,7 +2108,7 @@ function loopCanvas() {
   if (qwqIn.second >= 3 && qwqOut.second === 0) {
     //绘制note
     drawNotes();
-    if (showPoint.checked) {
+    if (shared.game.ptmain.gameConfig.showPoint) {
       //绘制定位点
       ctxos.font = `${lineScale}px Saira`;
       ctxos.textAlign = "center";
@@ -2160,7 +2160,7 @@ function loopCanvas() {
   // if (qwq[4]) ctxos.filter = `hue-rotate(${stat.combo*360/7}deg)`;
   hitImageList.animate(); //绘制打击特效1
   // if (qwq[4]) ctxos.filter = 'none';
-  if (showCE2.checked) hitWordList.animate(); //绘制打击特效2
+  if (shared.game.ptmain.gameConfig.showCE2) hitWordList.animate(); //绘制打击特效2
   ctxos.globalAlpha = 1;
   //绘制进度条
   ctxos.setTransform(
@@ -2237,7 +2237,7 @@ function loopCanvas() {
     if (qwqIn.second >= 2.5)
       ctxos.globalAlpha = tween.easeOutSine(6 - qwqIn.second * 2);
     ctxos.drawImage(
-      lineColor.checked ? res["JudgeLineMP"] : res["JudgeLine"],
+      shared.game.ptmain.gameConfig.lineColor ? res["JudgeLineMP"] : res["JudgeLine"],
       -imgW / 2,
       -imgH / 2,
       imgW,
@@ -2273,7 +2273,7 @@ function loopCanvas() {
       canvasos.width - lineScale * 0.65 + tmps.statStatus.score.offsetX,
       lineScale * 1.375 + tmps.statStatus.score.offsetY
     );
-    if (showAcc.checked && shared.game.ptmain.playConfig.mode !== "preview") {
+    if (shared.game.ptmain.gameConfig.showAcc && shared.game.ptmain.playConfig.mode !== "preview") {
       ctxos.font = `${lineScale * 0.66}px Saira`;
       ctxos.fillText(
         stat.accStr,
@@ -2647,7 +2647,7 @@ function drawLine(bool, lineScale) {
       const imgH = imgS * i.imageH * ((i.scaleY * 1) || 1);
       // ctxos.save();
       if (!i.text) {
-        // const lineImage = i.imageL[i.imageC && lineColor.checked ? stat.lineStatus : 0];
+        // const lineImage = i.imageL[i.imageC && shared.game.ptmain.gameConfig.lineColor ? stat.lineStatus : 0];
         // if (i.scaleX) ctxos.scale(-1, 1);
         try {
           if (i.color && i.color != "#fff" && i.color != "#ffffff") {
@@ -2671,7 +2671,7 @@ function drawLine(bool, lineScale) {
             }
           } else {
             ctxos.drawImage(
-              i.imageL[i.imageC && lineColor.checked ? stat.lineStatus : 0],
+              i.imageL[i.imageC && shared.game.ptmain.gameConfig.lineColor ? stat.lineStatus : 0],
               -imgW / 2,
               -imgH / 2,
               imgW,
@@ -2680,7 +2680,7 @@ function drawLine(bool, lineScale) {
           }
         } catch (err) {
           ctxos.drawImage(
-            i.imageL[i.imageC && lineColor.checked ? stat.lineStatus : 0],
+            i.imageL[i.imageC && shared.game.ptmain.gameConfig.lineColor ? stat.lineStatus : 0],
             -imgW / 2,
             -imgH / 2,
             imgW,
@@ -2699,7 +2699,7 @@ function drawLine(bool, lineScale) {
   }
 }
 function getColoredLineImage(line, hex) {
-  if (!hex) return line.imageL[i.imageC && lineColor.checked ? stat.lineStatus : 0];
+  if (!hex) return line.imageL[i.imageC && shared.game.ptmain.gameConfig.lineColor ? stat.lineStatus : 0];
   hex = hex.toLowerCase();
   return line.imagesColored[hex] || (line.imagesColored[hex] = imgShader(line.imageL[0], hex, true));
 }
@@ -3126,7 +3126,7 @@ function drawTap(note) {
     noteRender.note["TapBad"].full(ctxos);
   } else {
     ctxos.globalAlpha =
-      note.alpha || (note.showPoint && showPoint.checked ? 0.45 : 0);
+      note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
     if (main.qwqwq)
       ctxos.globalAlpha *= Math.max(1 + (timeChart - note.realTime) / 1.5, 0); //过线前1.5s出现
     noteRender.note[HL ? "TapHL" : "Tap"].full(ctxos);
@@ -3149,7 +3149,7 @@ function drawDrag(note) {
   if (note.badtime);
   else {
     ctxos.globalAlpha =
-      note.alpha || (note.showPoint && showPoint.checked ? 0.45 : 0);
+      note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
     if (main.qwqwq)
       ctxos.globalAlpha *= Math.max(1 + (timeChart - note.realTime) / 1.5, 0);
     noteRender.note[HL ? "DragHL" : "Drag"].full(ctxos);
@@ -3162,7 +3162,7 @@ function drawHold(note, realTime) {
   const nsr = app.noteScaleRatio * (note.size || 1);
   if (!note.visible || note.realTime + note.realHoldTime < realTime) return; //qwq
   ctxos.globalAlpha =
-    note.alpha || (note.showPoint && showPoint.checked ? 0.45 : 0);
+    note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
   if (main.qwqwq)
     ctxos.globalAlpha *= Math.max(1 + (timeChart - note.realTime) / 1.5, 0);
   ctxos.setTransform(
@@ -3208,7 +3208,7 @@ function drawFlick(note) {
   if (note.badtime);
   else {
     ctxos.globalAlpha =
-      note.alpha || (note.showPoint && showPoint.checked ? 0.45 : 0);
+      note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
     if (main.qwqwq)
       ctxos.globalAlpha *= Math.max(1 + (timeChart - note.realTime) / 1.5, 0);
     noteRender.note[HL ? "FlickHL" : "Flick"].full(ctxos);
@@ -3329,20 +3329,12 @@ $id("select-volume").addEventListener("change", (evt) => {
   app.soundVolume = Math.min(1, volume);
   Promise.resolve().then(qwqPause).then(qwqPause);
 });
-const inputOffset = $id("input-offset");
-const showCE2 = $id("showCE2");
-const showAcc = $id("showAcc");
-const showStat = $id("showStat");
 const lowRes = $id("lowRes");
-const lockOri = $id("lockOri");
 const maxFrame = $id("maxFrame");
 const isMaxFrame = $id("isMaxFrame");
 const isForcedMaxFrame = $id("isForcedMaxFrame");
-const autoDelay = $id("autoDelay");
 const enableVP = $id("enableVP");
 const enableFR = $id("enableFR");
-const showPoint = $id("showPoint");
-const lineColor = $id("lineColor");
 enableVP.addEventListener(
   "change",
   (evt) => (app.enableVP = evt.target.checked)
