@@ -1412,233 +1412,12 @@ function getPos(obj) {
 }
 //hit end
 const res = {}; //存放资源
-main.customResourceMeta = {
+main.customResourceMeta = {};
+let defaultCRM = {
   name: "PhiTogether Default 1",
   author: "Team PhiTogether",
 };
-let defaultCRM = main.customResourceMeta;
-//初始化
-//初始化(踩坑：监听DOMContentLoaded似乎会阻塞页面导致长时间白屏)
-window.addEventListener(
-  "load",
-  async function () {
-    shared.game = {
-      ...shared.game,
-      init: true,
-      app,
-      res,
-      charts,
-      stat,
-      hitManager,
-      judgeManager,
-      stage,
-      clearStat,
-      loadSkinFromBuffer,
-      loadSkinFromDB,
-      updateLevelText: updateLevelTextOut,
-      doFullScreen,
-      adjustInfo,
-      qwqStop,
-      qwqPause,
-      frameAnimater,
-    };
-    await shared.game.requestFullscreen();
-    canvas.classList.add("fade");
-    let loadedNum = 0;
-    let errorNum = 0;
-    if (await checkSupport()) return;
-    const pth = "/src/respack/";
-    let pack = "together-pack-1";
-
-    shared.game.ptmain.playerLoaded();
-
-    let ptSettings;
-    try {
-      ptSettings = await ptdb.gameConfig.get();
-    } catch (e) {
-      ptSettings = { resourcesType: "together-pack-1" };
-    }
-
-    if (ptSettings.resourcesType) {
-      if (ptSettings.resourcesType === "pt-custom") {
-        const urlBak = ptSettings["customResourceLink"];
-        if (!ptSettings["customResourceLink"].startsWith("http") || !ptSettings["customResourceLink"].startsWith("//")) ptSettings["customResourceLink"] = "https://" + ptSettings["customResourceLink"];
-        await fetch(ptSettings["customResourceLink"]).then(r => r.json().then(crm => {
-          if (crm["hitEvtDrawer"] && !urlBak.startsWith(atob("cGdyZXM0cHQucmVhbHR2b3Au"))) crm["hitEvtDrawer"] = null;
-          main.customResourceMeta = crm;
-        }).then(() => main.customResourceMeta.loaded = true)).catch(e => {
-          main.customResourceMeta = {
-            name: "PhiTogether Default 1",
-            author: "Team PhiTogether",
-          };
-          ptSettings = { resourcesType: "together-pack-1" };
-          msgHandler.sendError(shared.game.i18n.t("respack.err"));
-        });
-      } else if (ptSettings.resourcesType.startsWith("together-pack")) {
-        pack = ptSettings.resourcesType;
-        const spl = ptSettings.resourcesType.split("-")[2];
-        main.customResourceMeta.name = `PhiTogether Default ${spl}`;
-      }
-      defaultCRM = main.customResourceMeta;
-    }
-
-    const erc = (str) => {
-      if (ptSettings.resourcesType === "pt-custom") {
-        const customRess = [
-          "clickRaw.png",
-          "Tap.png",
-          "TapHL.png",
-          "Drag.png",
-          "DragHL.png",
-          "HoldHead.png",
-          "HoldHeadHL.png",
-          "Hold.png",
-          "HoldHL.png",
-          "HoldEnd.png",
-          "Flick.png",
-          "FlickHL.png",
-        ];
-        if (customRess.indexOf(str) > -1) return main.customResourceMeta["res"][str];
-        const hitSongs = ["HitSong0.ogg", "HitSong1.ogg", "HitSong2.ogg"];
-        if (
-          main.customResourceMeta["includesHitSongs"] &&
-          hitSongs.indexOf(str) > -1
-        )
-          return main.customResourceMeta["res"][str];
-      }
-      return pth + pack + "/" + str;
-    };
-    await Promise.all(
-      Object.entries({
-        JudgeLine: "JudgeLine.png",
-        ProgressBar: "ProgressBar.png",
-        Pause: "PauseNew.png",
-        HitFXRaw: "clickRaw.png",
-        Tap: "Tap.png",
-        TapHL: "TapHL.png",
-        Drag: "Drag.png",
-        DragHL: "DragHL.png",
-        HoldHead: "HoldHead.png",
-        HoldHeadHL: "HoldHeadHL.png",
-        Hold: "Hold.png",
-        HoldHL: "HoldHL.png",
-        HoldEnd: "HoldEnd.png",
-        Flick: "Flick.png",
-        FlickHL: "FlickHL.png",
-        Rank: "Rank.png",
-        HitSong0: "HitSong0.ogg",
-        HitSong1: "HitSong1.ogg",
-        HitSong2: "HitSong2.ogg",
-        FCV: "FCV.png",
-        LevelOver0: "LevelOver0.ogg",
-        LevelOver0_v2: "LevelOver0_v2.ogg",
-        LevelOver1_v2: "LevelOver1_v2.ogg",
-        LevelOver2_v2: "LevelOver2_v2.ogg",
-        LevelOver3_v2: "LevelOver3_v2.ogg",
-        Resume: "play.png",
-        Retry: "replay.png",
-        Back: "return.png",
-        Loop: "loop.png",
-      }).map(
-        ([name, src], _i, arr) =>
-          new Promise((resolve) => {
-            const xhr = new XMLHttpRequest();
-            const source = erc(src) || pth + pack + "/" + src;
-            xhr.open("get", (src = source), true);
-            xhr.responseType = "arraybuffer";
-            xhr.send();
-            xhr.onloadend = async () => {
-              if (!xhr.response || !xhr.response.byteLength) {
-                msgHandler.sendError(
-                  shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [++errorNum]),
-                  "",
-                  true
-                );
-              } else {
-                const a = new DataView(xhr.response, 0, 8);
-                const header1 = a.getUint32(0);
-                const header2 = a.getUint32(4);
-                if (header1 === 0x4f676753)
-                  res[name] = await audio.decode(xhr.response);
-                else if (header1 === 0x89504e47 && header2 === 0x0d0a1a0a)
-                  res[name] = await createImageBitmap(new Blob([xhr.response]));
-                else
-                  msgHandler.sendError(
-                    shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [++errorNum]),
-                    "",
-                    true
-                  );
-              }
-              resolve();
-            };
-          })
-      )
-    );
-    if (errorNum)
-      return msgHandler.sendError(
-        shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [errorNum])
-      );
-    const entries = [
-      "Tap",
-      "TapHL",
-      "Drag",
-      "DragHL",
-      "HoldHead",
-      "HoldHeadHL",
-      "Hold",
-      "HoldHL",
-      "HoldEnd",
-      "Flick",
-      "FlickHL",
-    ];
-    await updateRes(res);
-    res["NoImageBlack"] = await createImageBitmap(
-      new ImageData(new Uint8ClampedArray(4).fill(0), 1, 1)
-    );
-    res["NoImageWhite"] = await createImageBitmap(
-      new ImageData(new Uint8ClampedArray(4).fill(255), 1, 1)
-    );
-    res["JudgeLineMP"] = await imgShader(res["JudgeLine"], "#feffa9");
-    res["JudgeLineFC"] = await imgShader(res["JudgeLine"], "#a2eeff");
-    res["Ranks"] = await imgSplit(res["Rank"]);
-    res["Rank"].close();
-    res["mute"] = audio.mute(1);
-    if (
-      !(() => {
-        const b = createCanvas(1, 1).getContext("2d");
-        b.drawImage(res["JudgeLine"], 0, 0);
-        return b.getImageData(0, 0, 1, 1).data[0];
-      })()
-    )
-      return msgHandler.sendError(
-        shared.game.i18n.t("simphi.loading.imgLoadingError", [ err.cause.name ])
-      );
-    // if (ptSettings.resourcesType === "prpr-custom") await loadprprCustomRes();
-    // msgHandler.sendError(shared.game.i18n.t("respack.unavailableNow"));  // diasble custom respack for now
-    shared.game.ptmain.simphiLoaded();
-    $id("uploader").classList.remove("disabled");
-    $id("select").classList.remove("disabled");
-    emitter.dispatchEvent(new CustomEvent("change"));
-    btnPause.classList.add("disabled");
-
-    function decode(img, border = 0) {
-      const canvas = createCanvas(
-        img.width - border * 2,
-        img.height - border * 2
-      );
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, -border, -border);
-      const id = ctx.getImageData(0, 0, canvas.width, canvas.width);
-      const ab = new Uint8Array((id.data.length / 4) * 3);
-      for (let i = 0; i < ab.length; i++)
-        ab[i] = id.data[((i / 3) | 0) * 4 + (i % 3)] ^ (i * 3473);
-      const size = new DataView(ab.buffer, 0, 4).getUint32(0);
-      return { result: ab.buffer.slice(4, size + 4) };
-    }
-  },
-  { once: true }
-);
-shared.game.simphi.reloadRes = async (url, manual = false) => {
+const loadRes = shared.game.simphi.reloadRes = async (url, manual = false, setAsDefault = false) => {
   if (!url) {
     if (main.customResourceMeta == defaultCRM) return;
     // if (shared.game.ptmain.gameConfig.resourcesType === "prpr-custom") {
@@ -1671,7 +1450,7 @@ shared.game.simphi.reloadRes = async (url, manual = false) => {
       "HoldEnd",
       "Flick",
       "FlickHL",
-      "HitFXRaw"
+      "HitFXRaw",
     ];
     for (const i of entries) await noteRender.update(i, res[i], 1);
     res["JudgeLineMP"] = await imgShader(res["JudgeLine"], "#feffa9");
@@ -1685,16 +1464,18 @@ shared.game.simphi.reloadRes = async (url, manual = false) => {
   const newres = {}; //存放资源
   let errorNum = 0;
   const urlBak = url;
-  if (!url.startsWith("http") || !url.startsWith("//")) url = "https://" + url;
-  await fetch(url).then(r => r.json().then(crm => {
+  // if (!url.startsWith("http") || !url.startsWith("//")) url = "https://" + url;
+  await fetch(`${url}/meta.json`).then(r => r.json().then(crm => {
     if (crm["hitEvtDrawer"] && !urlBak.startsWith(atob("cGdyZXM0cHQucmVhbHR2b3Au"))) crm["hitEvtDrawer"] = null;
     main.customResourceMeta = crm;
+    if (setAsDefault) defaultCRM = crm;
   }).then(() => main.customResourceMeta.loaded = true)).catch(e => {
     msgHandler.sendError(shared.game.i18n.t("respack.err"));
     return;
   });
-  const erc = (str) => {
-    return main.customResourceMeta.res[str] || "";
+  const erc = (name, src) => {
+    try { return main.customResourceMeta.res[name] || main.customResourceMeta.res[src] || ""; }
+    catch { return ""; }
   };
   await Promise.all(
     Object.entries({
@@ -1712,13 +1493,13 @@ shared.game.simphi.reloadRes = async (url, manual = false) => {
       HitSong0: "HitSong0.ogg",
       HitSong1: "HitSong1.ogg",
       HitSong2: "HitSong2.ogg",
-      HitFXRaw: "clickRaw.png"
+      HitFXRaw: "clickRaw.png",
     }).map(
       ([name, src], _i, arr) =>
         new Promise((resolve) => {
-          if (!erc(src)) return resolve();
+          if (!erc(name, src)) return resolve();
           const xhr = new XMLHttpRequest();
-          xhr.open("get", (src = erc(src)), true);
+          xhr.open("get", (src = erc(name, src)), true);
           xhr.responseType = "arraybuffer";
           xhr.send();
           xhr.onloadend = async () => {
@@ -1760,6 +1541,7 @@ shared.game.simphi.reloadRes = async (url, manual = false) => {
       shared.game.i18n.t("simphi.loading.resLoadFailed1", [ errorNum ])
     );
   if (manual) defaultCRM = main.customResourceMeta;
+  console.log(newres)
   await updateRes(newres, manual);
 };
 async function updateRes(resources, manual = false) {
@@ -1846,6 +1628,231 @@ async function updateRes(resources, manual = false) {
   }
   if (manual) shared.game.msgHandler.sendMessage(shared.game.ptmain.$t("respack.customResApplied"), "success");
 }
+//初始化
+//初始化(踩坑：监听DOMContentLoaded似乎会阻塞页面导致长时间白屏)
+window.addEventListener(
+  "load",
+  async function () {
+    shared.game = {
+      ...shared.game,
+      init: true,
+      app,
+      res,
+      charts,
+      stat,
+      hitManager,
+      judgeManager,
+      stage,
+      clearStat,
+      loadSkinFromBuffer,
+      loadSkinFromDB,
+      updateLevelText: updateLevelTextOut,
+      doFullScreen,
+      adjustInfo,
+      qwqStop,
+      qwqPause,
+      frameAnimater,
+    };
+    await shared.game.requestFullscreen();
+    canvas.classList.add("fade");
+    let loadedNum = 0;
+    let errorNum = 0;
+    if (await checkSupport()) return;
+    const pth = "/src/respack/";
+    let pack = "together-pack-1";
+
+    shared.game.ptmain.playerLoaded();
+
+    loadRes(`${pth}${pack}`, false, true);
+
+    /* let ptSettings;
+    try {
+      ptSettings = await ptdb.gameConfig.get();
+    } catch (e) {
+      ptSettings = { resourcesType: "together-pack-1" };
+    }
+
+    if (ptSettings.resourcesType) {
+      if (ptSettings.resourcesType === "pt-custom") {
+        const urlBak = ptSettings["customResourceLink"];
+        if (!ptSettings["customResourceLink"].startsWith("http") || !ptSettings["customResourceLink"].startsWith("//")) ptSettings["customResourceLink"] = "https://" + ptSettings["customResourceLink"];
+        await fetch(ptSettings["customResourceLink"]).then(r => r.json().then(crm => {
+          if (crm["hitEvtDrawer"] && !urlBak.startsWith(atob("cGdyZXM0cHQucmVhbHR2b3Au"))) crm["hitEvtDrawer"] = null;
+          main.customResourceMeta = crm;
+        }).then(() => main.customResourceMeta.loaded = true)).catch(e => {
+          main.customResourceMeta = {
+            name: "PhiTogether Default 1",
+            author: "Team PhiTogether",
+          };
+          ptSettings = { resourcesType: "together-pack-1" };
+          msgHandler.sendError(shared.game.i18n.t("respack.err"));
+        });
+      } else if (ptSettings.resourcesType.startsWith("together-pack")) {
+        pack = ptSettings.resourcesType;
+        const spl = ptSettings.resourcesType.split("-")[2];
+        main.customResourceMeta.name = `PhiTogether Default ${spl}`;
+      }
+      defaultCRM = main.customResourceMeta;
+    }
+
+    const erc = (str) => {
+      if (ptSettings.resourcesType === "pt-custom") {
+        const customRess = [
+          "clickRaw.png",
+          "Tap.png",
+          "TapHL.png",
+          "Drag.png",
+          "DragHL.png",
+          "HoldHead.png",
+          "HoldHeadHL.png",
+          "Hold.png",
+          "HoldHL.png",
+          "HoldEnd.png",
+          "Flick.png",
+          "FlickHL.png",
+        ];
+        if (customRess.indexOf(str) > -1) return main.customResourceMeta["res"][str];
+        const hitSongs = ["HitSong0.ogg", "HitSong1.ogg", "HitSong2.ogg"];
+        if (
+          main.customResourceMeta["includesHitSongs"] &&
+          hitSongs.indexOf(str) > -1
+        )
+          return main.customResourceMeta["res"][str];
+      }
+      return pth + pack + "/" + str;
+    };*/
+    await Promise.all(
+      Object.entries({
+        JudgeLine: "JudgeLine.png",
+        ProgressBar: "ProgressBar.png",
+        Pause: "PauseNew.png",
+        Rank: "Rank.png",
+        FCV: "FCV.png",
+        LevelOver0: "LevelOver0.ogg",
+        LevelOver0_v2: "LevelOver0_v2.ogg",
+        LevelOver1_v2: "LevelOver1_v2.ogg",
+        LevelOver2_v2: "LevelOver2_v2.ogg",
+        LevelOver3_v2: "LevelOver3_v2.ogg",
+        Resume: "play.png",
+        Retry: "replay.png",
+        Back: "return.png",
+        Loop: "loop.png",
+
+        /* Default Respack Files, now use `loadRes` to load.
+        HitFXRaw: "clickRaw.png",
+        Tap: "Tap.png",
+        TapHL: "TapHL.png",
+        Drag: "Drag.png",
+        DragHL: "DragHL.png",
+        Flick: "Flick.png",
+        FlickHL: "FlickHL.png",
+        HoldHead: "HoldHead.png",
+        HoldHeadHL: "HoldHeadHL.png",
+        Hold: "Hold.png",
+        HoldHL: "HoldHL.png",
+        HoldEnd: "HoldEnd.png",
+        HitSong0: "HitSong0.ogg",
+        HitSong1: "HitSong1.ogg",
+        HitSong2: "HitSong2.ogg", */
+      }).map(
+        ([name, src], _i, arr) =>
+          new Promise((resolve) => {
+            const xhr = new XMLHttpRequest();
+            const source = /* erc(src) ||  */"/src/respack/shared/" + src;
+            xhr.open("get", (src = source), true);
+            xhr.responseType = "arraybuffer";
+            xhr.send();
+            xhr.onloadend = async () => {
+              if (!xhr.response || !xhr.response.byteLength) {
+                msgHandler.sendError(
+                  shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [++errorNum]),
+                  "",
+                  true
+                );
+              } else {
+                const a = new DataView(xhr.response, 0, 8);
+                const header1 = a.getUint32(0);
+                const header2 = a.getUint32(4);
+                if (header1 === 0x4f676753)
+                  res[name] = await audio.decode(xhr.response);
+                else if (header1 === 0x89504e47 && header2 === 0x0d0a1a0a)
+                  res[name] = await createImageBitmap(new Blob([xhr.response]));
+                else
+                  msgHandler.sendError(
+                    shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [++errorNum]),
+                    "",
+                    true
+                  );
+              }
+              resolve();
+            };
+          })
+      )
+    );
+    if (errorNum)
+      return msgHandler.sendError(
+        shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [errorNum])
+      );
+    /* const entries = [
+      "Tap",
+      "TapHL",
+      "Drag",
+      "DragHL",
+      "HoldHead",
+      "HoldHeadHL",
+      "Hold",
+      "HoldHL",
+      "HoldEnd",
+      "Flick",
+      "FlickHL",
+    ];
+    await updateRes(res); */
+    res["NoImageBlack"] = await createImageBitmap(
+      new ImageData(new Uint8ClampedArray(4).fill(0), 1, 1)
+    );
+    res["NoImageWhite"] = await createImageBitmap(
+      new ImageData(new Uint8ClampedArray(4).fill(255), 1, 1)
+    );
+    res["JudgeLineMP"] = await imgShader(res["JudgeLine"], "#feffa9");
+    res["JudgeLineFC"] = await imgShader(res["JudgeLine"], "#a2eeff");
+    res["Ranks"] = await imgSplit(res["Rank"]);
+    res["Rank"].close();
+    res["mute"] = audio.mute(1);
+    if (
+      !(() => {
+        const b = createCanvas(1, 1).getContext("2d");
+        b.drawImage(res["JudgeLine"], 0, 0);
+        return b.getImageData(0, 0, 1, 1).data[0];
+      })()
+    )
+      return msgHandler.sendError(
+        shared.game.i18n.t("simphi.loading.imgLoadingError", [ err.cause.name ])
+      );
+    // if (ptSettings.resourcesType === "prpr-custom") await loadprprCustomRes();
+    // msgHandler.sendError(shared.game.i18n.t("respack.unavailableNow"));  // diasble custom respack for now
+    shared.game.ptmain.simphiLoaded();
+    $id("uploader").classList.remove("disabled");
+    $id("select").classList.remove("disabled");
+    emitter.dispatchEvent(new CustomEvent("change"));
+    btnPause.classList.add("disabled");
+
+    function decode(img, border = 0) {
+      const canvas = createCanvas(
+        img.width - border * 2,
+        img.height - border * 2
+      );
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, -border, -border);
+      const id = ctx.getImageData(0, 0, canvas.width, canvas.width);
+      const ab = new Uint8Array((id.data.length / 4) * 3);
+      for (let i = 0; i < ab.length; i++)
+        ab[i] = id.data[((i / 3) | 0) * 4 + (i % 3)] ^ (i * 3473);
+      const size = new DataView(ab.buffer, 0, 4).getUint32(0);
+      return { result: ab.buffer.slice(4, size + 4) };
+    }
+  },
+  { once: true }
+);
 
 //必要组件
 const frameAnimater = new FrameAnimater();
