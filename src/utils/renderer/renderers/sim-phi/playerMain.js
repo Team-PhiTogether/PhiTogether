@@ -310,28 +310,28 @@ function adjustInfo() {
         selectbg.dispatchEvent(new Event("change"));
       }
       if (isFinite((i.AspectRatio = parseFloat(i.AspectRatio)))) {
-        $id("select-aspect-ratio").value = i.AspectRatio;
+        shared.game.ptmain.gameConfig.aspectRatio = i.AspectRatio;
       }
       if (isFinite((i.ScaleRatio = parseFloat(i.ScaleRatio)))) {
         //Legacy
-        $id("select-note-scale").value = 8080 / i.ScaleRatio;
+        shared.game.ptmain.gameConfig.noteScale = 8080 / i.ScaleRatio;
         app.setNoteScale(8080 / i.ScaleRatio);
       }
       if (isFinite((i.NoteScale = parseFloat(i.NoteScale)))) {
-        $id("select-note-scale").value = i.NoteScale;
+        shared.game.ptmain.gameConfig.noteScale = i.NoteScale;
         app.setNoteScale(i.NoteScale);
       }
       if (isFinite((i.GlobalAlpha = parseFloat(i.GlobalAlpha)))) {
         //Legacy
-        $id("select-background-dim").value = i.GlobalAlpha;
+        shared.game.ptmain.gameConfig.backgroundDim = i.GlobalAlpha;
         app.brightness = Number(i.GlobalAlpha);
       }
       if (isFinite((i.BackgroundDim = parseFloat(i.BackgroundDim)))) {
-        $id("select-background-dim").value = i.BackgroundDim;
+        shared.game.ptmain.gameConfig.backgroundDim = i.BackgroundDim;
         app.brightness = Number(i.BackgroundDim);
       }
       if (isFinite((i.Offset = parseFloat(i.Offset))))
-        $id("chart-offset-surface").value = i.Offset;
+        shared.game.ptmain.chartOffsetSurface = i.Offset;
     }
   }
 }
@@ -518,12 +518,6 @@ const doFullScreen = async () => {
     stage.resize();
   }
 };
-function spClickRB() {
-  if (!fucktemp2) return;
-  if (shared.game.ptmain.$route.path !== "/multipanel" && shared.game.ptmain.gameMode === "multi" )
-    shared.game.multiInstance.showStat();
-  else shared.game.ptmain.spClickRT();
-}
 const specialDrag = {
   listeningEvts: new Map(),
   update(evt, offsetX, offsetY) {
@@ -593,10 +587,39 @@ const specialDrag = {
 const specialClick = {
   time: [0, 0, 0, 0],
   func: [
-    shared.game.ptmain.spClickLT,
-    shared.game.ptmain.spClickRT,
-    shared.game.ptmain.spClickLB,
-    spClickRB,
+    function spClickLT() {
+      if (emitter.eq("play")) btnPause.click();
+    },
+    async function spClickRT() {
+      if (this.gameMode === "multi") return;
+      btnPause.value === "暂停" && btnPause.click();
+      if (shared.game.app.pauseNextTick)
+        clearInterval(shared.game.app.pauseNextTick),
+          (shared.game.app.pauseTime = 0),
+          (shared.game.app.pauseNextTick = null);
+      await shared.game.ptmain.retry();
+      Promise.resolve().then(shared.game.qwqStop).then(shared.game.qwqStop);
+    },
+    function spClickLB() {
+      if (
+        shared.game.isPlayFinished() &&
+        shared.game.ptmain.playConfig.mode !== "preview"
+      ) {
+        shared.game.exportRecord && shared.game.exportRecord();
+      } else if (shared.game.ptmain.gameMode === "single") {
+        if (btnPause.value == "暂停") return; //btnPause.click();
+        selectflip.value = app.mirrorView([3 - selectflip.value]);
+      } else {
+        shared.game.multiInstance.JITSOpen =
+          !shared.game.multiInstance.JITSOpen;
+      }
+    },
+    function spClickRB() {
+      if (!fucktemp2) return;
+      if (shared.game.ptmain.$route.path !== "/multipanel" && shared.game.ptmain.gameMode === "multi")
+        shared.game.multiInstance.showStat();
+      else shared.game.ptmain.spClickRT();
+    },
     () => { hitManager.clear(); shared.game.ptmain.$router.back(); },
   ],
   click(id) {
@@ -1389,233 +1412,12 @@ function getPos(obj) {
 }
 //hit end
 const res = {}; //存放资源
-main.customResourceMeta = {
+main.customResourceMeta = {};
+let defaultCRM = {
   name: "PhiTogether Default 1",
   author: "Team PhiTogether",
 };
-let defaultCRM = main.customResourceMeta;
-//初始化
-//初始化(踩坑：监听DOMContentLoaded似乎会阻塞页面导致长时间白屏)
-window.addEventListener(
-  "load",
-  async function () {
-    shared.game = {
-      ...shared.game,
-      init: true,
-      app,
-      res,
-      charts,
-      stat,
-      hitManager,
-      judgeManager,
-      stage,
-      clearStat,
-      loadSkinFromBuffer,
-      loadSkinFromDB,
-      updateLevelText: updateLevelTextOut,
-      doFullScreen,
-      adjustInfo,
-      qwqStop,
-      qwqPause,
-      frameAnimater,
-    };
-    await shared.game.requestFullscreen();
-    canvas.classList.add("fade");
-    let loadedNum = 0;
-    let errorNum = 0;
-    if (await checkSupport()) return;
-    const pth = "/src/respack/";
-    let pack = "together-pack-1";
-
-    shared.game.ptmain.playerLoaded();
-
-    let ptSettings;
-    try {
-      ptSettings = await ptdb.gameConfig.get();
-    } catch (e) {
-      ptSettings = { resourcesType: "together-pack-1" };
-    }
-
-    if (ptSettings.resourcesType) {
-      if (ptSettings.resourcesType === "pt-custom") {
-        const urlBak = ptSettings["customResourceLink"];
-        if (!ptSettings["customResourceLink"].startsWith("http") || !ptSettings["customResourceLink"].startsWith("//")) ptSettings["customResourceLink"] = "https://" + ptSettings["customResourceLink"];
-        await fetch(ptSettings["customResourceLink"]).then(r => r.json().then(crm => {
-          if (crm["hitEvtDrawer"] && !urlBak.startsWith(atob("cGdyZXM0cHQucmVhbHR2b3Au"))) crm["hitEvtDrawer"] = null;
-          main.customResourceMeta = crm;
-        }).then(() => main.customResourceMeta.loaded = true)).catch(e => {
-          main.customResourceMeta = {
-            name: "PhiTogether Default 1",
-            author: "Team PhiTogether",
-          };
-          ptSettings = { resourcesType: "together-pack-1" };
-          msgHandler.sendError(shared.game.i18n.t("respack.err"));
-        });
-      } else if (ptSettings.resourcesType.startsWith("together-pack")) {
-        pack = ptSettings.resourcesType;
-        const spl = ptSettings.resourcesType.split("-")[2];
-        main.customResourceMeta.name = `PhiTogether Default ${spl}`;
-      }
-      defaultCRM = main.customResourceMeta;
-    }
-
-    const erc = (str) => {
-      if (ptSettings.resourcesType === "pt-custom") {
-        const customRess = [
-          "clickRaw.png",
-          "Tap.png",
-          "TapHL.png",
-          "Drag.png",
-          "DragHL.png",
-          "HoldHead.png",
-          "HoldHeadHL.png",
-          "Hold.png",
-          "HoldHL.png",
-          "HoldEnd.png",
-          "Flick.png",
-          "FlickHL.png",
-        ];
-        if (customRess.indexOf(str) > -1) return main.customResourceMeta["res"][str];
-        const hitSongs = ["HitSong0.ogg", "HitSong1.ogg", "HitSong2.ogg"];
-        if (
-          main.customResourceMeta["includesHitSongs"] &&
-          hitSongs.indexOf(str) > -1
-        )
-          return main.customResourceMeta["res"][str];
-      }
-      return pth + pack + "/" + str;
-    };
-    await Promise.all(
-      Object.entries({
-        JudgeLine: "JudgeLine.png",
-        ProgressBar: "ProgressBar.png",
-        Pause: "PauseNew.png",
-        HitFXRaw: "clickRaw.png",
-        Tap: "Tap.png",
-        TapHL: "TapHL.png",
-        Drag: "Drag.png",
-        DragHL: "DragHL.png",
-        HoldHead: "HoldHead.png",
-        HoldHeadHL: "HoldHeadHL.png",
-        Hold: "Hold.png",
-        HoldHL: "HoldHL.png",
-        HoldEnd: "HoldEnd.png",
-        Flick: "Flick.png",
-        FlickHL: "FlickHL.png",
-        Rank: "Rank.png",
-        HitSong0: "HitSong0.ogg",
-        HitSong1: "HitSong1.ogg",
-        HitSong2: "HitSong2.ogg",
-        FCV: "FCV.png",
-        LevelOver0: "LevelOver0.ogg",
-        LevelOver0_v2: "LevelOver0_v2.ogg",
-        LevelOver1_v2: "LevelOver1_v2.ogg",
-        LevelOver2_v2: "LevelOver2_v2.ogg",
-        LevelOver3_v2: "LevelOver3_v2.ogg",
-        Resume: "play.png",
-        Retry: "replay.png",
-        Back: "return.png",
-        Loop: "loop.png",
-      }).map(
-        ([name, src], _i, arr) =>
-          new Promise((resolve) => {
-            const xhr = new XMLHttpRequest();
-            const source = erc(src) || pth + pack + "/" + src;
-            xhr.open("get", (src = source), true);
-            xhr.responseType = "arraybuffer";
-            xhr.send();
-            xhr.onloadend = async () => {
-              if (!xhr.response || !xhr.response.byteLength) {
-                msgHandler.sendError(
-                  shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [++errorNum]),
-                  "",
-                  true
-                );
-              } else {
-                const a = new DataView(xhr.response, 0, 8);
-                const header1 = a.getUint32(0);
-                const header2 = a.getUint32(4);
-                if (header1 === 0x4f676753)
-                  res[name] = await audio.decode(xhr.response);
-                else if (header1 === 0x89504e47 && header2 === 0x0d0a1a0a)
-                  res[name] = await createImageBitmap(new Blob([xhr.response]));
-                else
-                  msgHandler.sendError(
-                    shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [++errorNum]),
-                    "",
-                    true
-                  );
-              }
-              resolve();
-            };
-          })
-      )
-    );
-    if (errorNum)
-      return msgHandler.sendError(
-        shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [errorNum])
-      );
-    const entries = [
-      "Tap",
-      "TapHL",
-      "Drag",
-      "DragHL",
-      "HoldHead",
-      "HoldHeadHL",
-      "Hold",
-      "HoldHL",
-      "HoldEnd",
-      "Flick",
-      "FlickHL",
-    ];
-    await updateRes(res);
-    res["NoImageBlack"] = await createImageBitmap(
-      new ImageData(new Uint8ClampedArray(4).fill(0), 1, 1)
-    );
-    res["NoImageWhite"] = await createImageBitmap(
-      new ImageData(new Uint8ClampedArray(4).fill(255), 1, 1)
-    );
-    res["JudgeLineMP"] = await imgShader(res["JudgeLine"], "#feffa9");
-    res["JudgeLineFC"] = await imgShader(res["JudgeLine"], "#a2eeff");
-    res["Ranks"] = await imgSplit(res["Rank"]);
-    res["Rank"].close();
-    res["mute"] = audio.mute(1);
-    if (
-      !(() => {
-        const b = createCanvas(1, 1).getContext("2d");
-        b.drawImage(res["JudgeLine"], 0, 0);
-        return b.getImageData(0, 0, 1, 1).data[0];
-      })()
-    )
-      return msgHandler.sendError(
-        shared.game.i18n.t("simphi.loading.imgLoadingError", [ err.cause.name ])
-      );
-    // if (ptSettings.resourcesType === "prpr-custom") await loadprprCustomRes();
-    // msgHandler.sendError(shared.game.i18n.t("respack.unavailableNow"));  // diasble custom respack for now
-    shared.game.ptmain.simphiLoaded();
-    $id("uploader").classList.remove("disabled");
-    $id("select").classList.remove("disabled");
-    emitter.dispatchEvent(new CustomEvent("change"));
-    btnPause.classList.add("disabled");
-
-    function decode(img, border = 0) {
-      const canvas = createCanvas(
-        img.width - border * 2,
-        img.height - border * 2
-      );
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, -border, -border);
-      const id = ctx.getImageData(0, 0, canvas.width, canvas.width);
-      const ab = new Uint8Array((id.data.length / 4) * 3);
-      for (let i = 0; i < ab.length; i++)
-        ab[i] = id.data[((i / 3) | 0) * 4 + (i % 3)] ^ (i * 3473);
-      const size = new DataView(ab.buffer, 0, 4).getUint32(0);
-      return { result: ab.buffer.slice(4, size + 4) };
-    }
-  },
-  { once: true }
-);
-shared.game.simphi.reloadRes = async (url, manual = false) => {
+const loadRes = shared.game.simphi.reloadRes = async (url, manual = false, setAsDefault = false) => {
   if (!url) {
     if (main.customResourceMeta == defaultCRM) return;
     // if (shared.game.ptmain.gameConfig.resourcesType === "prpr-custom") {
@@ -1648,7 +1450,7 @@ shared.game.simphi.reloadRes = async (url, manual = false) => {
       "HoldEnd",
       "Flick",
       "FlickHL",
-      "HitFXRaw"
+      "HitFXRaw",
     ];
     for (const i of entries) await noteRender.update(i, res[i], 1);
     res["JudgeLineMP"] = await imgShader(res["JudgeLine"], "#feffa9");
@@ -1662,16 +1464,18 @@ shared.game.simphi.reloadRes = async (url, manual = false) => {
   const newres = {}; //存放资源
   let errorNum = 0;
   const urlBak = url;
-  if (!url.startsWith("http") || !url.startsWith("//")) url = "https://" + url;
-  await fetch(url).then(r => r.json().then(crm => {
+  if (!url.startsWith("/") && !url.startsWith("http")) url = "https://" + url;
+  await fetch(`${url}/meta.json`).then(r => r.json().then(crm => {
     if (crm["hitEvtDrawer"] && !urlBak.startsWith(atob("cGdyZXM0cHQucmVhbHR2b3Au"))) crm["hitEvtDrawer"] = null;
     main.customResourceMeta = crm;
+    if (setAsDefault) defaultCRM = crm;
   }).then(() => main.customResourceMeta.loaded = true)).catch(e => {
     msgHandler.sendError(shared.game.i18n.t("respack.err"));
     return;
   });
-  const erc = (str) => {
-    return main.customResourceMeta.res[str] || "";
+  const erc = (name, src) => {
+    try { return main.customResourceMeta.res[name] || main.customResourceMeta.res[src] || ""; }
+    catch { return ""; }
   };
   await Promise.all(
     Object.entries({
@@ -1689,13 +1493,13 @@ shared.game.simphi.reloadRes = async (url, manual = false) => {
       HitSong0: "HitSong0.ogg",
       HitSong1: "HitSong1.ogg",
       HitSong2: "HitSong2.ogg",
-      HitFXRaw: "clickRaw.png"
+      HitFXRaw: "clickRaw.png",
     }).map(
       ([name, src], _i, arr) =>
         new Promise((resolve) => {
-          if (!erc(src)) return resolve();
+          if (!erc(name, src)) return resolve();
           const xhr = new XMLHttpRequest();
-          xhr.open("get", (src = erc(src)), true);
+          xhr.open("get", (src = erc(name, src)), true);
           xhr.responseType = "arraybuffer";
           xhr.send();
           xhr.onloadend = async () => {
@@ -1823,6 +1627,171 @@ async function updateRes(resources, manual = false) {
   }
   if (manual) shared.game.msgHandler.sendMessage(shared.game.ptmain.$t("respack.customResApplied"), "success");
 }
+//初始化
+//初始化(踩坑：监听DOMContentLoaded似乎会阻塞页面导致长时间白屏)
+window.addEventListener(
+  "load",
+  async function () {
+    shared.game = {
+      ...shared.game,
+      init: true,
+      app,
+      res,
+      charts,
+      stat,
+      hitManager,
+      judgeManager,
+      stage,
+      clearStat,
+      loadSkinFromBuffer,
+      loadSkinFromDB,
+      updateLevelText: updateLevelTextOut,
+      doFullScreen,
+      adjustInfo,
+      qwqStop,
+      qwqPause,
+      frameAnimater,
+    };
+    await shared.game.requestFullscreen();
+    canvas.classList.add("fade");
+    let loadedNum = 0;
+    let errorNum = 0;
+    if (await checkSupport()) return;
+    const pth = "/src/respack/";
+    let pack = "together-pack-1";
+
+    shared.game.ptmain.playerLoaded();
+
+    let ptSettings;
+    try {
+      ptSettings = await ptdb.gameConfig.get();
+    } catch (e) {
+      ptSettings = { resourcesType: "together-pack-1" };
+    }
+
+    if (ptSettings.resourcesType) {
+      if (ptSettings.resourcesType === "pt-custom") loadRes(ptSettings["customResourceLink"], false, true);
+      else if (ptSettings.resourcesType.startsWith("together-pack")) loadRes(`/src/respack/${ptSettings.resourcesType}`, false, true);
+    }
+
+    await Promise.all(
+      Object.entries({
+        JudgeLine: "JudgeLine.png",
+        ProgressBar: "ProgressBar.png",
+        Pause: "PauseNew.png",
+        Rank: "Rank.png",
+        FCV: "FCV.png",
+        LevelOver0: "LevelOver0.ogg",
+        LevelOver0_v2: "LevelOver0_v2.ogg",
+        LevelOver1_v2: "LevelOver1_v2.ogg",
+        LevelOver2_v2: "LevelOver2_v2.ogg",
+        LevelOver3_v2: "LevelOver3_v2.ogg",
+        Resume: "play.png",
+        Retry: "replay.png",
+        Back: "return.png",
+        Loop: "loop.png",
+
+        /* Default Respack Files, now replaced by `loadRes`.
+        HitFXRaw: "clickRaw.png",
+        Tap: "Tap.png",
+        TapHL: "TapHL.png",
+        Drag: "Drag.png",
+        DragHL: "DragHL.png",
+        Flick: "Flick.png",
+        FlickHL: "FlickHL.png",
+        HoldHead: "HoldHead.png",
+        HoldHeadHL: "HoldHeadHL.png",
+        Hold: "Hold.png",
+        HoldHL: "HoldHL.png",
+        HoldEnd: "HoldEnd.png",
+        HitSong0: "HitSong0.ogg",
+        HitSong1: "HitSong1.ogg",
+        HitSong2: "HitSong2.ogg", */
+      }).map(
+        ([name, src], _i, arr) =>
+          new Promise((resolve) => {
+            const xhr = new XMLHttpRequest();
+            const source = /* erc(src) ||  */"/src/respack/shared/" + src;
+            xhr.open("get", (src = source), true);
+            xhr.responseType = "arraybuffer";
+            xhr.send();
+            xhr.onloadend = async () => {
+              if (!xhr.response || !xhr.response.byteLength) {
+                msgHandler.sendError(
+                  shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [++errorNum]),
+                  "",
+                  true
+                );
+              } else {
+                const a = new DataView(xhr.response, 0, 8);
+                const header1 = a.getUint32(0);
+                const header2 = a.getUint32(4);
+                if (header1 === 0x4f676753)
+                  res[name] = await audio.decode(xhr.response);
+                else if (header1 === 0x89504e47 && header2 === 0x0d0a1a0a)
+                  res[name] = await createImageBitmap(new Blob([xhr.response]));
+                else
+                  msgHandler.sendError(
+                    shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [++errorNum]),
+                    "",
+                    true
+                  );
+              }
+              resolve();
+            };
+          })
+      )
+    );
+    if (errorNum)
+      return msgHandler.sendError(
+        shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [errorNum])
+      );
+    res["NoImageBlack"] = await createImageBitmap(
+      new ImageData(new Uint8ClampedArray(4).fill(0), 1, 1)
+    );
+    res["NoImageWhite"] = await createImageBitmap(
+      new ImageData(new Uint8ClampedArray(4).fill(255), 1, 1)
+    );
+    res["JudgeLineMP"] = await imgShader(res["JudgeLine"], "#feffa9");
+    res["JudgeLineFC"] = await imgShader(res["JudgeLine"], "#a2eeff");
+    res["Ranks"] = await imgSplit(res["Rank"]);
+    res["Rank"].close();
+    res["mute"] = audio.mute(1);
+    if (
+      !(() => {
+        const b = createCanvas(1, 1).getContext("2d");
+        b.drawImage(res["JudgeLine"], 0, 0);
+        return b.getImageData(0, 0, 1, 1).data[0];
+      })()
+    )
+      return msgHandler.sendError(
+        shared.game.i18n.t("simphi.loading.imgLoadingError", [ err.cause.name ])
+      );
+    // if (ptSettings.resourcesType === "prpr-custom") await loadprprCustomRes();
+    // msgHandler.sendError(shared.game.i18n.t("respack.unavailableNow"));  // diasble custom respack for now
+    shared.game.ptmain.simphiLoaded();
+    $id("uploader").classList.remove("disabled");
+    $id("select").classList.remove("disabled");
+    emitter.dispatchEvent(new CustomEvent("change"));
+    btnPause.classList.add("disabled");
+
+    function decode(img, border = 0) {
+      const canvas = createCanvas(
+        img.width - border * 2,
+        img.height - border * 2
+      );
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, -border, -border);
+      const id = ctx.getImageData(0, 0, canvas.width, canvas.width);
+      const ab = new Uint8Array((id.data.length / 4) * 3);
+      for (let i = 0; i < ab.length; i++)
+        ab[i] = id.data[((i / 3) | 0) * 4 + (i % 3)] ^ (i * 3473);
+      const size = new DataView(ab.buffer, 0, 4).getUint32(0);
+      return { result: ab.buffer.slice(4, size + 4) };
+    }
+  },
+  { once: true }
+);
 
 //必要组件
 const frameAnimater = new FrameAnimater();
@@ -1870,7 +1839,7 @@ function playBgm(data, offset) {
     offset: offset,
     playbackrate: app.speed,
     gainrate: app.musicVolume,
-    interval: autoDelay.checked ? 1 : 0,
+    interval: shared.game.ptmain.gameConfig.autoDelay ? 1 : 0,
   });
 }
 /**
@@ -1936,7 +1905,7 @@ function mainLoop() {
     ctxos.globalCompositeOperation = "source-over";
     ctxos.resetTransform();
     ctxos.globalAlpha = 1;
-    if ($id("imageBlur").checked)
+    if (shared.game.ptmain.gameConfig.imageBlur)
       ctxos.drawImage(
         app.bgImageBlur,
         ...adjustSize(app.bgImageBlur, canvasos, 1)
@@ -2011,7 +1980,7 @@ function mainLoop() {
   }
   if (canvas.width > canvasos.width || canvas.height > canvasos.height || fucktemp2) {
     ctx.globalAlpha = 1;
-    if ($id("imageBlur").checked || fucktemp2)
+    if (shared.game.ptmain.gameConfig.imageBlur || fucktemp2)
       ctx.drawImage(app.bgImageBlur, ...adjustSize(app.bgImageBlur, canvas, 1.1));
     else ctx.drawImage(app.bgImage, ...adjustSize(app.bgImage, canvas, 1.1));
     ctx.fillStyle = "#000";
@@ -2051,7 +2020,7 @@ function loopNoCanvas() {
   }
   timeChart = Math.max(
     timeBgm -
-    (app.chart.offset + Number(inputOffset.value) / 1e3 || 0) / app.speed,
+    (app.chart.offset + Number(shared.game.ptmain.gameConfig.inputOffset) / 1e3 || 0) / app.speed,
     0
   );
   //遍历判定线events和Note
@@ -2078,7 +2047,7 @@ function loopNoCanvas() {
   }
   //更新判定
   hitManager.update();
-  tmps.bgImage = $id("imageBlur").checked ? app.bgImageBlur : app.bgImage;
+  tmps.bgImage = shared.game.ptmain.gameConfig.imageBlur ? app.bgImageBlur : app.bgImage;
   tmps.bgVideo = app.bgVideo;
   tmps.progress = (main.qwqwq ? duration - timeBgm : timeBgm) / duration;
   tmps.name = inputName.value || inputName.placeholder;
@@ -2139,7 +2108,7 @@ function loopCanvas() {
   if (qwqIn.second >= 3 && qwqOut.second === 0) {
     //绘制note
     drawNotes();
-    if (showPoint.checked) {
+    if (shared.game.ptmain.gameConfig.showPoint) {
       //绘制定位点
       ctxos.font = `${lineScale}px Saira`;
       ctxos.textAlign = "center";
@@ -2191,7 +2160,7 @@ function loopCanvas() {
   // if (qwq[4]) ctxos.filter = `hue-rotate(${stat.combo*360/7}deg)`;
   hitImageList.animate(); //绘制打击特效1
   // if (qwq[4]) ctxos.filter = 'none';
-  if (showCE2.checked) hitWordList.animate(); //绘制打击特效2
+  if (shared.game.ptmain.gameConfig.showCE2) hitWordList.animate(); //绘制打击特效2
   ctxos.globalAlpha = 1;
   //绘制进度条
   ctxos.setTransform(
@@ -2268,7 +2237,7 @@ function loopCanvas() {
     if (qwqIn.second >= 2.5)
       ctxos.globalAlpha = tween.easeOutSine(6 - qwqIn.second * 2);
     ctxos.drawImage(
-      lineColor.checked ? res["JudgeLineMP"] : res["JudgeLine"],
+      shared.game.ptmain.gameConfig.lineColor ? res["JudgeLineMP"] : res["JudgeLine"],
       -imgW / 2,
       -imgH / 2,
       imgW,
@@ -2304,7 +2273,7 @@ function loopCanvas() {
       canvasos.width - lineScale * 0.65 + tmps.statStatus.score.offsetX,
       lineScale * 1.375 + tmps.statStatus.score.offsetY
     );
-    if (showAcc.checked && shared.game.ptmain.playConfig.mode !== "preview") {
+    if (shared.game.ptmain.gameConfig.showAcc && shared.game.ptmain.playConfig.mode !== "preview") {
       ctxos.font = `${lineScale * 0.66}px Saira`;
       ctxos.fillText(
         stat.accStr,
@@ -2369,7 +2338,7 @@ function loopCanvas() {
   ctxos.resetTransform();
   if (qwqIn.second >= 2.5 && tmps.customForeDraw != null) tmps.customForeDraw(ctxos); // 自定义前景
   if (qwqIn.second > 3 && main.filter) main.filter(ctxos, timeBgm, nowTime_ms / 1e3); //滤镜处理
-  if ($id("feedback").checked) hitFeedbackList.animate(); //绘制打击特效0
+  if (shared.game.ptmain.gameConfig.feedback) hitFeedbackList.animate(); //绘制打击特效0
   ctxos.resetTransform();
   try {
     shared.game.graphicHandler.whilePlayingHook(ctx, ctxos, lineScale);
@@ -2678,7 +2647,7 @@ function drawLine(bool, lineScale) {
       const imgH = imgS * i.imageH * ((i.scaleY * 1) || 1);
       // ctxos.save();
       if (!i.text) {
-        // const lineImage = i.imageL[i.imageC && lineColor.checked ? stat.lineStatus : 0];
+        // const lineImage = i.imageL[i.imageC && shared.game.ptmain.gameConfig.lineColor ? stat.lineStatus : 0];
         // if (i.scaleX) ctxos.scale(-1, 1);
         try {
           if (i.color && i.color != "#fff" && i.color != "#ffffff") {
@@ -2702,7 +2671,7 @@ function drawLine(bool, lineScale) {
             }
           } else {
             ctxos.drawImage(
-              i.imageL[i.imageC && lineColor.checked ? stat.lineStatus : 0],
+              i.imageL[i.imageC && shared.game.ptmain.gameConfig.lineColor ? stat.lineStatus : 0],
               -imgW / 2,
               -imgH / 2,
               imgW,
@@ -2711,7 +2680,7 @@ function drawLine(bool, lineScale) {
           }
         } catch (err) {
           ctxos.drawImage(
-            i.imageL[i.imageC && lineColor.checked ? stat.lineStatus : 0],
+            i.imageL[i.imageC && shared.game.ptmain.gameConfig.lineColor ? stat.lineStatus : 0],
             -imgW / 2,
             -imgH / 2,
             imgW,
@@ -2730,7 +2699,7 @@ function drawLine(bool, lineScale) {
   }
 }
 function getColoredLineImage(line, hex) {
-  if (!hex) return line.imageL[i.imageC && lineColor.checked ? stat.lineStatus : 0];
+  if (!hex) return line.imageL[i.imageC && shared.game.ptmain.gameConfig.lineColor ? stat.lineStatus : 0];
   hex = hex.toLowerCase();
   return line.imagesColored[hex] || (line.imagesColored[hex] = imgShader(line.imageL[0], hex, true));
 }
@@ -3157,7 +3126,7 @@ function drawTap(note) {
     noteRender.note["TapBad"].full(ctxos);
   } else {
     ctxos.globalAlpha =
-      note.alpha || (note.showPoint && showPoint.checked ? 0.45 : 0);
+      note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
     if (main.qwqwq)
       ctxos.globalAlpha *= Math.max(1 + (timeChart - note.realTime) / 1.5, 0); //过线前1.5s出现
     noteRender.note[HL ? "TapHL" : "Tap"].full(ctxos);
@@ -3180,7 +3149,7 @@ function drawDrag(note) {
   if (note.badtime);
   else {
     ctxos.globalAlpha =
-      note.alpha || (note.showPoint && showPoint.checked ? 0.45 : 0);
+      note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
     if (main.qwqwq)
       ctxos.globalAlpha *= Math.max(1 + (timeChart - note.realTime) / 1.5, 0);
     noteRender.note[HL ? "DragHL" : "Drag"].full(ctxos);
@@ -3193,7 +3162,7 @@ function drawHold(note, realTime) {
   const nsr = app.noteScaleRatio * (note.size || 1);
   if (!note.visible || note.realTime + note.realHoldTime < realTime) return; //qwq
   ctxos.globalAlpha =
-    note.alpha || (note.showPoint && showPoint.checked ? 0.45 : 0);
+    note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
   if (main.qwqwq)
     ctxos.globalAlpha *= Math.max(1 + (timeChart - note.realTime) / 1.5, 0);
   ctxos.setTransform(
@@ -3239,7 +3208,7 @@ function drawFlick(note) {
   if (note.badtime);
   else {
     ctxos.globalAlpha =
-      note.alpha || (note.showPoint && showPoint.checked ? 0.45 : 0);
+      note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
     if (main.qwqwq)
       ctxos.globalAlpha *= Math.max(1 + (timeChart - note.realTime) / 1.5, 0);
     noteRender.note[HL ? "FlickHL" : "Flick"].full(ctxos);
@@ -3360,20 +3329,12 @@ $id("select-volume").addEventListener("change", (evt) => {
   app.soundVolume = Math.min(1, volume);
   Promise.resolve().then(qwqPause).then(qwqPause);
 });
-const inputOffset = $id("input-offset");
-const showCE2 = $id("showCE2");
-const showAcc = $id("showAcc");
-const showStat = $id("showStat");
 const lowRes = $id("lowRes");
-const lockOri = $id("lockOri");
 const maxFrame = $id("maxFrame");
 const isMaxFrame = $id("isMaxFrame");
 const isForcedMaxFrame = $id("isForcedMaxFrame");
-const autoDelay = $id("autoDelay");
 const enableVP = $id("enableVP");
 const enableFR = $id("enableFR");
-const showPoint = $id("showPoint");
-const lineColor = $id("lineColor");
 enableVP.addEventListener(
   "change",
   (evt) => (app.enableVP = evt.target.checked)

@@ -21,6 +21,9 @@ import ptdb from "@utils/ptdb";
 import "@utils/js/errHandler";
 if (import.meta.env.DEV) self.ptdb = ptdb;
 
+import { renderers } from "@utils/renderer";
+import { render } from "vue";
+
 var searchParams;
 
 const msgHandler = {
@@ -334,6 +337,7 @@ const ptAppInstance = createApp({
   data() {
     return {
       _pzFollowAspectRatio: false,
+      currentRenderer: renderers.simphi,
       gameConfig: {
         _followAspectRatio: false,
         account: {
@@ -542,10 +546,9 @@ const ptAppInstance = createApp({
             }
           } catch (e) { }
           if (
-            newVal.startsWith("together-pack") &&
-            (await msgHandler.confirm(this.$t("respack.requestReload")))
+            newVal.startsWith("together-pack")
           )
-            location.reload();
+            this.currentRenderer.loadRespack("/src/respack/" + newVal);
         } else if (newVal === "prpr-custom") {
           return;
         }
@@ -634,40 +637,6 @@ const ptAppInstance = createApp({
     },
     ptAppPause(i) {
       btnPause.value == "暂停" && btnPause.click(); //
-    },
-    spClickLB() {
-      if (
-        shared.game.isPlayFinished() &&
-        shared.game.ptmain.playConfig.mode !== "preview"
-      ) {
-        shared.game.exportRecord && shared.game.exportRecord();
-      } else if (this.gameMode === "single") {
-        if (btnPause.value == "暂停") return; //btnPause.click();
-        switch (selectflip.value) {
-          case "0":
-            selectflip.value = "3";
-            shared.game.simphi.mirrorView(3);
-            break;
-          case "1":
-            selectflip.value = "2";
-            shared.game.simphi.mirrorView(2);
-            break;
-          case "2":
-            selectflip.value = "1";
-            shared.game.simphi.mirrorView(1);
-            break;
-          case "3":
-            selectflip.value = "0";
-            shared.game.simphi.mirrorView(0);
-            break;
-        }
-      } else {
-        shared.game.multiInstance.JITSOpen =
-          !shared.game.multiInstance.JITSOpen;
-      }
-    },
-    spClickLT() {
-      if (shared.game.simphi.emitter.eq("play")) btnPause.click(); //
     },
     async modJudgment() {
       try {
@@ -766,17 +735,10 @@ const ptAppInstance = createApp({
         return;
       }
     },
-    async spClickRT() {
-      if (this.gameMode === "multi") return;
-      btnPause.value === "暂停" && btnPause.click();
-      if (shared.game.app.pauseNextTick)
-        clearInterval(shared.game.app.pauseNextTick),
-          (shared.game.app.pauseTime = 0),
-          (shared.game.app.pauseNextTick = null);
+    async retry() {
       await this.genPlayToken();
       recordMgr.reset();
       shared.game.restartClearRecord();
-      Promise.resolve().then(shared.game.qwqStop).then(shared.game.qwqStop);
     },
     async playChart(settings) {
       if (this.gameMode !== "multi" && !this.shouldNotUploadPhiZone)

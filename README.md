@@ -6,7 +6,7 @@
 
 ## 👍 支持我们的持续运行
 
-[Team PhiTogether 的爱发电](https://afdian.net/a/PhiTogether)
+[Team PhiTogether 的爱发电](https://afdian.com/a/PhiTogether)
 
 ## 💪 贡献此项目
 
@@ -62,5 +62,5 @@
 ## ⭐ 致谢
 
 - 基于 [lchzh3473/sim-phi](https://github.com/lchzh3473/sim-phi) 。
-- 所有[以爱发电等各种形式支持我们](https://afdian.net/a/PhiTogether?tab=sponsor)的玩家。
+- 所有[以爱发电等各种形式支持我们](https://afdian.com/a/PhiTogether?tab=sponsor)的玩家。
 - 以及屏幕前的你！
