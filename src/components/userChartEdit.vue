@@ -78,11 +78,10 @@ export default {
                 v-model="songData.name" />
         </div>
         <div class="userChartEditRow">
-            {{ $t("userChartEdit.composer") }}：<input class="input textInput" style="width:calc(100%/2);"
+            {{ $t("userChartEdit.composer") }}：<input class="input textInput" style="width:calc(100%/4.75);"
                 v-model="songData.composer" />
-        </div>
-        <div class="userChartEditRow">
-            {{ $t("userChartEdit.illustrator") }}：<input class="input textInput" style="width:calc(100%/2);"
+
+            {{ $t("userChartEdit.illustrator") }}：<input class="input textInput" style="width:calc(100%/4.75);"
                 v-model="songData.illustrator" />
         </div>
         <br />
@@ -93,9 +92,9 @@ export default {
                     v-model="chartData.charter" />
             </div>
             <div class="userChartEditRow">
-                {{ $t("userChartEdit.level") }}：<input class="input textInput" style="width:calc(100%/6);"
+                {{ $t("userChartEdit.level") }}：<input class="input textInput" style="width:calc(100%/4.5);"
                     v-model="chartData.level" />
-                {{ $t("userChartEdit.difficulty") }}：<input class="input textInput" style="width:calc(100%/6);"
+                {{ $t("userChartEdit.difficulty") }}：<input class="input textInput" style="width:calc(100%/4.5);"
                     v-model="chartData.difficulty" />
             </div>
         </div>
