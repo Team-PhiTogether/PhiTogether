@@ -116,15 +116,13 @@ export default {
                 return;
             }
             if (shared.game.ptmain.noAccountMode) {
-                if (
-                    await shared.game.msgHandler.confirm(
-                        this.loginInfo ? this.$t("startPage.askForRelogin") : this.$t("startPage.askForLogin")
-                    )
-                ) {
-                    if (!this.loginInfo) this.to({ path: "/login" });
-                    else this.reLogin();
-                    return;
-                }
+                if (this.loginInfo) {
+                    if (await shared.game.msgHandler.confirm(this.$t("startPage.askForRelogin"))) {
+                        if (!this.loginInfo) this.to({ path: "/login" });
+                        else this.reLogin();
+                        return;
+                    }
+                } else shared.game.msgHandler.sendMessage(this.$t("startPage.askForLogin"), "error");
             }
             this.to({ path: "/chartSelect" });
         },
