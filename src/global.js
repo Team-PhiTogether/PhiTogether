@@ -169,7 +169,7 @@ const requestFullscreen = async (forced) => {
     shared.game.requestedFullscreen = true;
     return;
   }
-  if (spec.isAppleDevice && !spec.isPhiTogetherApp && !spec.isDesktop) {
+  if (spec.isiOSDevice && !spec.isPhiTogetherApp) {
     if (
       await msgHandler.confirm(
         i18n.global.t("requestFullscreen.requestDownloadiOSApp")
