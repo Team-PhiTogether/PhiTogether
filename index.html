@@ -26,7 +26,7 @@
 			isDesktop: !(navigator.userAgent.includes("Mobile") || navigator.userAgent.includes("Android")),
 		};
 		window.spec.isAndroidApp = !window.spec.isAppleDevice && window.spec.isPhiTogetherApp;
-		window.spec.isiOSDevice = window.spec.isAppleDevice && !navigator.userAgent.includes('Mac OS X');
+		window.spec.isiOSDevice = window.spec.isAppleDevice && !spec.isDesktop;
 		window.spec.antiAdditionEnabled = window.nativeApi && window.nativeApi.antiAddiction_enabled && window.nativeApi.antiAddiction_enabled();
 		// 节日活动
 		const partyMgr = {
