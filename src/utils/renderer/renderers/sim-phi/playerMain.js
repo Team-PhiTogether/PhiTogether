@@ -324,11 +324,11 @@ function adjustInfo() {
       if (isFinite((i.GlobalAlpha = parseFloat(i.GlobalAlpha)))) {
         //Legacy
         shared.game.ptmain.gameConfig.backgroundDim = i.GlobalAlpha;
-        app.brightness = Number(i.GlobalAlpha);
+        shared.game.ptmain.gameConfig.shared.game.ptmain.gameConfig.backgroundDim = Number(i.GlobalAlpha);
       }
       if (isFinite((i.BackgroundDim = parseFloat(i.BackgroundDim)))) {
         shared.game.ptmain.gameConfig.backgroundDim = i.BackgroundDim;
-        app.brightness = Number(i.BackgroundDim);
+        shared.game.ptmain.gameConfig.shared.game.ptmain.gameConfig.backgroundDim = Number(i.BackgroundDim);
       }
       if (isFinite((i.Offset = parseFloat(i.Offset))))
         shared.game.ptmain.chartOffsetSurface = i.Offset;
@@ -2094,11 +2094,11 @@ function loopCanvas() {
   ctxos.resetTransform();
   ctxos.fillStyle = "#000"; //背景变暗
   if (qwqIn.second < 0.67)
-    ctxos.globalAlpha = tween.easeOutSine(qwqIn.second * 1.5) * app.brightness;
+    ctxos.globalAlpha = tween.easeOutSine(qwqIn.second * 1.5) * shared.game.ptmain.gameConfig.shared.game.ptmain.gameConfig.backgroundDim;
   else
     ctxos.globalAlpha =
-      app.brightness -
-      tween.easeOutSine(qwqOut.second * 1.5) * (app.brightness - 0.2);
+      shared.game.ptmain.gameConfig.shared.game.ptmain.gameConfig.backgroundDim -
+      tween.easeOutSine(qwqOut.second * 1.5) * (shared.game.ptmain.gameConfig.shared.game.ptmain.gameConfig.backgroundDim - 0.2);
   ctxos.fillRect(0, 0, canvasos.width, canvasos.height);
   if (qwqIn.second >= 2.5 && tmps.customBackDraw != null) tmps.customBackDraw(ctxos); // 自定义背景
   // if (qwq[4]) ctxos.filter = `hue-rotate(${stat.combo*360/7}deg)`;
@@ -3110,7 +3110,7 @@ function drawNotes() {
 
 function drawTap(note) {
   if (app.pauseTime && shared.game.ptmain.gameConfig.reviewWhenResume && note.scored) return;
-  const HL = note.isMulti && app.multiHint;
+  const HL = note.isMulti && shared.game.ptmain.gameConfig.highLight;
   const nsr = app.noteScaleRatio * (note.size || 1);
   if (!note.visible || (note.scored && !note.badtime)) return;
   ctxos.setTransform(
@@ -3135,7 +3135,7 @@ function drawTap(note) {
 
 function drawDrag(note) {
   if (app.pauseTime && shared.game.ptmain.gameConfig.reviewWhenResume && note.scored) return;
-  const HL = note.isMulti && app.multiHint;
+  const HL = note.isMulti && shared.game.ptmain.gameConfig.highLight;
   const nsr = app.noteScaleRatio * (note.size || 1);
   if (!note.visible || (note.scored && !note.badtime)) return;
   ctxos.setTransform(
@@ -3158,7 +3158,7 @@ function drawDrag(note) {
 
 function drawHold(note, realTime) {
   if (app.pauseTime && shared.game.ptmain.gameConfig.reviewWhenResume && note.scored) return;
-  const HL = note.isMulti && app.multiHint;
+  const HL = note.isMulti && shared.game.ptmain.gameConfig.highLight;
   const nsr = app.noteScaleRatio * (note.size || 1);
   if (!note.visible || note.realTime + note.realHoldTime < realTime) return; //qwq
   ctxos.globalAlpha =
@@ -3194,7 +3194,7 @@ function drawHold(note, realTime) {
 
 function drawFlick(note) {
   if (app.pauseTime && shared.game.ptmain.gameConfig.reviewWhenResume && note.scored) return;
-  const HL = note.isMulti && app.multiHint;
+  const HL = note.isMulti && shared.game.ptmain.gameConfig.highLight;
   const nsr = app.noteScaleRatio * (note.size || 1);
   if (!note.visible || (note.scored && !note.badtime)) return;
   ctxos.setTransform(
@@ -3329,6 +3329,7 @@ $id("select-volume").addEventListener("change", (evt) => {
   app.soundVolume = Math.min(1, volume);
   Promise.resolve().then(qwqPause).then(qwqPause);
 });
+// TODO
 const lowRes = $id("lowRes");
 const maxFrame = $id("maxFrame");
 const isMaxFrame = $id("isMaxFrame");
