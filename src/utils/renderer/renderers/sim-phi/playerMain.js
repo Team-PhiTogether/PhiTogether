@@ -324,11 +324,11 @@ function adjustInfo() {
       if (isFinite((i.GlobalAlpha = parseFloat(i.GlobalAlpha)))) {
         //Legacy
         shared.game.ptmain.gameConfig.backgroundDim = i.GlobalAlpha;
-        shared.game.ptmain.gameConfig.shared.game.ptmain.gameConfig.backgroundDim = Number(i.GlobalAlpha);
+        shared.game.ptmain.gameConfig.backgroundDim = Number(i.GlobalAlpha);
       }
       if (isFinite((i.BackgroundDim = parseFloat(i.BackgroundDim)))) {
         shared.game.ptmain.gameConfig.backgroundDim = i.BackgroundDim;
-        shared.game.ptmain.gameConfig.shared.game.ptmain.gameConfig.backgroundDim = Number(i.BackgroundDim);
+        shared.game.ptmain.gameConfig.backgroundDim = Number(i.BackgroundDim);
       }
       if (isFinite((i.Offset = parseFloat(i.Offset))))
         shared.game.ptmain.chartOffsetSurface = i.Offset;
@@ -2094,11 +2094,11 @@ function loopCanvas() {
   ctxos.resetTransform();
   ctxos.fillStyle = "#000"; //背景变暗
   if (qwqIn.second < 0.67)
-    ctxos.globalAlpha = tween.easeOutSine(qwqIn.second * 1.5) * shared.game.ptmain.gameConfig.shared.game.ptmain.gameConfig.backgroundDim;
+    ctxos.globalAlpha = tween.easeOutSine(qwqIn.second * 1.5) * shared.game.ptmain.gameConfig.backgroundDim;
   else
     ctxos.globalAlpha =
-      shared.game.ptmain.gameConfig.shared.game.ptmain.gameConfig.backgroundDim -
-      tween.easeOutSine(qwqOut.second * 1.5) * (shared.game.ptmain.gameConfig.shared.game.ptmain.gameConfig.backgroundDim - 0.2);
+      shared.game.ptmain.gameConfig.backgroundDim -
+      tween.easeOutSine(qwqOut.second * 1.5) * (shared.game.ptmain.gameConfig.backgroundDim - 0.2);
   ctxos.fillRect(0, 0, canvasos.width, canvasos.height);
   if (qwqIn.second >= 2.5 && tmps.customBackDraw != null) tmps.customBackDraw(ctxos); // 自定义背景
   // if (qwq[4]) ctxos.filter = `hue-rotate(${stat.combo*360/7}deg)`;
