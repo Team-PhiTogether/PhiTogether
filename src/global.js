@@ -386,6 +386,11 @@ const ptAppInstance = createApp({
       },
       deep: true,
     },
+    "gameConfig.noteScale": {
+      handler(newVal) {
+        shared.game.simphi.setNoteScale(Number(newVal));
+      },
+    },
     debugEnabled: {
       handler(newVal, oldVal) {
         const ele = document.querySelector("#eruda");
@@ -1176,8 +1181,8 @@ const ptAppInstance = createApp({
     update() {
       caches.delete("PTv0-Main").then(() => {
         const url = `/#${searchParams
-            ? `/updateAndPlayChart?${searchParams.toString()}`
-            : "update"
+          ? `/updateAndPlayChart?${searchParams.toString()}`
+          : "update"
           }`;
         fetch(url, {
           headers: {
