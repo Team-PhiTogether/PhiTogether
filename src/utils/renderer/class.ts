@@ -4,8 +4,11 @@ export class ChartRenderer {
     description: string | null;
 
     init: Function;
-    loadChart: Function;
-    loadRespack: Function;
+    load: {
+        chart: Function;   // url
+        respack: Function; // url
+    };
+    startGameplay: Function; // settings
     reset: Function;
 
     constructor({
@@ -16,6 +19,7 @@ export class ChartRenderer {
         init,
         loadChart,
         loadRespack,
+        startGameplay,
         // reset,
     }) {
         this.name = name || "unknown";
@@ -23,7 +27,10 @@ export class ChartRenderer {
         this.description = description || null;
 
         this.init = init;
-        this.loadChart = loadChart;
-        this.loadRespack = loadRespack;
+        this.load = {
+            chart: loadChart,
+            respack: loadRespack,
+        };
+        this.startGameplay = startGameplay;
     }
 }
