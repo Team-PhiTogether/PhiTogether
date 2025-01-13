@@ -122,3 +122,53 @@ export const msgHandler = {
     });
   },
 }; 
+
+export const spMsgHandler = {
+  lastMessage: "",
+  msgbox(msg, type, fatal) {
+    return;
+  },
+  sendMessage(msg, type) {
+    if (!msg) return;
+    if (type === "error") {
+      Notiflix.Notify.failure(msg, {
+        ID: "msgHandlerErr",
+        zindex: 114515,
+        cssAnimationStyle: "fade",
+        opacity: "0.8",
+        borderRadius: "15px",
+      });
+    } else {
+      Notiflix.Notify.info(msg, {
+        ID: "msgHandlerInfo",
+        showOnlyTheLastOne: true,
+        zindex: 114515,
+        cssAnimationStyle: "fade",
+        clickToClose: true,
+        opacity: "0.8",
+        borderRadius: "15px",
+      });
+    }
+  },
+  sendWarning(msg, isHTML) {
+    const msgText = isHTML ? msg : Utils.escapeHTML(msg);
+    this.msgbox(msgText, "warn");
+    //this.sendMessage(this.lastMessage);
+  },
+  sendError(msg, html, fatal) {
+    if (html) {
+      const exp =
+        /([A-Za-z][A-Za-z+-.]{2,}:\/\/|www\.)[^\s\x00-\x20\x7f-\x9f"]{2,}[^\s\x00-\x20\x7f-\x9f"!'),.:;?\]}]/g;
+      const ahtml = html.replace(exp, (match = "") => {
+        const url = match.startsWith("www.") ? `//${match}` : match;
+        const rpath = match.replace(`${location.origin}/`, "");
+        if (match.indexOf(location.origin) > -1)
+          return `<a href="#"style="color:#023b8f;text-decoration:underline;">${rpath}</a>`;
+        return `<a href="${url}"target="_blank"style="color:#023b8f;text-decoration:underline;">${rpath}</a>`;
+      });
+      this.msgbox(ahtml, "error", fatal);
+    }
+    this.sendMessage(msg, "error");
+    return false;
+  },
+};

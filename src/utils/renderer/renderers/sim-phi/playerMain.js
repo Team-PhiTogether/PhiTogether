@@ -26,19 +26,13 @@ import { imgBlur, imgShader, imgPainter, imgSplit, hex2rgba, rgba2hex } from "./
 import { createCanvas } from "./utils/canvas.js";
 
 import ptdb from "@utils/ptdb";
+import { spMsgHandler } from "@utils/js/msgHandler.js";
+import { tween, Emitter } from "./utils/simphiUtils.js";
 
 const $id = (query) => document.getElementById(query);
 const $ = (query) => document.body.querySelector(query);
 const $$ = (query) => document.body.querySelectorAll(query);
-const tween = {
-  easeInSine: (pos) => 1 - Math.cos((pos * Math.PI) / 2),
-  easeOutSine: (pos) => Math.sin((pos * Math.PI) / 2),
-  easeOutCubic: (pos) => 1 + (pos - 1) ** 3,
-  easeIOCubic: (pos) => ((pos *= 2) < 1 ? pos ** 3 : (pos - 2) ** 3 + 2) / 2,
-  easeInCubic: (pos) => pos ** 3, //9
-  ease10: (pos) => 1 - (pos - 1) ** 4, //10
-  ease15: (pos) => pos ** 5, //15
-};
+
 const main = {};
 main.modify = (a) => a;
 main.pressTime = 0;
@@ -53,77 +47,10 @@ main.filterOptions = {};
 main["flag{qwq}"] = (_) => { };
 document.oncontextmenu = (e) => e.preventDefault(); //qwq
 
-const msgHandler = {
-  lastMessage: "",
-  msgbox(msg, type, fatal) {
-    return;
-  },
-  sendMessage(msg, type) {
-    if (!msg) return;
-    if (type === "error") {
-      Notiflix.Notify.failure(msg, {
-        ID: "msgHandlerErr",
-        zindex: 114515,
-        cssAnimationStyle: "fade",
-        opacity: "0.8",
-        borderRadius: "15px",
-      });
-    } else {
-      Notiflix.Notify.info(msg, {
-        ID: "msgHandlerInfo",
-        showOnlyTheLastOne: true,
-        zindex: 114515,
-        cssAnimationStyle: "fade",
-        clickToClose: true,
-        opacity: "0.8",
-        borderRadius: "15px",
-      });
-    }
-  },
-  sendWarning(msg, isHTML) {
-    const msgText = isHTML ? msg : Utils.escapeHTML(msg);
-    this.msgbox(msgText, "warn");
-    //this.sendMessage(this.lastMessage);
-  },
-  sendError(msg, html, fatal) {
-    if (html) {
-      const exp =
-        /([A-Za-z][A-Za-z+-.]{2,}:\/\/|www\.)[^\s\x00-\x20\x7f-\x9f"]{2,}[^\s\x00-\x20\x7f-\x9f"!'),.:;?\]}]/g;
-      const ahtml = html.replace(exp, (match = "") => {
-        const url = match.startsWith("www.") ? `//${match}` : match;
-        const rpath = match.replace(`${location.origin}/`, "");
-        if (match.indexOf(location.origin) > -1)
-          return `<a href="#"style="color:#023b8f;text-decoration:underline;">${rpath}</a>`;
-        return `<a href="${url}"target="_blank"style="color:#023b8f;text-decoration:underline;">${rpath}</a>`;
-      });
-      this.msgbox(ahtml, "error", fatal);
-    }
-    this.sendMessage(msg, "error");
-    return false;
-  },
-};
-shared.game.spMsgHandler = msgHandler;
 const stat = new simphi.Stat();
 const app = new simphi.Renderer($id("stage")); //test
 shared.game.simphi = app;
-const { canvas, ctx, canvasos, ctxos } = app;
-class Emitter extends EventTarget {
-  constructor(statusInit) {
-    super();
-    this.status = statusInit;
-  }
-  emit(status) {
-    if (this.status === status) return;
-    this.status = status;
-    this.dispatchEvent(new Event("change"));
-  }
-  eq(status) {
-    return this.status === status;
-  }
-  ne(status) {
-    return this.status !== status;
-  }
-}
+
 const emitter = new Emitter("stop");
 shared.game.simphi.emitter = emitter;
 const status2 = {
@@ -200,20 +127,20 @@ const gauge = {
     for (let i = 1; i < 8; i++) gauge._flags[i] = stat.noteRank[i];
   },
   draw() {
-    if(!shared.game.ptmain.gameConfig.enableLife) return;
+    if (!shared.game.ptmain.gameConfig.enableLife) return;
     const gaugeValue = Math.max(gauge.value / 100, 0);
     gauge._drawGaugeBar('#3f3b71', 1);
-    ctxos.fillStyle = "#fff";
-    ctxos.font = `${app.lineScale * 0.5}px Saira`;
-    ctxos.textAlign = "left";
-    ctxos.globalAlpha = tmps.statStatus.pause.alpha;
-    ctxos.fillText(
+    app.ctxos.fillStyle = "#fff";
+    app.ctxos.font = `${app.lineScale * 0.5}px Saira`;
+    app.ctxos.textAlign = "left";
+    app.ctxos.globalAlpha = tmps.statStatus.pause.alpha;
+    app.ctxos.fillText(
       "LIFE",
       app.lineScale * 1.75 + tmps.statStatus.pause.offsetX,
       app.lineScale * 0.95 + tmps.statStatus.pause.offsetY
     );
-    ctxos.textAlign = "right";
-    ctxos.fillText(
+    app.ctxos.textAlign = "right";
+    app.ctxos.fillText(
       shared.game.ptmain.playConfig.mode === "preview" ? "∞" : gaugeValue.toFixed(3) * 1000,
       app.lineScale * 6 + tmps.statStatus.pause.offsetX,
       app.lineScale * 0.95 + tmps.statStatus.pause.offsetY
@@ -221,9 +148,9 @@ const gauge = {
     gauge._drawGaugeBar(gaugeValue <= 0.25 ? "#f00" : "#0ff", gaugeValue);
   },
   _drawGaugeBar(c, p) {
-    ctxos.fillStyle = c;
+    app.ctxos.fillStyle = c;
     drawRoundRect(
-      ctxos,
+      app.ctxos,
       app.lineScale * 1.75 + tmps.statStatus.pause.offsetX,
       app.lineScale * 1.1 + tmps.statStatus.pause.offsetY,
       app.lineScale * 4.25 * Math.max(p, 0),
@@ -241,12 +168,12 @@ async function checkSupport() {
     const errmsg3 = shared.game.i18n.t("simphi.loadLib.err.msg3", { name });
     if (
       !(await loadJS(urls).catch((e) =>
-        msgHandler.sendError(errmsg1, e.message.replace(/.+/, errmsg2), true)
+        spMsgHandler.sendError(errmsg1, e.message.replace(/.+/, errmsg2), true)
       ))
     )
       return false;
     if (!check()) return true;
-    return msgHandler.sendError(errmsg1, errmsg3, true);
+    return spMsgHandler.sendError(errmsg1, errmsg3, true);
   };
   await Utils.addFont("Cairo", { alt: "Custom" });
   // await Utils.addFont('Saira', { alt: 'Custom' });
@@ -259,7 +186,7 @@ async function checkSupport() {
   if (navigator.userAgent.indexOf("MiuiBrowser") > -1) {
     //实测 v17.1.8 问题仍然存在，v17.4.80113 问题已修复
     const version = navigator.userAgent.match(/MiuiBrowser\/(\d+\.\d+)/);
-    if (!version || parseFloat(version[1]) < 17.4) msgHandler.sendWarning(shared.game.i18n.t("simphi.compatibilityWarning.miBrowser"));
+    if (!version || parseFloat(version[1]) < 17.4) spMsgHandler.sendWarning(shared.game.i18n.t("simphi.compatibilityWarning.miBrowser"));
   }
   if (
     !(await loadLib(shared.game.i18n.t("simphi.loadLib.libNames.createImageBitmap"), urls.bitmap, () =>
@@ -359,7 +286,7 @@ self.addEventListener("resize", () => stage.resize());
     uploader_total = Object.values(totals).reduce((a, b) => a + b, 0);
     if (!(promise instanceof Promise)) promise = Promise.resolve();
     await promise.catch((err) =>
-      msgHandler.sendWarning(shared.game.i18n.t("simphi.handleFile.unsupportedFile", [ err.cause.name ]))
+      spMsgHandler.sendWarning(shared.game.i18n.t("simphi.handleFile.unsupportedFile", [err.cause.name]))
     );
     dones[tag] = (dones[tag] || 0) + 1;
     uploader_done = Object.values(dones).reduce((a, b) => a + b, 0);
@@ -461,7 +388,7 @@ self.addEventListener("resize", () => stage.resize());
         selectbg.appendChild(createOption(data.name, data.name));
         break;
       case "chart":
-        if (data.msg) data.msg.forEach((v) => msgHandler.sendWarning(v));
+        if (data.msg) data.msg.forEach((v) => spMsgHandler.sendWarning(v));
         if (data.info) chartInfoData.push(data.info);
         if (data.line) chartLineData.push(...data.line);
         let basename = data.name;
@@ -540,7 +467,7 @@ const specialDrag = {
   del(evt) {
     if (!this.listeningEvts.has(evt)) return;
     this.func[this.listeningEvts.get(evt)].del();
-    this.listeningEvts.delete(evt); 
+    this.listeningEvts.delete(evt);
   },
   func: [
     {
@@ -572,8 +499,8 @@ const specialDrag = {
         const speedNew = 0.5 + Math.round(Math.min(Math.max((offsetX - app.wlen - app.lineScale * 4) / (app.wlen * 0.5), 0), 1) * 30) * 0.05;
         const deltaSpeed = app.speed / speedNew;
         (app.speed = speedNew),
-        (duration = app.bgMusic.duration / speedNew),
-        (timeBgm = curTime = curTime * deltaSpeed);
+          (duration = app.bgMusic.duration / speedNew),
+          (timeBgm = curTime = curTime * deltaSpeed);
       },
       del: () => {
         app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
@@ -630,16 +557,16 @@ const specialClick = {
   qwq(offsetX, offsetY) {
     const { lineScale } = app;
     if (offsetX < lineScale * 1.5 && offsetY < lineScale * 1.5) this.click(0);
-    if (offsetX > canvasos.width - lineScale * 1.5 && offsetY < lineScale * 1.5)
+    if (offsetX > app.canvasos.width - lineScale * 1.5 && offsetY < lineScale * 1.5)
       this.click(1);
     if (
       offsetX < lineScale * 1.5 &&
-      offsetY > canvasos.height - lineScale * 1.5
+      offsetY > app.canvasos.height - lineScale * 1.5
     )
       this.click(2);
     if (
-      offsetX > canvasos.width - lineScale * 1.5 &&
-      offsetY > canvasos.height - lineScale * 1.5
+      offsetX > app.canvasos.width - lineScale * 1.5 &&
+      offsetY > app.canvasos.height - lineScale * 1.5
     )
       this.click(3);
     if (!emitter.eq("play") && !app.pauseTime) {
@@ -667,8 +594,8 @@ const specialClick = {
           const speedNew = Math.max(app.speed - 0.05, 0.5);
           const deltaSpeed = app.speed / speedNew;
           (app.speed = speedNew),
-          (duration = app.bgMusic.duration / speedNew),
-          (timeBgm = curTime = curTime * deltaSpeed);
+            (duration = app.bgMusic.duration / speedNew),
+            (timeBgm = curTime = curTime * deltaSpeed);
           app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
           stat.reset(app.chart.numOfNotes, chartsMD5.get(selectchart.value), selectspeed.value);
           loadLineData();
@@ -676,19 +603,19 @@ const specialClick = {
           const speedNew = Math.min(app.speed + 0.05, 2);
           const deltaSpeed = app.speed / speedNew;
           (app.speed = speedNew),
-          (duration = app.bgMusic.duration / speedNew),
-          (timeBgm = curTime = curTime * deltaSpeed);
+            (duration = app.bgMusic.duration / speedNew),
+            (timeBgm = curTime = curTime * deltaSpeed);
           app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
           stat.reset(app.chart.numOfNotes, chartsMD5.get(selectchart.value), selectspeed.value);
           loadLineData();
         }
       }
     }
-    if (shared.game.ptmain.playConfig.adjustOffset && emitter.eq("play") && offsetX > canvasos.width - lineScale * 7.5 && offsetY > canvasos.height - lineScale * 5 && !fucktemp2) {
+    if (shared.game.ptmain.playConfig.adjustOffset && emitter.eq("play") && offsetX > app.canvasos.width - lineScale * 7.5 && offsetY > app.canvasos.height - lineScale * 5 && !fucktemp2) {
       const getBtnAxis = (p, ps) => {
         const h = lineScale * 0.5 - lineScale * Math.abs(p) * 0.1;
-        const x = canvasos.width - 3.75 * lineScale + lineScale * ps;
-        const y = canvasos.height - lineScale * 2.5 - h;
+        const x = app.canvasos.width - 3.75 * lineScale + lineScale * ps;
+        const y = app.canvasos.height - lineScale * 2.5 - h;
         return [
           x,
           y,
@@ -710,9 +637,9 @@ const specialClick = {
           app.chart.offset = (app.chart.offset * 1e3 + i[2]) / 1e3;
         }
       }
-      if (canvasos.width - 3.5 * lineScale < offsetX && offsetX < canvasos.width - 0.5 * lineScale && canvasos.height - lineScale * 1.25 < offsetY && offsetY < canvasos.height - lineScale * 0.25) {
+      if (app.canvasos.width - 3.5 * lineScale < offsetX && offsetX < app.canvasos.width - 0.5 * lineScale && app.canvasos.height - lineScale * 1.25 < offsetY && offsetY < app.canvasos.height - lineScale * 0.25) {
         saveAdjustedChart(app, fucktemp2);
-      } else if (canvasos.width - 7 * lineScale < offsetX && offsetX < canvasos.width - 5 * lineScale && canvasos.height - lineScale * 1.25 < offsetY && offsetY < canvasos.height - lineScale * 0.25) {
+      } else if (app.canvasos.width - 7 * lineScale < offsetX && offsetX < app.canvasos.width - 5 * lineScale && app.canvasos.height - lineScale * 1.25 < offsetY && offsetY < app.canvasos.height - lineScale * 0.25) {
         app.chart.offset = app.chart.offsetBak;
       }
     }
@@ -1192,12 +1119,12 @@ const hitFeedbackList = new HitEvents({
   updateCallback: (i) => ++i.time > 0,
   /**	@param {HitFeedback} i */
   iterateCallback: (i) => {
-    ctxos.globalAlpha = 0.85;
-    ctxos.setTransform(1, 0, 0, 1, i.offsetX, i.offsetY); //缩放
-    ctxos.fillStyle = i.color;
-    ctxos.beginPath();
-    ctxos.arc(0, 0, app.lineScale * 0.5, 0, 2 * Math.PI);
-    ctxos.fill();
+    app.ctxos.globalAlpha = 0.85;
+    app.ctxos.setTransform(1, 0, 0, 1, i.offsetX, i.offsetY); //缩放
+    app.ctxos.fillStyle = i.color;
+    app.ctxos.beginPath();
+    app.ctxos.arc(0, 0, app.lineScale * 0.5, 0, 2 * Math.PI);
+    app.ctxos.fill();
   },
 });
 const hitImageList = new HitEvents({
@@ -1208,8 +1135,8 @@ const hitImageList = new HitEvents({
     if (!emitter.eq("play") || app.pauseTime) return;
     const tick = (nowTime_ms - i.time) / i.duration;
     const effects = i.effects;
-    ctxos.globalAlpha = 1;
-    ctxos.setTransform(
+    app.ctxos.globalAlpha = 1;
+    app.ctxos.setTransform(
       app.noteScaleRatio * 6,
       0,
       0,
@@ -1217,28 +1144,28 @@ const hitImageList = new HitEvents({
       i.offsetX,
       i.offsetY
     ); //缩放
-    ctxos.rotate(i.rotation);
+    app.ctxos.rotate(i.rotation);
     (
       effects[Math.floor(tick * effects.length)] || effects[effects.length - 1]
-    ).full(ctxos); //停留约0.5秒
-    ctxos.fillStyle = i.color;
-    ctxos.globalAlpha = 1 - tick; //不透明度
+    ).full(app.ctxos); //停留约0.5秒
+    app.ctxos.fillStyle = i.color;
+    app.ctxos.globalAlpha = 1 - tick; //不透明度
     const r3 =
       30 * (((0.2078 * tick - 1.6524) * tick + 1.6399) * tick + 0.4988); //方块大小
     if (r3 < 0) return;
     for (const j of i.direction) {
       const ds = j[0] * ((9 * tick) / (8 * tick + 1)); //打击点距离
       if (!main.customResourceMeta["loaded"]) {
-        ctxos.beginPath();
-        ctxos.arc(
+        app.ctxos.beginPath();
+        app.ctxos.arc(
           ds * Math.cos(j[1]),
           ds * Math.sin(j[1]),
           (r3 / 3) * 2,
           0,
           2 * Math.PI
         );
-        ctxos.fill();
-        ctxos.closePath();
+        app.ctxos.fill();
+        app.ctxos.closePath();
       } else if (main.customResourceMeta["hitEvtDrawer"]) eval(main.customResourceMeta["hitEvtDrawer"]);
     }
   },
@@ -1249,14 +1176,14 @@ const hitWordList = new HitEvents({
   /**	@param {HitWord} i */
   iterateCallback: (i) => {
     const tick = (nowTime_ms - i.time) / i.duration;
-    ctxos.setTransform(1, 0, 0, 1, i.offsetX, i.offsetY); //缩放
-    ctxos.font = `bold ${app.noteScaleRatio *
+    app.ctxos.setTransform(1, 0, 0, 1, i.offsetX, i.offsetY); //缩放
+    app.ctxos.font = `bold ${app.noteScaleRatio *
       (256 + 128 * (((0.2078 * tick - 1.6524) * tick + 1.6399) * tick + 0.4988))
       }px Saira`;
-    ctxos.textAlign = "center";
-    ctxos.fillStyle = i.color;
-    ctxos.globalAlpha = 1 - tick; //不透明度
-    ctxos.fillText(i.text, 0, -app.noteScaleRatio * 128);
+    app.ctxos.textAlign = "center";
+    app.ctxos.fillStyle = i.color;
+    app.ctxos.globalAlpha = 1 - tick; //不透明度
+    app.ctxos.fillText(i.text, 0, -app.noteScaleRatio * 128);
   },
 });
 class HitFeedback {
@@ -1321,7 +1248,7 @@ class HitWord {
     return new HitWord(offsetX, offsetY, "#ff4612", "Late");
   }
 }
-const interact = new InteractProxy(canvas);
+const interact = new InteractProxy(app.canvas);
 //兼容PC鼠标
 interact.setMouseEvent({
   mousedownCallback(evt) {
@@ -1401,13 +1328,13 @@ interact.setTouchEvent({
 });
 /** @param {MouseEvent|Touch} obj */
 function getPos(obj) {
-  const rect = canvas.getBoundingClientRect();
+  const rect = app.canvas.getBoundingClientRect();
   return {
     x:
-      ((obj.clientX - rect.left) / canvas.offsetWidth) * canvas.width -
-      (canvas.width - canvasos.width) / 2,
-    y: ((obj.clientY - rect.top) / canvas.offsetHeight) * canvas.height-
-    (canvas.height - canvasos.height) / 2,
+      ((obj.clientX - rect.left) / app.canvas.offsetWidth) * app.canvas.width -
+      (app.canvas.width - app.canvasos.width) / 2,
+    y: ((obj.clientY - rect.top) / app.canvas.offsetHeight) * app.canvas.height -
+      (app.canvas.height - app.canvasos.height) / 2,
   };
 }
 //hit end
@@ -1470,7 +1397,7 @@ const loadRes = shared.game.simphi.reloadRes = async (url, manual = false, setAs
     main.customResourceMeta = crm;
     if (setAsDefault) defaultCRM = crm;
   }).then(() => main.customResourceMeta.loaded = true)).catch(e => {
-    msgHandler.sendError(shared.game.i18n.t("respack.err"));
+    spMsgHandler.sendError(shared.game.i18n.t("respack.err"));
     return;
   });
   const erc = (name, src) => {
@@ -1504,9 +1431,9 @@ const loadRes = shared.game.simphi.reloadRes = async (url, manual = false, setAs
           xhr.send();
           xhr.onloadend = async () => {
             if (!xhr.response || !xhr.response.byteLength) {
-              msgHandler.sendError(
-                shared.game.i18n.t("simphi.loading.resLoadFailed1", [ ++errorNum ]),
-                shared.game.i18n.t("simphi.loading.resLoadFailed2", [ new URL(
+              spMsgHandler.sendError(
+                shared.game.i18n.t("simphi.loading.resLoadFailed1", [++errorNum]),
+                shared.game.i18n.t("simphi.loading.resLoadFailed2", [new URL(
                   src,
                   location
                 )]),
@@ -1522,9 +1449,9 @@ const loadRes = shared.game.simphi.reloadRes = async (url, manual = false, setAs
               else if (header1 === 0x89504e47 && header2 === 0x0d0a1a0a)
                 newres[name] = await createImageBitmap(new Blob([xhr.response]));
               else
-                msgHandler.sendError(
-                  shared.game.i18n.t("simphi.loading.resLoadFailed1", [ ++errorNum ]),
-                  shared.game.i18n.t("simphi.loading.resLoadFailed2", [ new URL(
+                spMsgHandler.sendError(
+                  shared.game.i18n.t("simphi.loading.resLoadFailed1", [++errorNum]),
+                  shared.game.i18n.t("simphi.loading.resLoadFailed2", [new URL(
                     src,
                     location
                   )]),
@@ -1537,8 +1464,8 @@ const loadRes = shared.game.simphi.reloadRes = async (url, manual = false, setAs
     )
   );
   if (errorNum)
-    return msgHandler.sendError(
-      shared.game.i18n.t("simphi.loading.resLoadFailed1", [ errorNum ])
+    return spMsgHandler.sendError(
+      shared.game.i18n.t("simphi.loading.resLoadFailed1", [errorNum])
     );
   if (manual) defaultCRM = main.customResourceMeta;
   await updateRes(newres, manual);
@@ -1617,13 +1544,13 @@ async function updateRes(resources, manual = false) {
       } else await noteRender.update(i, resources[i], 1);
     } else {
       await noteRender.update(i.replaceAll(/\.(jpg|png)/gi, ""), resources[i], ["HoldHL", "HoldHeadHL"].includes(i) ? 8080 / 7875 : 1);
-      if(manual) res[i.replaceAll(/\.(jpg|png)/gi, "")] = resources[i];
+      if (manual) res[i.replaceAll(/\.(jpg|png)/gi, "")] = resources[i];
     }
   }
   if (resources["HitFXRaw"]) await noteRender.updateFX(resources["HitFXRaw"], 1);
-  for(let i=0;i<3;i++) {
-    const str=`HitSong${i}`;
-    if(resources[str]) res[str] = resources[str];
+  for (let i = 0; i < 3; i++) {
+    const str = `HitSong${i}`;
+    if (resources[str]) res[str] = resources[str];
   }
   if (manual) shared.game.msgHandler.sendMessage(shared.game.ptmain.$t("respack.customResApplied"), "success");
 }
@@ -1653,7 +1580,7 @@ window.addEventListener(
       frameAnimater,
     };
     await shared.game.requestFullscreen();
-    canvas.classList.add("fade");
+    app.canvas.classList.add("fade");
     let loadedNum = 0;
     let errorNum = 0;
     if (await checkSupport()) return;
@@ -1717,7 +1644,7 @@ window.addEventListener(
             xhr.send();
             xhr.onloadend = async () => {
               if (!xhr.response || !xhr.response.byteLength) {
-                msgHandler.sendError(
+                spMsgHandler.sendError(
                   shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [++errorNum]),
                   "",
                   true
@@ -1731,7 +1658,7 @@ window.addEventListener(
                 else if (header1 === 0x89504e47 && header2 === 0x0d0a1a0a)
                   res[name] = await createImageBitmap(new Blob([xhr.response]));
                 else
-                  msgHandler.sendError(
+                  spMsgHandler.sendError(
                     shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [++errorNum]),
                     "",
                     true
@@ -1743,7 +1670,7 @@ window.addEventListener(
       )
     );
     if (errorNum)
-      return msgHandler.sendError(
+      return spMsgHandler.sendError(
         shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [errorNum])
       );
     res["NoImageBlack"] = await createImageBitmap(
@@ -1764,8 +1691,8 @@ window.addEventListener(
         return b.getImageData(0, 0, 1, 1).data[0];
       })()
     )
-      return msgHandler.sendError(
-        shared.game.i18n.t("simphi.loading.imgLoadingError", [ err.cause.name ])
+      return spMsgHandler.sendError(
+        shared.game.i18n.t("simphi.loading.imgLoadingError", [err.cause.name])
       );
     // if (ptSettings.resourcesType === "prpr-custom") await loadprprCustomRes();
     // msgHandler.sendError(shared.game.i18n.t("respack.unavailableNow"));  // diasble custom respack for now
@@ -1806,7 +1733,7 @@ let isInEnd = false; //开头过渡动画
 let isOutStart = false; //结尾过渡动画
 let isOutEnd = false; //临时变量
 function onPageVisibilityChange() {
-  if (document.visibilityState === "hidden") 
+  if (document.visibilityState === "hidden")
     if (emitter.eq("play")) qwqPause()
     else {
       if (!audio._actx) return;
@@ -1853,7 +1780,7 @@ function playVideo(data, offset) {
   data.muted = true;
   return data.play();
 }
-let fucktemp1 = false;
+let resultPageData = false;
 let fucktemp2 = null;
 const tmps = {
   bgImage: null,
@@ -1898,24 +1825,24 @@ function mainLoop() {
     // main["flag{qwq}"](timeBgm);
     for (const i of main.now.values()) i(timeBgm * app.speed);
     loopCanvas();
-  } else if (!fucktemp1) {
-    fucktemp1 = true;
+  } else if (!resultPageData) {
+    resultPageData = true;
     audio.stop();
     btnPause.classList.add("disabled"); //qwq
-    ctxos.globalCompositeOperation = "source-over";
-    ctxos.resetTransform();
-    ctxos.globalAlpha = 1;
+    app.ctxos.globalCompositeOperation = "source-over";
+    app.ctxos.resetTransform();
+    app.ctxos.globalAlpha = 1;
     if (shared.game.ptmain.gameConfig.imageBlur)
-      ctxos.drawImage(
+      app.ctxos.drawImage(
         app.bgImageBlur,
-        ...adjustSize(app.bgImageBlur, canvasos, 1)
+        ...adjustSize(app.bgImageBlur, app.canvasos, 1)
       );
-    else ctxos.drawImage(app.bgImage, ...adjustSize(app.bgImage, canvasos, 1));
-    ctxos.fillStyle = "#000"; //背景变暗
-    ctxos.globalAlpha = 0.2;
-    ctxos.fillRect(0, 0, canvasos.width, canvasos.height);
+    else app.ctxos.drawImage(app.bgImage, ...adjustSize(app.bgImage, app.canvasos, 1));
+    app.ctxos.fillStyle = "#000"; //背景变暗
+    app.ctxos.globalAlpha = 0.2;
+    app.ctxos.fillRect(0, 0, app.canvasos.width, app.canvasos.height);
     setTimeout(() => {
-      if (!fucktemp1) return; //避免快速重开后直接结算
+      if (!resultPageData) return; //避免快速重开后直接结算
       const difficulty = ["ez", "hd", "in", "at"].indexOf(
         levelText.slice(0, 2).toLocaleLowerCase()
       );
@@ -1942,66 +1869,66 @@ function mainLoop() {
   } //只让它执行一次
   if (fucktemp2) {
     qwqdraw3(fucktemp2);
-    ctxos.globalAlpha = 0.5;
-    ctxos.drawImage(
+    app.ctxos.globalAlpha = 0.5;
+    app.ctxos.drawImage(
       res["Retry"],
-      canvasos.width - app.lineScale * 1,
-      canvasos.height - app.lineScale * 1,
+      app.canvasos.width - app.lineScale * 1,
+      app.canvasos.height - app.lineScale * 1,
       app.lineScale * 0.75,
       app.lineScale * 0.75
     );
-    ctxos.textAlign = "left";
+    app.ctxos.textAlign = "left";
     // if (shared.game.ptmain.playConfig.mode !== "preview") {
-      // drawRoundRect(
-      //   ctxos,
-      //   -lineScale * 7.5,
-      //   canvasos.height - lineScale * 5,
-      //   lineScale * 7.5,
-      //   lineScale * 5,
-      //   lineScale * 0.25
-      // ).fill();
+    // drawRoundRect(
+    //   ctxos,
+    //   -lineScale * 7.5,
+    //   canvasos.height - lineScale * 5,
+    //   lineScale * 7.5,
+    //   lineScale * 5,
+    //   lineScale * 0.25
+    // ).fill();
     //   ctxos.fillText(
     //     "下载游玩回放",
     //     20,
     //     50
     //   )
     // };
-    ctxos.textAlign = null;
+    app.ctxos.textAlign = null;
   }
   if (!emitter.eq("play") && !app.pauseTime && !fucktemp2) {
-    ctxos.globalAlpha = 0.5;
-    ctxos.drawImage(
+    app.ctxos.globalAlpha = 0.5;
+    app.ctxos.drawImage(
       res["Loop"],
       app.lineScale * 0.25,
-      canvasos.height - app.lineScale * 1,
+      app.canvasos.height - app.lineScale * 1,
       app.lineScale * 0.75,
       app.lineScale * 0.75
     );
   }
-  if (canvas.width > canvasos.width || canvas.height > canvasos.height || fucktemp2) {
-    ctx.globalAlpha = 1;
+  if (app.canvas.width > app.canvasos.width || app.canvas.height > app.canvasos.height || fucktemp2) {
+    app.ctx.globalAlpha = 1;
     if (shared.game.ptmain.gameConfig.imageBlur || fucktemp2)
-      ctx.drawImage(app.bgImageBlur, ...adjustSize(app.bgImageBlur, canvas, 1.1));
-    else ctx.drawImage(app.bgImage, ...adjustSize(app.bgImage, canvas, 1.1));
-    ctx.fillStyle = "#000";
-    ctx.globalAlpha = 0.2;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+      app.ctx.drawImage(app.bgImageBlur, ...adjustSize(app.bgImageBlur, app.canvas, 1.1));
+    else app.ctx.drawImage(app.bgImage, ...adjustSize(app.bgImage, app.canvas, 1.1));
+    app.ctx.fillStyle = "#000";
+    app.ctx.globalAlpha = 0.2;
+    app.ctx.fillRect(0, 0, app.canvas.width, app.canvas.height);
   }
-  ctx.globalAlpha = 1;
-  ctx.drawImage(canvasos, (canvas.width - canvasos.width) / 2, (canvas.height - canvasos.height) / 2);
+  app.ctx.globalAlpha = 1;
+  app.ctx.drawImage(app.canvasos, (app.canvas.width - app.canvasos.width) / 2, (app.canvas.height - app.canvasos.height) / 2);
   //Copyright
-  ctx.font = `${lineScale * 0.3}px Saira`;
-  ctx.fillStyle = "#FFF";
-  ctx.globalAlpha = 0.25;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(
+  app.ctx.font = `${lineScale * 0.3}px Saira`;
+  app.ctx.fillStyle = "#FFF";
+  app.ctx.globalAlpha = 0.25;
+  app.ctx.textAlign = "center";
+  app.ctx.textBaseline = "middle";
+  app.ctx.fillText(
     app.playMode === 1 ? `PhiTogether Preview (Respack by ${main.customResourceMeta["author"]})` : `${replayMgr.replaying ? `[ ·REC ${replayMgr.playerInfo.username || replayMgr.playerInfo.userName} (ID ${replayMgr.playerInfo.id}) ] ` : ''}PhiTogether ${spec.thisVersion
-    } @ sim-phi - P${judgeManager.time.p * 1000} G${judgeManager.time.g * 1000
-    } S${app.speed.toFixed(2)}${shared.game.ptmain.gameConfig.fullScreenJudge ? " F" : ""} - ${shared.game.ptmain.noAccountMode ? "OFFLINE" : "ONLINE"
-    } - RES ${main.customResourceMeta["author"]}`,
-    canvas.width / 2 - lineScale * 0,
-    canvas.height - lineScale * 0.3 - (canvas.height - canvasos.height) / 2
+      } @ sim-phi - P${judgeManager.time.p * 1000} G${judgeManager.time.g * 1000
+      } S${app.speed.toFixed(2)}${shared.game.ptmain.gameConfig.fullScreenJudge ? " F" : ""} - ${shared.game.ptmain.noAccountMode ? "OFFLINE" : "ONLINE"
+      } - RES ${main.customResourceMeta["author"]}`,
+    app.canvas.width / 2 - lineScale * 0,
+    app.canvas.height - lineScale * 0.3 - (app.canvas.height - app.canvasos.height) / 2
   );
 }
 
@@ -2039,7 +1966,7 @@ function loopNoCanvas() {
   }
   //触发判定和播放打击音效
   if (isInEnd && !app.pauseTime) {
-    const judgeWidth = canvasos.width * 0.118125;
+    const judgeWidth = app.canvasos.width * 0.118125;
     if (!replayMgr.replaying) judgeManager.addEvent(app.notes, timeChart);
     judgeManager.execute(app.drags, timeChart, judgeWidth);
     judgeManager.execute(app.flicks, timeChart, judgeWidth);
@@ -2076,44 +2003,44 @@ function loopNoCanvas() {
 function loopCanvas() {
   //尽量不要在这里出现app
   const { lineScale } = app;
-  ctxos.clearRect(0, 0, canvasos.width, canvasos.height); //重置画面
-  ctxos.globalAlpha = 1;
+  app.ctxos.clearRect(0, 0, app.canvasos.width, app.canvasos.height); //重置画面
+  app.ctxos.globalAlpha = 1;
   //绘制背景
-  ctxos.globalAlpha = 1;
-  ctxos.drawImage(tmps.bgImage, ...adjustSize(tmps.bgImage, canvasos, 1));
+  app.ctxos.globalAlpha = 1;
+  app.ctxos.drawImage(tmps.bgImage, ...adjustSize(tmps.bgImage, app.canvasos, 1));
   if (isInEnd && tmps.bgVideo && !main.qwqwq) {
     const { videoWidth: width, videoHeight: height } = tmps.bgVideo;
-    ctxos.drawImage(
+    app.ctxos.drawImage(
       tmps.bgVideo,
-      ...adjustSize({ width, height }, canvasos, 1)
+      ...adjustSize({ width, height }, app.canvasos, 1)
     );
   }
   // if (qwq[4]) ctxos.filter = `hue-rotate(${stat.combo*360/7}deg)`;
   if (qwqIn.second >= 2.5 && !stat.lineStatus) drawLine(0, lineScale); //绘制判定线(背景后0)
   // if (qwq[4]) ctxos.filter = 'none';
-  ctxos.resetTransform();
-  ctxos.fillStyle = "#000"; //背景变暗
+  app.ctxos.resetTransform();
+  app.ctxos.fillStyle = "#000"; //背景变暗
   if (qwqIn.second < 0.67)
-    ctxos.globalAlpha = tween.easeOutSine(qwqIn.second * 1.5) * shared.game.ptmain.gameConfig.backgroundDim;
+    app.ctxos.globalAlpha = tween.easeOutSine(qwqIn.second * 1.5) * shared.game.ptmain.gameConfig.backgroundDim;
   else
-    ctxos.globalAlpha =
+    app.ctxos.globalAlpha =
       shared.game.ptmain.gameConfig.backgroundDim -
       tween.easeOutSine(qwqOut.second * 1.5) * (shared.game.ptmain.gameConfig.backgroundDim - 0.2);
-  ctxos.fillRect(0, 0, canvasos.width, canvasos.height);
-  if (qwqIn.second >= 2.5 && tmps.customBackDraw != null) tmps.customBackDraw(ctxos); // 自定义背景
+  app.ctxos.fillRect(0, 0, app.canvasos.width, app.canvasos.height);
+  if (qwqIn.second >= 2.5 && tmps.customBackDraw != null) tmps.customBackDraw(app.ctxos); // 自定义背景
   // if (qwq[4]) ctxos.filter = `hue-rotate(${stat.combo*360/7}deg)`;
   if (qwqIn.second >= 2.5) drawLine(stat.lineStatus ? 2 : 1, lineScale); //绘制判定线(背景前1)
   // if (qwq[4]) ctxos.filter = 'none';
-  ctxos.resetTransform();
+  app.ctxos.resetTransform();
   if (qwqIn.second >= 3 && qwqOut.second === 0) {
     //绘制note
     drawNotes();
     if (shared.game.ptmain.gameConfig.showPoint) {
       //绘制定位点
-      ctxos.font = `${lineScale}px Saira`;
-      ctxos.textAlign = "center";
+      app.ctxos.font = `${lineScale}px Saira`;
+      app.ctxos.textAlign = "center";
       for (const i of app.linesReversed) {
-        ctxos.setTransform(
+        app.ctxos.setTransform(
           i.cosr,
           i.sinr,
           -i.sinr,
@@ -2121,21 +2048,21 @@ function loopCanvas() {
           i.offsetX,
           i.offsetY
         );
-        ctxos.globalAlpha = 1;
-        ctxos.fillStyle = "violet";
-        ctxos.fillRect(
+        app.ctxos.globalAlpha = 1;
+        app.ctxos.fillStyle = "violet";
+        app.ctxos.fillRect(
           -lineScale * 0.2,
           -lineScale * 0.2,
           lineScale * 0.4,
           lineScale * 0.4
         );
-        ctxos.fillStyle = "yellow";
-        ctxos.globalAlpha = (i.alpha + 0.5) / 1.5;
-        ctxos.fillText(`${i.lineId.toString()}`, 0, -lineScale * 0.3);
+        app.ctxos.fillStyle = "yellow";
+        app.ctxos.globalAlpha = (i.alpha + 0.5) / 1.5;
+        app.ctxos.fillText(`${i.lineId.toString()}`, 0, -lineScale * 0.3);
       }
       for (const i of app.notesReversed) {
         if (!i.visible) continue;
-        ctxos.setTransform(
+        app.ctxos.setTransform(
           i.cosr,
           i.sinr,
           -i.sinr,
@@ -2143,17 +2070,17 @@ function loopCanvas() {
           i.offsetX,
           i.offsetY
         );
-        ctxos.globalAlpha = 1;
-        ctxos.fillStyle = "lime";
-        ctxos.fillRect(
+        app.ctxos.globalAlpha = 1;
+        app.ctxos.fillStyle = "lime";
+        app.ctxos.fillRect(
           -lineScale * 0.2,
           -lineScale * 0.2,
           lineScale * 0.4,
           lineScale * 0.4
         );
-        ctxos.fillStyle = "cyan";
-        ctxos.globalAlpha = i.realTime > timeChart ? 1 : 0.5;
-        ctxos.fillText(`${i.name}:${i.line.speed}`, 0, -lineScale * 0.3);
+        app.ctxos.fillStyle = "cyan";
+        app.ctxos.globalAlpha = i.realTime > timeChart ? 1 : 0.5;
+        app.ctxos.fillText(`${i.name}:${i.line.speed}`, 0, -lineScale * 0.3);
       }
     }
   }
@@ -2161,13 +2088,13 @@ function loopCanvas() {
   hitImageList.animate(); //绘制打击特效1
   // if (qwq[4]) ctxos.filter = 'none';
   if (shared.game.ptmain.gameConfig.showCE2) hitWordList.animate(); //绘制打击特效2
-  ctxos.globalAlpha = 1;
+  app.ctxos.globalAlpha = 1;
   //绘制进度条
-  ctxos.setTransform(
-    canvasos.width / 1920,
+  app.ctxos.setTransform(
+    app.canvasos.width / 1920,
     0,
     0,
-    canvasos.width / 1920,
+    app.canvasos.width / 1920,
     0,
     lineScale *
     (qwqIn.second < 0.67
@@ -2175,68 +2102,68 @@ function loopCanvas() {
       : -tween.easeOutSine(qwqOut.second * 1.5)) *
     1.75
   );
-  ctxos.drawImage(res["ProgressBar"], tmps.progress * 1920 - 1920, 0);
+  app.ctxos.drawImage(res["ProgressBar"], tmps.progress * 1920 - 1920, 0);
   //绘制文字
-  ctxos.resetTransform();
+  app.ctxos.resetTransform();
   for (const i of main.after.values()) i();
-  ctxos.fillStyle = "#fff";
+  app.ctxos.fillStyle = "#fff";
   //开头过渡动画
   if (qwqIn.second < 3) {
     if (qwqIn.second < 0.67)
-      ctxos.globalAlpha = tween.easeOutSine(qwqIn.second * 1.5);
+      app.ctxos.globalAlpha = tween.easeOutSine(qwqIn.second * 1.5);
     else if (qwqIn.second >= 2.5)
-      ctxos.globalAlpha = tween.easeOutSine(6 - qwqIn.second * 2);
+      app.ctxos.globalAlpha = tween.easeOutSine(6 - qwqIn.second * 2);
     const name = tmps.name;
     const artist = tmps.artist;
     const illustrator = `Illustration designed by ${tmps.illustrator}`;
     const charter = `Level designed by ${tmps.charter}`;
     const theme = `Resource Pack ${main.customResourceMeta["name"]} designed by ${main.customResourceMeta["author"]}`;
-    ctxos.textAlign = "center";
+    app.ctxos.textAlign = "center";
     //曲名
-    ctxos.textBaseline = "alphabetic";
-    ctxos.font = `${lineScale * 1.1}px Saira`;
-    const dxsnm = ctxos.measureText(name).width;
-    if (dxsnm > canvasos.width - lineScale * 1.5)
-      ctxos.font = `${((lineScale * 1.1) / dxsnm) * (canvasos.width - lineScale * 1.5)
+    app.ctxos.textBaseline = "alphabetic";
+    app.ctxos.font = `${lineScale * 1.1}px Saira`;
+    const dxsnm = app.ctxos.measureText(name).width;
+    if (dxsnm > app.canvasos.width - lineScale * 1.5)
+      app.ctxos.font = `${((lineScale * 1.1) / dxsnm) * (app.canvasos.width - lineScale * 1.5)
         }px Saira`;
-    ctxos.fillText(name, app.wlen, app.hlen * 0.75);
+    app.ctxos.fillText(name, app.wlen, app.hlen * 0.75);
     //曲师、曲绘和谱师
-    ctxos.textBaseline = "top";
-    ctxos.font = `${lineScale * 0.55}px Saira`;
-    const dxa = ctxos.measureText(artist).width;
-    if (dxa > canvasos.width - lineScale * 1.5)
-      ctxos.font = `${((lineScale * 0.55) / dxa) * (canvasos.width - lineScale * 1.5)
+    app.ctxos.textBaseline = "top";
+    app.ctxos.font = `${lineScale * 0.55}px Saira`;
+    const dxa = app.ctxos.measureText(artist).width;
+    if (dxa > app.canvasos.width - lineScale * 1.5)
+      app.ctxos.font = `${((lineScale * 0.55) / dxa) * (app.canvasos.width - lineScale * 1.5)
         }px Saira`;
-    ctxos.fillText(artist, app.wlen, app.hlen * 0.75 + lineScale * 0.85);
-    ctxos.font = `${lineScale * 0.55}px Saira`;
-    const dxi = ctxos.measureText(illustrator).width;
-    if (dxi > canvasos.width - lineScale * 1.5)
-      ctxos.font = `${((lineScale * 0.55) / dxi) * (canvasos.width - lineScale * 1.5)
+    app.ctxos.fillText(artist, app.wlen, app.hlen * 0.75 + lineScale * 0.85);
+    app.ctxos.font = `${lineScale * 0.55}px Saira`;
+    const dxi = app.ctxos.measureText(illustrator).width;
+    if (dxi > app.canvasos.width - lineScale * 1.5)
+      app.ctxos.font = `${((lineScale * 0.55) / dxi) * (app.canvasos.width - lineScale * 1.5)
         }px Saira`;
-    ctxos.fillText(illustrator, app.wlen, app.hlen * 1.25 + lineScale * 0.15);
-    ctxos.font = `${lineScale * 0.55}px Saira`;
-    const dxc = ctxos.measureText(charter).width;
-    if (dxc > canvasos.width - lineScale * 1.5)
-      ctxos.font = `${((lineScale * 0.55) / dxc) * (canvasos.width - lineScale * 1.5)
+    app.ctxos.fillText(illustrator, app.wlen, app.hlen * 1.25 + lineScale * 0.15);
+    app.ctxos.font = `${lineScale * 0.55}px Saira`;
+    const dxc = app.ctxos.measureText(charter).width;
+    if (dxc > app.canvasos.width - lineScale * 1.5)
+      app.ctxos.font = `${((lineScale * 0.55) / dxc) * (app.canvasos.width - lineScale * 1.5)
         }px Saira`;
-    ctxos.fillText(charter, app.wlen, app.hlen * 1.25 + lineScale * 1.0);
-    ctxos.font = `${lineScale * 0.55}px Saira`;
-    const dxt = ctxos.measureText(theme).width;
-    if (dxt > canvasos.width - lineScale * 1.5)
-      ctxos.font = `${((lineScale * 0.55) / dxt) * (canvasos.width - lineScale * 1.5)
+    app.ctxos.fillText(charter, app.wlen, app.hlen * 1.25 + lineScale * 1.0);
+    app.ctxos.font = `${lineScale * 0.55}px Saira`;
+    const dxt = app.ctxos.measureText(theme).width;
+    if (dxt > app.canvasos.width - lineScale * 1.5)
+      app.ctxos.font = `${((lineScale * 0.55) / dxt) * (app.canvasos.width - lineScale * 1.5)
         }px Saira`;
-    ctxos.fillText(theme, app.wlen, app.hlen * 1.25 + lineScale * 1.75);
+    app.ctxos.fillText(theme, app.wlen, app.hlen * 1.25 + lineScale * 1.75);
     //判定线(装饰用)
-    ctxos.globalAlpha = 1;
-    ctxos.setTransform(1, 0, 0, 1, app.wlen, app.hlen);
+    app.ctxos.globalAlpha = 1;
+    app.ctxos.setTransform(1, 0, 0, 1, app.wlen, app.hlen);
     const imgW =
       lineScale *
       48 *
       (qwqIn.second < 0.67 ? tween.easeInCubic(qwqIn.second * 1.5) : 1);
     const imgH = lineScale * 0.15; //0.1333...
     if (qwqIn.second >= 2.5)
-      ctxos.globalAlpha = tween.easeOutSine(6 - qwqIn.second * 2);
-    ctxos.drawImage(
+      app.ctxos.globalAlpha = tween.easeOutSine(6 - qwqIn.second * 2);
+    app.ctxos.drawImage(
       shared.game.ptmain.gameConfig.lineColor ? res["JudgeLineMP"] : res["JudgeLine"],
       -imgW / 2,
       -imgH / 2,
@@ -2245,12 +2172,12 @@ function loopCanvas() {
     );
   }
 
-  ctxos.globalAlpha = 1;
-  ctxos.resetTransform();
-  ctxos.fillStyle = "#fff";
+  app.ctxos.globalAlpha = 1;
+  app.ctxos.resetTransform();
+  app.ctxos.fillStyle = "#fff";
   //绘制分数和combo以及暂停按钮
-  ctxos.globalAlpha = 1;
-  ctxos.setTransform(
+  app.ctxos.globalAlpha = 1;
+  app.ctxos.setTransform(
     1,
     0,
     0,
@@ -2262,41 +2189,41 @@ function loopCanvas() {
       : -tween.easeIOCubic(qwqOut.second * 1.5)) *
     1.75
   );
-  ctxos.textBaseline = "alphabetic";
+  app.ctxos.textBaseline = "alphabetic";
   if (tmps.showStat) {
     // 绘制分数
-    ctxos.font = `${lineScale * 0.95}px Saira`;
-    ctxos.textAlign = "right";
-    ctxos.globalAlpha = tmps.statStatus.score.alpha;
-    ctxos.fillText(
+    app.ctxos.font = `${lineScale * 0.95}px Saira`;
+    app.ctxos.textAlign = "right";
+    app.ctxos.globalAlpha = tmps.statStatus.score.alpha;
+    app.ctxos.fillText(
       stat.scoreStr,
-      canvasos.width - lineScale * 0.65 + tmps.statStatus.score.offsetX,
+      app.canvasos.width - lineScale * 0.65 + tmps.statStatus.score.offsetX,
       lineScale * 1.375 + tmps.statStatus.score.offsetY
     );
     if (shared.game.ptmain.gameConfig.showAcc && shared.game.ptmain.playConfig.mode !== "preview") {
-      ctxos.font = `${lineScale * 0.66}px Saira`;
-      ctxos.fillText(
+      app.ctxos.font = `${lineScale * 0.66}px Saira`;
+      app.ctxos.fillText(
         stat.accStr,
-        canvasos.width - lineScale * 0.65 + tmps.statStatus.score.offsetX,
+        app.canvasos.width - lineScale * 0.65 + tmps.statStatus.score.offsetX,
         lineScale * 2.05 + tmps.statStatus.score.offsetY
       );
     }
     shared.game.ptmain.playConfig.mode !== "preview" ? gauge.draw() : null;
   }
-  ctxos.fillStyle = "#fff";
-  ctxos.textAlign = "center";
-  ctxos.font = `${lineScale * 1.32}px Saira`;
-  ctxos.globalAlpha = tmps.statStatus.combonumber.alpha;
-  ctxos.fillText(tmps.combo, app.wlen + tmps.statStatus.combonumber.offsetX, lineScale * 1.375 + tmps.statStatus.combonumber.offsetY);
-  ctxos.globalAlpha =
+  app.ctxos.fillStyle = "#fff";
+  app.ctxos.textAlign = "center";
+  app.ctxos.font = `${lineScale * 1.32}px Saira`;
+  app.ctxos.globalAlpha = tmps.statStatus.combonumber.alpha;
+  app.ctxos.fillText(tmps.combo, app.wlen + tmps.statStatus.combonumber.offsetX, lineScale * 1.375 + tmps.statStatus.combonumber.offsetY);
+  app.ctxos.globalAlpha =
     qwqIn.second < 0.67
       ? tween.easeOutSine(qwqIn.second * 1.5)
       : 1 - tween.easeOutSine(qwqOut.second * 1.5);
-  ctxos.globalAlpha *= tmps.statStatus.combo.alpha;
-  ctxos.font = `${lineScale * 0.5}px Saira`;
-  ctxos.fillText(tmps.combo2, app.wlen + tmps.statStatus.combo.offsetX, lineScale * 1.95 + tmps.statStatus.combo.offsetY);
+  app.ctxos.globalAlpha *= tmps.statStatus.combo.alpha;
+  app.ctxos.font = `${lineScale * 0.5}px Saira`;
+  app.ctxos.fillText(tmps.combo2, app.wlen + tmps.statStatus.combo.offsetX, lineScale * 1.95 + tmps.statStatus.combo.offsetY);
   //绘制曲名和等级
-  ctxos.setTransform(
+  app.ctxos.setTransform(
     1,
     0,
     0,
@@ -2308,65 +2235,65 @@ function loopCanvas() {
       : tween.easeIOCubic(qwqOut.second * 1.5)) *
     1.75
   );
-  ctxos.textBaseline = "alphabetic";
-  ctxos.textAlign = "right";
-  ctxos.font = `${lineScale * 0.63}px Saira`;
-  const dxlvl = ctxos.measureText(levelText).width;
+  app.ctxos.textBaseline = "alphabetic";
+  app.ctxos.textAlign = "right";
+  app.ctxos.font = `${lineScale * 0.63}px Saira`;
+  const dxlvl = app.ctxos.measureText(levelText).width;
   if (dxlvl > app.wlen - lineScale)
-    ctxos.font = `${((lineScale * 0.63) / dxlvl) * (app.wlen - lineScale)}px Saira`;
-  ctxos.globalAlpha = tmps.statStatus.level.alpha;
-  ctxos.fillText(
+    app.ctxos.font = `${((lineScale * 0.63) / dxlvl) * (app.wlen - lineScale)}px Saira`;
+  app.ctxos.globalAlpha = tmps.statStatus.level.alpha;
+  app.ctxos.fillText(
     tmps.level,
-    canvasos.width - lineScale * 0.75 + tmps.statStatus.level.offsetX,
-    canvasos.height - lineScale * 0.66 + tmps.statStatus.level.offsetY
+    app.canvasos.width - lineScale * 0.75 + tmps.statStatus.level.offsetX,
+    app.canvasos.height - lineScale * 0.66 + tmps.statStatus.level.offsetY
   );
-  ctxos.textAlign = "left";
+  app.ctxos.textAlign = "left";
   // ctxos.textBaseline = "middle";
-  ctxos.font = `${lineScale * 0.63}px Saira`;
-  const dxsnm = ctxos.measureText(
+  app.ctxos.font = `${lineScale * 0.63}px Saira`;
+  const dxsnm = app.ctxos.measureText(
     inputName.value || inputName.placeholder
   ).width;
   if (dxsnm > app.wlen - lineScale)
-    ctxos.font = `${((lineScale * 0.63) / dxsnm) * (app.wlen - lineScale)}px Saira`;
-  ctxos.globalAlpha = tmps.statStatus.name.alpha;
-  ctxos.fillText(
+    app.ctxos.font = `${((lineScale * 0.63) / dxsnm) * (app.wlen - lineScale)}px Saira`;
+  app.ctxos.globalAlpha = tmps.statStatus.name.alpha;
+  app.ctxos.fillText(
     inputName.value || inputName.placeholder,
     lineScale * 0.65 + tmps.statStatus.name.offsetX,
-    canvasos.height - lineScale * 0.66 + tmps.statStatus.name.offsetY
+    app.canvasos.height - lineScale * 0.66 + tmps.statStatus.name.offsetY
   );
-  ctxos.globalAlpha = 1;
-  ctxos.resetTransform();
-  if (qwqIn.second >= 2.5 && tmps.customForeDraw != null) tmps.customForeDraw(ctxos); // 自定义前景
-  if (qwqIn.second > 3 && main.filter) main.filter(ctxos, timeBgm, nowTime_ms / 1e3); //滤镜处理
+  app.ctxos.globalAlpha = 1;
+  app.ctxos.resetTransform();
+  if (qwqIn.second >= 2.5 && tmps.customForeDraw != null) tmps.customForeDraw(app.ctxos); // 自定义前景
+  if (qwqIn.second > 3 && main.filter) main.filter(app.ctxos, timeBgm, nowTime_ms / 1e3); //滤镜处理
   if (shared.game.ptmain.gameConfig.feedback) hitFeedbackList.animate(); //绘制打击特效0
-  ctxos.resetTransform();
+  app.ctxos.resetTransform();
   try {
-    shared.game.graphicHandler.whilePlayingHook(ctx, ctxos, lineScale);
+    shared.game.graphicHandler.whilePlayingHook(app.ctx, app.ctxos, lineScale);
   } catch (e) {
     console.warn(e);
   }
   //绘制时间和帧率以及note打击数
-  ctxos.fillStyle = "#fff";
+  app.ctxos.fillStyle = "#fff";
   if (qwqIn.second < 0.67)
-    ctxos.globalAlpha = tween.easeOutSine(qwqIn.second * 1.5);
-  else ctxos.globalAlpha = 1 - tween.easeOutSine(qwqOut.second * 1.5);
-  ctxos.font = `${lineScale * 0.4}px Saira`;
-  ctxos.textBaseline = "middle";
-  ctxos.textAlign = "right";
-  ctxos.globalAlpha = 0.5;
-  ctxos.fillText(
+    app.ctxos.globalAlpha = tween.easeOutSine(qwqIn.second * 1.5);
+  else app.ctxos.globalAlpha = 1 - tween.easeOutSine(qwqOut.second * 1.5);
+  app.ctxos.font = `${lineScale * 0.4}px Saira`;
+  app.ctxos.textBaseline = "middle";
+  app.ctxos.textAlign = "right";
+  app.ctxos.globalAlpha = 0.5;
+  app.ctxos.fillText(
     frameTimer.fpsStr,
-    canvasos.width - lineScale * 0.05,
+    app.canvasos.width - lineScale * 0.05,
     lineScale * 0.5
   );
-  ctxos.font = `${lineScale * 0.25}px Saira`;
-  ctxos.fillText("FPS", canvasos.width - lineScale * 0.05, lineScale * 0.8);
-  ctxos.textBaseline = "alphabetic";
-  ctxos.globalAlpha = 1;
-  ctxos.resetTransform();
-  ctxos.globalAlpha = tmps.canPause ? tmps.statStatus.pause.alpha : 0.5;
+  app.ctxos.font = `${lineScale * 0.25}px Saira`;
+  app.ctxos.fillText("FPS", app.canvasos.width - lineScale * 0.05, lineScale * 0.8);
+  app.ctxos.textBaseline = "alphabetic";
+  app.ctxos.globalAlpha = 1;
+  app.ctxos.resetTransform();
+  app.ctxos.globalAlpha = tmps.canPause ? tmps.statStatus.pause.alpha : 0.5;
   if (tmps.showStat)
-    ctxos.drawImage(
+    app.ctxos.drawImage(
       res["Pause"],
       lineScale * 0.6 + tmps.statStatus.pause.offsetX,
       lineScale * 0.7 + tmps.statStatus.pause.offsetY,
@@ -2374,38 +2301,38 @@ function loopCanvas() {
       lineScale * 0.7
     );
   if (shared.game.ptmain.playConfig.adjustOffset) {
-    ctxos.fillStyle = 'gray';
-    ctxos.globalAlpha = 0.75;
+    app.ctxos.fillStyle = 'gray';
+    app.ctxos.globalAlpha = 0.75;
     drawRoundRect(
-      ctxos,
-      canvasos.width - lineScale * 7.5,
-      canvasos.height - lineScale * 5,
+      app.ctxos,
+      app.canvasos.width - lineScale * 7.5,
+      app.canvasos.height - lineScale * 5,
       lineScale * 7.5,
       lineScale * 5,
       lineScale * 0.25
     ).fill();
-    ctxos.globalAlpha = 1;
-    ctxos.fillStyle = "#fff";
-    ctxos.textBaseline = "middle";
-    ctxos.textAlign = "center";
-    ctxos.font = `${lineScale * 0.75}px Saira`;
-    ctxos.fillText(shared.game.i18n.t("simphi.adjustOffset.title"), canvasos.width - lineScale * 3.75, canvasos.height - lineScale * 4.25);
-    ctxos.font = `${lineScale * 0.65}px Saira`;
-    ctxos.fillText(`${(app.chart.offset * 1e3).toFixed(0)}ms`, canvasos.width - lineScale * 3.75, canvasos.height - lineScale * 2.5);
-    ctxos.font = `${lineScale * 0.5}px Saira`;
+    app.ctxos.globalAlpha = 1;
+    app.ctxos.fillStyle = "#fff";
+    app.ctxos.textBaseline = "middle";
+    app.ctxos.textAlign = "center";
+    app.ctxos.font = `${lineScale * 0.75}px Saira`;
+    app.ctxos.fillText(shared.game.i18n.t("simphi.adjustOffset.title"), app.canvasos.width - lineScale * 3.75, app.canvasos.height - lineScale * 4.25);
+    app.ctxos.font = `${lineScale * 0.65}px Saira`;
+    app.ctxos.fillText(`${(app.chart.offset * 1e3).toFixed(0)}ms`, app.canvasos.width - lineScale * 3.75, app.canvasos.height - lineScale * 2.5);
+    app.ctxos.font = `${lineScale * 0.5}px Saira`;
     const drawIcon = (p, ps) => {
       const h = lineScale * 0.5 - lineScale * Math.abs(p) * 0.1;
-      ctxos.fillStyle = "#fff";
+      app.ctxos.fillStyle = "#fff";
       drawRoundRect(
-        ctxos,
-        canvasos.width - 3.75 * lineScale + lineScale * ps,
-        canvasos.height - lineScale * 2.5 - h,
+        app.ctxos,
+        app.canvasos.width - 3.75 * lineScale + lineScale * ps,
+        app.canvasos.height - lineScale * 2.5 - h,
         h * 2,
         h * 2,
         lineScale * 0.1
       ).fill();
-      ctxos.fillStyle = "#000";
-      ctxos.fillText(p > 0 ? "+" : "-", canvasos.width - 3.75 * lineScale + lineScale * ps + h, canvasos.height - lineScale * 2.5)
+      app.ctxos.fillStyle = "#000";
+      app.ctxos.fillText(p > 0 ? "+" : "-", app.canvasos.width - 3.75 * lineScale + lineScale * ps + h, app.canvasos.height - lineScale * 2.5)
     }
     drawIcon(-3, -3.5);
     drawIcon(-2, -3);
@@ -2413,32 +2340,32 @@ function loopCanvas() {
     drawIcon(1, 1.5);
     drawIcon(2, 2.45);
     drawIcon(3, 3.15);
-    ctxos.fillStyle = "#fff";
+    app.ctxos.fillStyle = "#fff";
     drawRoundRect(
-      ctxos,
-      canvasos.width - 7 * lineScale,
-      canvasos.height - lineScale * 1.25,
+      app.ctxos,
+      app.canvasos.width - 7 * lineScale,
+      app.canvasos.height - lineScale * 1.25,
       lineScale * 3,
       lineScale,
       lineScale * 0.1
     ).fill();
     drawRoundRect(
-      ctxos,
-      canvasos.width - 3.5 * lineScale,
-      canvasos.height - lineScale * 1.25,
+      app.ctxos,
+      app.canvasos.width - 3.5 * lineScale,
+      app.canvasos.height - lineScale * 1.25,
       lineScale * 3,
       lineScale,
       lineScale * 0.1
     ).fill();
-    ctxos.fillStyle = "#000";
-    ctxos.font = `${lineScale * 0.65}px Saira`;
-    ctxos.fillText(shared.game.i18n.t("simphi.adjustOffset.reset"), canvasos.width - 5.5 * lineScale, canvasos.height - lineScale * 0.75);
-    ctxos.fillText(shared.game.i18n.t("simphi.adjustOffset.save"), canvasos.width - 2 * lineScale, canvasos.height - lineScale * 0.75);
+    app.ctxos.fillStyle = "#000";
+    app.ctxos.font = `${lineScale * 0.65}px Saira`;
+    app.ctxos.fillText(shared.game.i18n.t("simphi.adjustOffset.reset"), app.canvasos.width - 5.5 * lineScale, app.canvasos.height - lineScale * 0.75);
+    app.ctxos.fillText(shared.game.i18n.t("simphi.adjustOffset.save"), app.canvasos.width - 2 * lineScale, app.canvasos.height - lineScale * 0.75);
   }
-  ctxos.fillStyle = "#fff";
+  app.ctxos.fillStyle = "#fff";
   if (!emitter.eq("play")) {
-    ctxos.fillStyle = "#000"; //背景变暗
-    ctxos.globalAlpha = app.pauseBackgroundDimPara1
+    app.ctxos.fillStyle = "#000"; //背景变暗
+    app.ctxos.globalAlpha = app.pauseBackgroundDimPara1
       ? Math.max(
         0.6 -
         0.6 *
@@ -2448,15 +2375,15 @@ function loopCanvas() {
         0
       )
       : 0.6; //背景不透明度
-    ctxos.fillRect(0, 0, canvasos.width, canvasos.height);
-    ctxos.globalAlpha = 0.5;
+    app.ctxos.fillRect(0, 0, app.canvasos.width, app.canvasos.height);
+    app.ctxos.globalAlpha = 0.5;
     if (!app.pauseTime) {
-      ctxos.globalAlpha = 1;
-      ctxos.fillStyle = "#fff";
-      ctxos.textBaseline = "middle";
-      ctxos.font = `${lineScale * 0.4}px Saira`;
-      ctxos.textAlign = "left";
-      ctxos.fillText(
+      app.ctxos.globalAlpha = 1;
+      app.ctxos.fillStyle = "#fff";
+      app.ctxos.textBaseline = "middle";
+      app.ctxos.font = `${lineScale * 0.4}px Saira`;
+      app.ctxos.textAlign = "left";
+      app.ctxos.fillText(
         `${time2Str(main.qwqwq ? duration - timeBgm : timeBgm)}/${time2Str(
           duration
         )}${status2.text}`,
@@ -2489,28 +2416,28 @@ function loopCanvas() {
           "Bad:",
           "Miss:",
         ];
-        ctxos.fillStyle = comboColor[idx];
-        ctxos.fillText(
+        app.ctxos.fillStyle = comboColor[idx];
+        app.ctxos.fillText(
           comboText[idx],
           lineScale * 0.05,
-          canvasos.height / 2 + lineScale * (idx - 2.8) * 0.5
+          app.canvasos.height / 2 + lineScale * (idx - 2.8) * 0.5
         );
-        ctxos.fillText(
+        app.ctxos.fillText(
           val.toString(),
           lineScale * 1.75,
-          canvasos.height / 2 + lineScale * (idx - 2.8) * 0.5
+          app.canvasos.height / 2 + lineScale * (idx - 2.8) * 0.5
         );
       });
-      ctxos.fillStyle = "#fff";
-      ctxos.fillText(
+      app.ctxos.fillStyle = "#fff";
+      app.ctxos.fillText(
         `DSP:  ${stat.curDispStr}`,
         lineScale * 0.05,
-        canvasos.height / 2 + lineScale * 2.6
+        app.canvasos.height / 2 + lineScale * 2.6
       );
-      ctxos.fillText(
+      app.ctxos.fillText(
         `AVG:  ${stat.avgDispStr}`,
         lineScale * 0.05,
-        canvasos.height / 2 + lineScale * 3.1
+        app.canvasos.height / 2 + lineScale * 3.1
       );
       // ctxos.textBaseline = "alphabetic";
       // ctxos.textAlign = "center";
@@ -2525,21 +2452,21 @@ function loopCanvas() {
       // });
       const imgBaseLine = n => app.hlen - lineScale * n / 2;
       const imgX = n => app.wlen + lineScale * (n * 2 - 0.5);
-      ctxos.drawImage(
+      app.ctxos.drawImage(
         res["Back"],
         imgX(-1.1),
         imgBaseLine(1.5),
         lineScale * 1.5,
         lineScale * 1.5
       );
-      ctxos.drawImage(
+      app.ctxos.drawImage(
         res["Retry"],
         imgX(0),
         imgBaseLine(1.25),
         lineScale * 1.25,
         lineScale * 1.25
       );
-      ctxos.drawImage(
+      app.ctxos.drawImage(
         res["Resume"],
         imgX(1),
         imgBaseLine(1.5),
@@ -2547,16 +2474,16 @@ function loopCanvas() {
         lineScale * 1.5
       );
       if (shared.game.ptmain.playConfig.practiseMode && qwqIn.second >= 3) {
-        ctxos.font = `${lineScale * 0.5}px Saira`;
-        ctxos.fillStyle = "#fff";
-        ctxos.textAlign = "center";
-        ctxos.textBaseline = "middle";
-        ctxos.fillText("00:00.000", app.wlen * 0.25, app.hlen + lineScale * 4.25);
-        ctxos.fillText(time2Str(duration, true), app.wlen * 1.75, app.hlen + lineScale * 4.25);
+        app.ctxos.font = `${lineScale * 0.5}px Saira`;
+        app.ctxos.fillStyle = "#fff";
+        app.ctxos.textAlign = "center";
+        app.ctxos.textBaseline = "middle";
+        app.ctxos.fillText("00:00.000", app.wlen * 0.25, app.hlen + lineScale * 4.25);
+        app.ctxos.fillText(time2Str(duration, true), app.wlen * 1.75, app.hlen + lineScale * 4.25);
         const progress = (main.qwqwq ? duration - timeBgm : timeBgm) / duration;
-        ctxos.fillText(time2Str(main.qwqwq ? duration - timeBgm : timeBgm, true), app.wlen * (0.25 + 1.5 * progress), app.hlen + lineScale * 2);
+        app.ctxos.fillText(time2Str(main.qwqwq ? duration - timeBgm : timeBgm, true), app.wlen * (0.25 + 1.5 * progress), app.hlen + lineScale * 2);
         drawRoundRect(
-          ctxos,
+          app.ctxos,
           app.wlen * 1.5 + lineScale * 2.5,
           app.hlen - lineScale * 0.5,
           lineScale * 0.6,
@@ -2564,40 +2491,40 @@ function loopCanvas() {
           lineScale * 0.1
         ).fill();
         drawRoundRect(
-          ctxos,
+          app.ctxos,
           app.wlen * 1.5 + lineScale * 3.4,
           app.hlen - lineScale * 0.5,
           lineScale * 0.6,
           lineScale * 0.6,
           lineScale * 0.1
         ).fill();
-        ctxos.textAlign = "left";
-        ctxos.fillText(`Speed: ${app.speed.toFixed(3)}`, app.wlen + lineScale * 4, app.hlen - lineScale * 0.25);
-        ctxos.fillRect(
+        app.ctxos.textAlign = "left";
+        app.ctxos.fillText(`Speed: ${app.speed.toFixed(3)}`, app.wlen + lineScale * 4, app.hlen - lineScale * 0.25);
+        app.ctxos.fillRect(
           app.wlen + lineScale * 4,
           app.hlen + lineScale * 0.25,
           app.wlen * 0.5,
           lineScale * 0.1
         );
-        ctxos.fillStyle = "#000";
-        ctxos.textAlign = "center";
-        ctxos.fillText("-", app.wlen * 1.5 + lineScale * 2.8, app.hlen - lineScale * 0.25);
-        ctxos.fillText("+", app.wlen * 1.5 + lineScale * 3.7, app.hlen - lineScale * 0.2);
-        ctxos.fillStyle = "#a9a9a9";
-        ctxos.fillRect(
+        app.ctxos.fillStyle = "#000";
+        app.ctxos.textAlign = "center";
+        app.ctxos.fillText("-", app.wlen * 1.5 + lineScale * 2.8, app.hlen - lineScale * 0.25);
+        app.ctxos.fillText("+", app.wlen * 1.5 + lineScale * 3.7, app.hlen - lineScale * 0.2);
+        app.ctxos.fillStyle = "#a9a9a9";
+        app.ctxos.fillRect(
           app.wlen * 0.25,
           app.hlen + lineScale * 2.5,
           app.wlen * 1.5,
           lineScale * 1.25
         );
-        ctxos.fillStyle = "deepskyblue";
-        ctxos.fillRect(
+        app.ctxos.fillStyle = "deepskyblue";
+        app.ctxos.fillRect(
           app.wlen * (0.25 + 1.5 * progress),
           app.hlen + lineScale * 2.25,
           lineScale * 0.1,
           lineScale * 1.5
         );
-        ctxos.fillRect(
+        app.ctxos.fillRect(
           app.wlen + lineScale * 3.9 + app.wlen * 0.5 * Math.min((app.speed - 0.5) / 1.5, 1),
           app.hlen + lineScale * 0.15,
           lineScale * 0.1,
@@ -2606,19 +2533,19 @@ function loopCanvas() {
       }
     }
   }
-  ctxos.fillStyle = "#fff";
+  app.ctxos.fillStyle = "#fff";
   if (app.pauseTime) {
-    ctxos.font = `${lineScale * 2}px Saira`;
-    ctxos.fillStyle = "#FFF";
-    ctxos.globalAlpha = 1;
-    ctxos.textAlign = "center";
-    ctxos.textBaseline = "middle";
-    ctxos.fillText(app.pauseTime, canvasos.width / 2, canvasos.height / 2);
+    app.ctxos.font = `${lineScale * 2}px Saira`;
+    app.ctxos.fillStyle = "#FFF";
+    app.ctxos.globalAlpha = 1;
+    app.ctxos.textAlign = "center";
+    app.ctxos.textBaseline = "middle";
+    app.ctxos.fillText(app.pauseTime, app.canvasos.width / 2, app.canvasos.height / 2);
   }
 }
 //判定线函数，undefined/0:默认,1:非,2:恒成立
 function drawLine(bool, lineScale) {
-  ctxos.globalAlpha = 1;
+  app.ctxos.globalAlpha = 1;
   const tw = 1 - tween.easeOutSine(qwqOut.second * 1.5);
   for (const i of app.linesReversed) {
     if (bool ^ Number(i.imageD) && qwqOut.second < 0.67) {
@@ -2633,8 +2560,8 @@ function drawLine(bool, lineScale) {
 
         continue;
       }
-      ctxos.globalAlpha = i.alpha;
-      ctxos.setTransform(
+      app.ctxos.globalAlpha = i.alpha;
+      app.ctxos.setTransform(
         i.cosr * tw,
         i.sinr,
         -i.sinr * tw,
@@ -2642,8 +2569,8 @@ function drawLine(bool, lineScale) {
         app.wlen + (i.offsetX - app.wlen) * tw,
         i.offsetY
       ); //hiahiah
-      const imgS = ((i.imageU ? lineScale * 18.75 : canvasos.height) * i.imageS) / 1080; 
-      const imgW = imgS * i.imageW * i.imageA * ((i.scaleX * (-0.0081 + 0.5214 * (canvasos.width / canvasos.height))) || 1); //1.5 0.774 1.78 0.92
+      const imgS = ((i.imageU ? lineScale * 18.75 : app.canvasos.height) * i.imageS) / 1080;
+      const imgW = imgS * i.imageW * i.imageA * ((i.scaleX * (-0.0081 + 0.5214 * (app.canvasos.width / app.canvasos.height))) || 1); //1.5 0.774 1.78 0.92
       const imgH = imgS * i.imageH * ((i.scaleY * 1) || 1);
       // ctxos.save();
       if (!i.text) {
@@ -2652,16 +2579,16 @@ function drawLine(bool, lineScale) {
         try {
           if (i.color && i.color != "#fff" && i.color != "#ffffff") {
             if (!i.isCustomImage) {
-              ctxos.fillStyle = i.color || "#fff";
-              ctxos.fillRect(
+              app.ctxos.fillStyle = i.color || "#fff";
+              app.ctxos.fillRect(
                 -imgW / 2,
                 -imgH / 2,
                 imgW,
                 imgH
               );
-              ctxos.fillStyle = "#fff";
+              app.ctxos.fillStyle = "#fff";
             } else {
-              ctxos.drawImage(
+              app.ctxos.drawImage(
                 getColoredLineImage(i, i.color),
                 -imgW / 2,
                 -imgH / 2,
@@ -2670,7 +2597,7 @@ function drawLine(bool, lineScale) {
               );
             }
           } else {
-            ctxos.drawImage(
+            app.ctxos.drawImage(
               i.imageL[i.imageC && shared.game.ptmain.gameConfig.lineColor ? stat.lineStatus : 0],
               -imgW / 2,
               -imgH / 2,
@@ -2679,7 +2606,7 @@ function drawLine(bool, lineScale) {
             );
           }
         } catch (err) {
-          ctxos.drawImage(
+          app.ctxos.drawImage(
             i.imageL[i.imageC && shared.game.ptmain.gameConfig.lineColor ? stat.lineStatus : 0],
             -imgW / 2,
             -imgH / 2,
@@ -2688,11 +2615,11 @@ function drawLine(bool, lineScale) {
           );
         }
       } else {
-        ctxos.fillStyle = i.color || "#fff";
-        ctxos.textAlign = "center";
-        ctxos.textBaseline = "middle";
-        ctxos.font = `${lineScale * (i.scaleY || 1)}px Saira`;
-        ctxos.fillText(i.text, 0, 0);
+        app.ctxos.fillStyle = i.color || "#fff";
+        app.ctxos.textAlign = "center";
+        app.ctxos.textBaseline = "middle";
+        app.ctxos.font = `${lineScale * (i.scaleY || 1)}px Saira`;
+        app.ctxos.fillText(i.text, 0, 0);
       }
       // ctxos.restore();
     }
@@ -2723,12 +2650,12 @@ function drawRoundRect(ctx, x, y, w, h, r) {
 
 function qwqdraw3(statData) {
 
-  (ctxos.shadowBlur = 40), (ctxos.shadowColor = "#000000");
-  ctxos.globalAlpha = 1;
+  (app.ctxos.shadowBlur = 40), (app.ctxos.shadowColor = "#000000");
+  app.ctxos.globalAlpha = 1;
   const k = 3.7320508075688776; //tan75°
 
-  const qwq0 = (canvasos.width - canvasos.height / k) / (16 - 9 / k);
-  ctxos.setTransform(
+  const qwq0 = (app.canvasos.width - app.canvasos.height / k) / (16 - 9 / k);
+  app.ctxos.setTransform(
     qwq0 / 120,
     0,
     0,
@@ -2737,14 +2664,14 @@ function qwqdraw3(statData) {
     app.hlen - qwq0 * 4.5
   ); //?
 
-  ctxos.globalAlpha = 1;
+  app.ctxos.globalAlpha = 1;
   let imgWidthAct = 700 * (app.bgImage.width / app.bgImage.height),
     imgHeightAct = 700;
   if (imgWidthAct < 1200) {
     imgWidthAct = 1200;
     imgHeightAct = 1200 * (app.bgImage.height / app.bgImage.width);
   }
-  ctxos.drawImage(
+  app.ctxos.drawImage(
     app.bgImage,
     -1920 * tween.ease10(clip(qwqEnd.second * 1)) + 2460.5 - imgWidthAct / 2,
     208 - (imgHeightAct - 645) / 2,
@@ -2753,22 +2680,22 @@ function qwqdraw3(statData) {
   );
 
   drawRoundRect(
-    ctxos,
+    app.ctxos,
     -1920 * tween.ease10(clip(qwqEnd.second * 1)) + 2010.24,
     182,
     890,
     700,
     30
   );
-  ctxos.globalCompositeOperation = "destination-in";
-  ctxos.fill();
-  ctxos.globalCompositeOperation = "source-over";
-  ctxos.stroke();
+  app.ctxos.globalCompositeOperation = "destination-in";
+  app.ctxos.fill();
+  app.ctxos.globalCompositeOperation = "source-over";
+  app.ctxos.stroke();
 
-  ctxos.globalAlpha = 0.5;
-  ctxos.fillStyle = "black";
+  app.ctxos.globalAlpha = 0.5;
+  app.ctxos.fillStyle = "black";
   drawRoundRect(
-    ctxos,
+    app.ctxos,
     -1720 * tween.ease10(clip(qwqEnd.second - 0.1)) + 2740,
     180,
     800,
@@ -2777,7 +2704,7 @@ function qwqdraw3(statData) {
   ).fill();
 
   drawRoundRect(
-    ctxos,
+    app.ctxos,
     -1020 * tween.ease10(clip(qwqEnd.second * 0.9 - 0.25)) + 2040,
     563,
     800,
@@ -2785,7 +2712,7 @@ function qwqdraw3(statData) {
     30
   ).fill();
   drawRoundRect(
-    ctxos,
+    app.ctxos,
     -1020 * tween.ease10(clip(qwqEnd.second * 0.8 - 0.3)) + 2040,
     735,
     800,
@@ -2794,9 +2721,9 @@ function qwqdraw3(statData) {
   ).fill();
 
   //歌名和等级
-  ctxos.globalAlpha = 1;
-  ctxos.restore();
-  ctxos.setTransform(
+  app.ctxos.globalAlpha = 1;
+  app.ctxos.restore();
+  app.ctxos.setTransform(
     qwq0 / 120,
     0,
     0,
@@ -2804,38 +2731,38 @@ function qwqdraw3(statData) {
     app.wlen - qwq0 * 8,
     app.hlen - qwq0 * 4.5
   ); //?
-  ctxos.fillStyle = "#fff";
-  ctxos.textAlign = "left";
-  ctxos.font = `73.5px Saira`;
-  const dxsnm = ctxos.measureText(
+  app.ctxos.fillStyle = "#fff";
+  app.ctxos.textAlign = "left";
+  app.ctxos.font = `73.5px Saira`;
+  const dxsnm = app.ctxos.measureText(
     inputName.value || inputName.placeholder
   ).width;
   if (dxsnm > 600)
-    ctxos.font = `${(73.5 / dxsnm) * 600}px Saira`;
-  ctxos.fillText(
+    app.ctxos.font = `${(73.5 / dxsnm) * 600}px Saira`;
+  app.ctxos.fillText(
     inputName.value || inputName.placeholder,
     -1920 * tween.ease10(clip(qwqEnd.second * 1)) + 2050,
     830
   );
-  ctxos.font = `30px Saira`;
-  const dxlvl = ctxos.measureText(levelText).width;
+  app.ctxos.font = `30px Saira`;
+  const dxlvl = app.ctxos.measureText(levelText).width;
   if (dxlvl > 150)
-    ctxos.font = `${(30 / dxlvl) * 150}px Saira`;
-  ctxos.textAlign = "right";
-  ctxos.fillText(
+    app.ctxos.font = `${(30 / dxlvl) * 150}px Saira`;
+  app.ctxos.textAlign = "right";
+  app.ctxos.fillText(
     levelText,
     -1920 * tween.ease10(clip(qwqEnd.second * 1)) + 2860,
     835
   );
-  ctxos.textAlign = "left";
+  app.ctxos.textAlign = "left";
   //Rank图标
-  ctxos.globalAlpha = clip((qwqEnd.second - 1.3) * 3.75);
+  app.ctxos.globalAlpha = clip((qwqEnd.second - 1.3) * 3.75);
   const qwq2 = 293 + clip((qwqEnd.second - 1.3) * 3.75) * 100;
   const qwq3 = 410 - tween.ease15(clip((qwqEnd.second - 1.3) * 1.5)) * 164;
   if (stat.lineStatus == 3)
-    ctxos.drawImage(res["FCV"], 1685 - qwq3, 373 - qwq3, qwq3 * 2, qwq3 * 2);
+    app.ctxos.drawImage(res["FCV"], 1685 - qwq3, 373 - qwq3, qwq3 * 2, qwq3 * 2);
   else
-    ctxos.drawImage(
+    app.ctxos.drawImage(
       res["Ranks"][stat.rankStatus],
       1685 - qwq3,
       373 - qwq3,
@@ -2843,48 +2770,48 @@ function qwqdraw3(statData) {
       qwq3 * 2
     );
   //准度和连击
-  ctxos.globalAlpha = clip((qwqEnd.second - 0.8) * 1.5);
-  ctxos.textAlign = "right";
-  ctxos.font = `55px Saira`;
-  ctxos.fillText(
+  app.ctxos.globalAlpha = clip((qwqEnd.second - 0.8) * 1.5);
+  app.ctxos.textAlign = "right";
+  app.ctxos.font = `55px Saira`;
+  app.ctxos.fillText(
     stat.accStr,
     -1020 * tween.ease10(clip(qwqEnd.second * 0.9 - 0.25)) + 2785,
     638
   );
-  ctxos.font = `26px Saira`;
-  ctxos.fillText(
+  app.ctxos.font = `26px Saira`;
+  app.ctxos.fillText(
     "ACCURACY",
     -1020 * tween.ease10(clip(qwqEnd.second * 0.9 - 0.25)) + 2783,
     673
   );
-  ctxos.textAlign = "left";
-  ctxos.font = `55px Saira`;
-  ctxos.fillText(
+  app.ctxos.textAlign = "left";
+  app.ctxos.font = `55px Saira`;
+  app.ctxos.fillText(
     stat.maxcombo,
     -1020 * tween.ease10(clip(qwqEnd.second * 0.9 - 0.25)) + 2095,
     638
   );
-  ctxos.font = `26px Saira`;
-  ctxos.fillText(
+  app.ctxos.font = `26px Saira`;
+  app.ctxos.fillText(
     "MAX COMBO",
     -1020 * tween.ease10(clip(qwqEnd.second * 0.9 - 0.25)) + 2095,
     673
   );
   // ctxos.fillStyle = statData[4];
   //分数
-  ctxos.fillStyle = "#fff";
-  ctxos.textAlign = "left";
-  ctxos.font = `86px Saira`;
-  ctxos.globalAlpha = clip((qwqEnd.second - 0.4) * 2.0);
-  ctxos.fillText(
+  app.ctxos.fillStyle = "#fff";
+  app.ctxos.textAlign = "left";
+  app.ctxos.font = `86px Saira`;
+  app.ctxos.globalAlpha = clip((qwqEnd.second - 0.4) * 2.0);
+  app.ctxos.fillText(
     stat.scoreStr,
     -1720 * tween.ease10(clip(qwqEnd.second - 0.1)) + 2795,
     415
   );
-  ctxos.textAlign = "right";
-  ctxos.font = `25px Saira`;
-  ctxos.fillStyle = "#83e691";
-  ctxos.fillText(
+  app.ctxos.textAlign = "right";
+  app.ctxos.font = `25px Saira`;
+  app.ctxos.fillStyle = "#83e691";
+  app.ctxos.fillText(
     app.speed === 1
       ? ""
       : statData.textAboveStr.replace("{SPEED}", app.speed.toFixed(2)),
@@ -2892,118 +2819,118 @@ function qwqdraw3(statData) {
     792
   );
 
-  ctxos.textAlign = "left";
-  ctxos.globalAlpha = clip((qwqEnd.second - 0.4) * 2.5);
-  ctxos.fillStyle = "#a2e27f";
-  ctxos.font = `25px Saira`;
-  ctxos.fillText(
+  app.ctxos.textAlign = "left";
+  app.ctxos.globalAlpha = clip((qwqEnd.second - 0.4) * 2.5);
+  app.ctxos.fillStyle = "#a2e27f";
+  app.ctxos.font = `25px Saira`;
+  app.ctxos.fillText(
     statData.newBestStr,
     -1720 * tween.ease10(clip(qwqEnd.second - 0.1)) + 2800,
     337
   );
-  ctxos.fillStyle = "#fff";
-  ctxos.textAlign = "left";
-  ctxos.font = `30px Saira`;
-  ctxos.fillText(
+  app.ctxos.fillStyle = "#fff";
+  app.ctxos.textAlign = "left";
+  app.ctxos.font = `30px Saira`;
+  app.ctxos.fillText(
     statData.scoreBest,
     -1720 * tween.ease10(clip(qwqEnd.second - 0.1)) + 2800,
     460
   );
   // 	ctxos.globalAlpha = clip((qwqEnd.second - 1.87) * 2.50);
-  ctxos.textAlign = "left";
-  ctxos.fillText(
+  app.ctxos.textAlign = "left";
+  app.ctxos.fillText(
     statData.scoreDelta,
     -1720 * tween.ease10(clip(qwqEnd.second - 0.1)) + 2950,
     460
   );
 
   //Perfect, good, bad, miss
-  ctxos.fillStyle = "#fff";
-  ctxos.font = `45px Saira`;
-  ctxos.textAlign = "center";
-  ctxos.globalAlpha = clip((qwqEnd.second - 1.25) * 2.5);
-  ctxos.fillText(
+  app.ctxos.fillStyle = "#fff";
+  app.ctxos.font = `45px Saira`;
+  app.ctxos.textAlign = "center";
+  app.ctxos.globalAlpha = clip((qwqEnd.second - 1.25) * 2.5);
+  app.ctxos.fillText(
     stat.perfect,
     -1020 * tween.ease10(clip(qwqEnd.second * 0.8 - 0.3)) + 2140,
     812
   );
-  ctxos.fillText(
+  app.ctxos.fillText(
     stat.good,
     -1020 * tween.ease10(clip(qwqEnd.second * 0.8 - 0.3)) + 2288,
     812
   );
-  ctxos.fillText(
+  app.ctxos.fillText(
     stat.noteRank[6],
     -1020 * tween.ease10(clip(qwqEnd.second * 0.8 - 0.3)) + 2395,
     812
   );
-  ctxos.fillText(
+  app.ctxos.fillText(
     stat.noteRank[2],
     -1020 * tween.ease10(clip(qwqEnd.second * 0.8 - 0.3)) + 2502,
     812
   );
-  ctxos.font = `20px Saira`;
-  ctxos.fillText(
+  app.ctxos.font = `20px Saira`;
+  app.ctxos.fillText(
     "PERFECT",
     -1020 * tween.ease10(clip(qwqEnd.second * 0.8 - 0.3)) + 2140,
     842
   );
-  ctxos.fillText(
+  app.ctxos.fillText(
     "GOOD",
     -1020 * tween.ease10(clip(qwqEnd.second * 0.8 - 0.3)) + 2288,
     842
   );
-  ctxos.fillText(
+  app.ctxos.fillText(
     "BAD",
     -1020 * tween.ease10(clip(qwqEnd.second * 0.8 - 0.3)) + 2395,
     842
   );
-  ctxos.fillText(
+  app.ctxos.fillText(
     "MISS",
     -1020 * tween.ease10(clip(qwqEnd.second * 0.8 - 0.3)) + 2502,
     842
   );
-  ctxos.font = `28px Saira`;
+  app.ctxos.font = `28px Saira`;
   //Early, Late
   const qwq4 = clip(
     (qwq[3] > 0 ? qwqEnd.second - qwq[3] : 0.2 - qwqEnd.second - qwq[3]) * 5.0
   );
-  ctxos.textAlign = "left";
-  ctxos.fillText(
+  app.ctxos.textAlign = "left";
+  app.ctxos.fillText(
     "EARLY",
     -1020 * tween.ease10(clip(qwqEnd.second * 0.8 - 0.3)) + 2610,
     800
   );
-  ctxos.fillText(
+  app.ctxos.fillText(
     "LATE",
     -1020 * tween.ease10(clip(qwqEnd.second * 0.8 - 0.3)) + 2625,
     838
   );
-  ctxos.textAlign = "right";
-  ctxos.fillText(
+  app.ctxos.textAlign = "right";
+  app.ctxos.fillText(
     stat.noteRank[7],
     -1020 * tween.ease10(clip(qwqEnd.second * 0.8 - 0.3)) + 2775,
     800
   );
-  ctxos.fillText(
+  app.ctxos.fillText(
     stat.noteRank[3],
     -1020 * tween.ease10(clip(qwqEnd.second * 0.8 - 0.3)) + 2775,
     838
   );
   // 控制按钮
-	// // ctxos.fillStyle = "#fff";
-	// ctxos.font = '40px Saira';
-	// // ctxos.textAlign = 'right';
-	// ctxos.fillText("BACK", 1620, 1075 + (canvasos.height / (qwq0 / 120) - 1075) / 2 - 40);
-	// ctxos.textAlign = 'left';
-	// ctxos.fillText("RETRY", 350, 1075 + (canvasos.height / (qwq0 / 120) - 1075) / 2 - 40);
+  // // ctxos.fillStyle = "#fff";
+  // ctxos.font = '40px Saira';
+  // // ctxos.textAlign = 'right';
+  // ctxos.fillText("BACK", 1620, 1075 + (canvasos.height / (qwq0 / 120) - 1075) / 2 - 40);
+  // ctxos.textAlign = 'left';
+  // ctxos.fillText("RETRY", 350, 1075 + (canvasos.height / (qwq0 / 120) - 1075) / 2 - 40);
   try {
-    shared.game.graphicHandler.resultHook(ctx, ctxos);
+    shared.game.graphicHandler.resultHook(app.ctx, app.ctxos);
   } catch (e) {
     console.warn(e);
   }
-  (ctxos.shadowBlur = 0), (ctxos.shadowColor = "#000000");
-  ctxos.resetTransform();
+  (app.ctxos.shadowBlur = 0), (app.ctxos.shadowColor = "#000000");
+  app.ctxos.resetTransform();
 }
 
 function clip(num) {
@@ -3053,7 +2980,7 @@ const noteRender = {
    * @param {ImageBitmap} img
    * @param {number} scale
    */
-  async update(name, img, scale, compacted=false) {
+  async update(name, img, scale, compacted = false) {
     this.note[name] = new ScaledNote(img, scale, compacted);
     if (name === "Tap")
       this.note["TapBad"] = new ScaledNote(
@@ -3113,7 +3040,7 @@ function drawTap(note) {
   const HL = note.isMulti && shared.game.ptmain.gameConfig.highLight;
   const nsr = app.noteScaleRatio * (note.size || 1);
   if (!note.visible || (note.scored && !note.badtime)) return;
-  ctxos.setTransform(
+  app.ctxos.setTransform(
     nsr * note.cosr,
     nsr * note.sinr,
     -nsr * note.sinr,
@@ -3122,14 +3049,14 @@ function drawTap(note) {
     note.offsetY
   );
   if (note.badtime) {
-    ctxos.globalAlpha = 1 - clip((performance.now() - note.badtime) / 500);
-    noteRender.note["TapBad"].full(ctxos);
+    app.ctxos.globalAlpha = 1 - clip((performance.now() - note.badtime) / 500);
+    noteRender.note["TapBad"].full(app.ctxos);
   } else {
-    ctxos.globalAlpha =
+    app.ctxos.globalAlpha =
       note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
     if (main.qwqwq)
-      ctxos.globalAlpha *= Math.max(1 + (timeChart - note.realTime) / 1.5, 0); //过线前1.5s出现
-    noteRender.note[HL ? "TapHL" : "Tap"].full(ctxos);
+      app.ctxos.globalAlpha *= Math.max(1 + (timeChart - note.realTime) / 1.5, 0); //过线前1.5s出现
+    noteRender.note[HL ? "TapHL" : "Tap"].full(app.ctxos);
   }
 }
 
@@ -3138,7 +3065,7 @@ function drawDrag(note) {
   const HL = note.isMulti && shared.game.ptmain.gameConfig.highLight;
   const nsr = app.noteScaleRatio * (note.size || 1);
   if (!note.visible || (note.scored && !note.badtime)) return;
-  ctxos.setTransform(
+  app.ctxos.setTransform(
     nsr * note.cosr,
     nsr * note.sinr,
     -nsr * note.sinr,
@@ -3148,11 +3075,11 @@ function drawDrag(note) {
   );
   if (note.badtime);
   else {
-    ctxos.globalAlpha =
+    app.ctxos.globalAlpha =
       note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
     if (main.qwqwq)
-      ctxos.globalAlpha *= Math.max(1 + (timeChart - note.realTime) / 1.5, 0);
-    noteRender.note[HL ? "DragHL" : "Drag"].full(ctxos);
+      app.ctxos.globalAlpha *= Math.max(1 + (timeChart - note.realTime) / 1.5, 0);
+    noteRender.note[HL ? "DragHL" : "Drag"].full(app.ctxos);
   }
 }
 
@@ -3161,11 +3088,11 @@ function drawHold(note, realTime) {
   const HL = note.isMulti && shared.game.ptmain.gameConfig.highLight;
   const nsr = app.noteScaleRatio * (note.size || 1);
   if (!note.visible || note.realTime + note.realHoldTime < realTime) return; //qwq
-  ctxos.globalAlpha =
+  app.ctxos.globalAlpha =
     note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
   if (main.qwqwq)
-    ctxos.globalAlpha *= Math.max(1 + (timeChart - note.realTime) / 1.5, 0);
-  ctxos.setTransform(
+    app.ctxos.globalAlpha *= Math.max(1 + (timeChart - note.realTime) / 1.5, 0);
+  app.ctxos.setTransform(
     nsr * note.cosr,
     nsr * note.sinr,
     -nsr * note.sinr,
@@ -3176,20 +3103,20 @@ function drawHold(note, realTime) {
   const baseLength = (app.scaleY / nsr) * note.speed * app.speed;
   const holdLength = baseLength * note.realHoldTime;
   if (note.realTime > realTime) {
-    noteRender.note[HL ? "HoldHeadHL" : "HoldHead"].head(ctxos);
+    noteRender.note[HL ? "HoldHeadHL" : "HoldHead"].head(app.ctxos);
     noteRender.note[HL ? "HoldHL" : "Hold"].body(
-      ctxos,
+      app.ctxos,
       -holdLength,
       holdLength
     );
   } else {
     noteRender.note[HL ? "HoldHL" : "Hold"].body(
-      ctxos,
+      app.ctxos,
       -holdLength,
       holdLength - baseLength * (realTime - note.realTime)
     );
   }
-  noteRender.note["HoldEnd"].tail(ctxos, -holdLength);
+  noteRender.note["HoldEnd"].tail(app.ctxos, -holdLength);
 }
 
 function drawFlick(note) {
@@ -3197,7 +3124,7 @@ function drawFlick(note) {
   const HL = note.isMulti && shared.game.ptmain.gameConfig.highLight;
   const nsr = app.noteScaleRatio * (note.size || 1);
   if (!note.visible || (note.scored && !note.badtime)) return;
-  ctxos.setTransform(
+  app.ctxos.setTransform(
     nsr * note.cosr,
     nsr * note.sinr,
     -nsr * note.sinr,
@@ -3207,11 +3134,11 @@ function drawFlick(note) {
   );
   if (note.badtime);
   else {
-    ctxos.globalAlpha =
+    app.ctxos.globalAlpha =
       note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
     if (main.qwqwq)
-      ctxos.globalAlpha *= Math.max(1 + (timeChart - note.realTime) / 1.5, 0);
-    noteRender.note[HL ? "FlickHL" : "Flick"].full(ctxos);
+      app.ctxos.globalAlpha *= Math.max(1 + (timeChart - note.realTime) / 1.5, 0);
+    noteRender.note[HL ? "FlickHL" : "Flick"].full(app.ctxos);
   }
 }
 //调节画面尺寸和全屏相关(返回source播放aegleseeker会出现迷之error)
@@ -3370,7 +3297,7 @@ isForcedMaxFrame.addEventListener("change", function () {
 emitter.addEventListener(
   "change",
   /** @this {Emitter} */ function () {
-    canvas.classList.toggle("fade", this.eq("stop"));
+    app.canvas.classList.toggle("fade", this.eq("stop"));
     btnPlay.value = this.eq("stop") ? "播放" : "停止";
     btnPause.value = this.eq("pause") ? "继续" : "暂停";
     btnPause.classList.toggle("disabled", this.eq("stop"));
@@ -3405,8 +3332,8 @@ status2.reg(emitter, "change", (/** @type {Emitter} */ target) =>
 );
 async function qwqStop() {
   if (emitter.eq("stop")) {
-    if (!selectchart.value) return msgHandler.sendError(shared.game.i18n.t("simphi.playErr.noChartSelected"));
-    if (!selectbgm.value) return msgHandler.sendError(shared.game.i18n.t("simphi.playErr.noMusicSelected"));
+    if (!selectchart.value) return spMsgHandler.sendError(shared.game.i18n.t("simphi.playErr.noChartSelected"));
+    if (!selectbgm.value) return spMsgHandler.sendError(shared.game.i18n.t("simphi.playErr.noMusicSelected"));
     app.stage.style.display = "block";
     for (const i of main.before.values()) await i();
     audio.play(res["mute"], { loop: true, isOut: false }); //播放空音频(避免音画不同步)
@@ -3437,7 +3364,7 @@ async function qwqStop() {
     audio.stop();
     frameAnimater.stop();
     //清除原有数据
-    fucktemp1 = false;
+    resultPageData = false;
     fucktemp2 = null;
     if (app.pauseNextTick)
       clearInterval(app.pauseNextTick),
@@ -3469,10 +3396,10 @@ async function loadLineData() {
   for (const i of chartLineData) {
     if (selectchart.value === i.Chart) {
       if (!app.lines[i.LineId]) {
-        msgHandler.sendWarning(shared.game.i18n.t("simphi.playErr.judgeLineDoesentExist", [ i.LineId ]));
+        spMsgHandler.sendWarning(shared.game.i18n.t("simphi.playErr.judgeLineDoesentExist", [i.LineId]));
         continue;
       }
-      if (!bgs.has(i.Image)) msgHandler.sendWarning(shared.game.i18n.t("simphi.playErr.imageDoesentExist", [ i.image ]));
+      if (!bgs.has(i.Image)) spMsgHandler.sendWarning(shared.game.i18n.t("simphi.playErr.imageDoesentExist", [i.image]));
       /** @type {ImageBitmap} */
       const image = bgs.get(i.Image) || res["NoImageBlack"];
       app.lines[i.LineId].imageW = image.width;
@@ -3485,7 +3412,7 @@ async function loadLineData() {
         await lineImage.getAP(),
         await lineImage.getFC(),
       ];
-      app.lines[i.LineId].isCustomImage = bgs.get(i.Image) ? true: false;
+      app.lines[i.LineId].isCustomImage = bgs.get(i.Image) ? true : false;
       if (isFinite((i.Vert = parseFloat(i.Vert)))) {
         //Legacy
         app.lines[i.LineId].imageS = (Math.abs(i.Vert) * 1080) / image.height;
@@ -3510,7 +3437,7 @@ async function loadLineData() {
 }
 async function qwqPause() {
   if (btnPause.classList.contains("disabled") || !tmps.canPause) return;
-  if (emitter.eq("stop") || fucktemp1) return;
+  if (emitter.eq("stop") || resultPageData) return;
   btnPause.classList.add("disabled");
   if (emitter.eq("play")) {
     if (app.bgVideo) app.bgVideo.pause();
@@ -3673,7 +3600,7 @@ main.stat = stat;
 main.app = app;
 main.res = res;
 main.audio = audio;
-main.msgHandler = msgHandler;
+main.msgHandler = spMsgHandler;
 main.frameAnimater = frameAnimater;
 main.qwqEnd = qwqEnd;
 main.bgms = bgms;
@@ -3694,7 +3621,7 @@ shared.game.simphiPlugins = { videoRecorder };
 Object.defineProperty(main, "time", {
   get: () => timeBgm,
   set: async (v) => {
-    if (emitter.eq("stop") || fucktemp1) return;
+    if (emitter.eq("stop") || resultPageData) return;
     const isPlaying = emitter.eq("play");
     if (isPlaying) await qwqPause();
     curTime = timeBgm = v;

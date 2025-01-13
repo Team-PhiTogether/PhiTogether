@@ -1,4 +1,5 @@
 import shared from "./shared";
+import { spMsgHandler } from "./msgHandler.js";
 import {
     getConstructorName,
 } from "../js/common.js";
@@ -24,7 +25,7 @@ const sysError = (e, error, message) => {
     const errDetail = `[${type}] ${detail}`;
     if (/(orientation|Decoding)/.test(errMessage)) return;
     shared.game.loadHandler.r();
-    shared.game.spMsgHandler.sendError(errMessage, Utils.escapeHTML(errDetail));
+    spMsgHandler.sendError(errMessage, Utils.escapeHTML(errDetail));
 
     try {
         const formData = new FormData();

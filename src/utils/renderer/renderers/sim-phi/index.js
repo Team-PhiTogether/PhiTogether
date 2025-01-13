@@ -9,5 +9,7 @@ export const rendererInterface = new ChartRenderer(
 
         init: () => {},
         loadRespack: (url) => shared.game.simphi.reloadRes(url),
+        // loadChart: (url) => shared.game.simphi.reloadChart(url),
+        // startGameplat: () => shared.game.simphi.startGameplat(),
     }
 );
