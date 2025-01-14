@@ -36,3 +36,5 @@ vite.config.local.js
 # golang_backend/main.exe~
 # golang_backend/main
 # golang_backend/config.json
+
+public/latestVersion.json
