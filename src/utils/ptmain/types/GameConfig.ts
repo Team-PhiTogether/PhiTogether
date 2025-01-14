@@ -48,7 +48,6 @@ export interface GameConfig {
   stopWhenNoLife: boolean;
   useSeparateOffscreenCanvas: boolean;
   reviewWhenResume: boolean;
-  allowNonFullscreen: boolean;
 }
 
 export interface GameConfigAccount {
@@ -109,6 +108,5 @@ export const defaultGameConfig = {
   stopWhenNoLife: false,
   useSeparateOffscreenCanvas: false,
   reviewWhenResume: false,
-  allowNonFullscreen: false,
   lastVersion: "lastVer",
 };

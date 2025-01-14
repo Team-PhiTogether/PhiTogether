@@ -268,7 +268,6 @@ const ptAppInstance = createApp({
         stopWhenNoLife: false,
         useSeparateOffscreenCanvas: false,
         reviewWhenResume: false,
-        allowNonFullscreen: false,
         lastVersion: "lastVer",
       },
       debugEnabled: false,

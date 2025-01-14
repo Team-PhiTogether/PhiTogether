@@ -105,7 +105,6 @@ function parseGameConfig(gameConfig: GameConfig): ParsedGameConfig {
             stopWhenNoLife: false,
             useSeparateOffscreenCanvas: false,
             reviewWhenResume: false,
-            allowNonFullscreen: false,
         },
         ptBestRecords: null,
     };
