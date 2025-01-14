@@ -17,6 +17,7 @@ import shared from "@utils/js/shared.js";
 import { recordMgr } from "@components/recordMgr/recordMgr.js";
 import { replayMgr } from "@components/recordMgr/replayMgr.js";
 
+import { loadModYukiOri } from "./plugins/aprfools/loadModYukiOri.js";
 import saveAdjustedChart from "./plugins/saveAdjustedChart";
 import videoRecorder from "./plugins/video-recorder";
 import { loadSkinFromBuffer, loadSkinFromDB } from "./plugins/skin";
@@ -26,15 +27,16 @@ import { createCanvas } from "./utils/canvas.js";
 
 import ptdb from "@utils/ptdb";
 import { msgHandler } from "@utils/js/msgHandler.js";
-import { tween, Emitter } from "./utils/simphiUtils.js";
+import { tween, Emitter, clip } from "./utils/simphiUtils.js";
 
+// import { judgeManager } from "./components/JudgeManager.js";
 import { HitManager } from "./components/HitManager.js";
 
 const $id = (query) => document.getElementById(query);
 const $ = (query) => document.body.querySelector(query);
 const $$ = (query) => document.body.querySelectorAll(query);
 
-const main = {};
+export const main = {};
 main.modify = (a) => a;
 main.pressTime = 0;
 // main.kfcFkXqsVw50 = [];
@@ -1193,15 +1195,12 @@ class HitFeedback {
     this.time = 0;
   }
   static tap(offsetX, offsetY) {
-    //console.log('Tap', offsetX, offsetY);
     return new HitFeedback(offsetX, offsetY, "cyan", "");
   }
   static hold(offsetX, offsetY) {
-    //console.log('Hold', offsetX, offsetY);
     return new HitFeedback(offsetX, offsetY, "lime", "");
   }
   static move(offsetX, offsetY) {
-    //console.log('Move', offsetX, offsetY);
     return new HitFeedback(offsetX, offsetY, "violet", "");
   }
 }
@@ -1220,11 +1219,9 @@ class HitImage {
     this.color = String(n3);
   }
   static perfect(offsetX, offsetY, note) {
-    //console.log(note);
     return new HitImage(offsetX, offsetY, "Perfect", tmps.hitPerfectColor || "#ffeca0", note.line.rotation);
   }
   static good(offsetX, offsetY, note) {
-    //console.log(note);
     return new HitImage(offsetX, offsetY, "Good", tmps.hitGoodColor || "#b4e1ff", note.line.rotation);
   }
 }
@@ -1238,11 +1235,9 @@ class HitWord {
     this.text = String(n2);
   }
   static early(offsetX, offsetY) {
-    //console.log('Tap', offsetX, offsetY);
     return new HitWord(offsetX, offsetY, "#03aaf9", "Early");
   }
   static late(offsetX, offsetY) {
-    //console.log('Hold', offsetX, offsetY);
     return new HitWord(offsetX, offsetY, "#ff4612", "Late");
   }
 }
@@ -1438,7 +1433,6 @@ const loadRes = shared.game.simphi.reloadRes = async (url, manual = false, setAs
                 true
               );
             } else {
-              // console.log(xhr.response)
               const a = new DataView(xhr.response, 0, 8);
               const header1 = a.getUint32(0);
               const header2 = a.getUint32(4);
@@ -1699,21 +1693,6 @@ window.addEventListener(
     $id("select").classList.remove("disabled");
     emitter.dispatchEvent(new CustomEvent("change"));
     btnPause.classList.add("disabled");
-
-    function decode(img, border = 0) {
-      const canvas = createCanvas(
-        img.width - border * 2,
-        img.height - border * 2
-      );
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, -border, -border);
-      const id = ctx.getImageData(0, 0, canvas.width, canvas.width);
-      const ab = new Uint8Array((id.data.length / 4) * 3);
-      for (let i = 0; i < ab.length; i++)
-        ab[i] = id.data[((i / 3) | 0) * 4 + (i % 3)] ^ (i * 3473);
-      const size = new DataView(ab.buffer, 0, 4).getUint32(0);
-      return { result: ab.buffer.slice(4, size + 4) };
-    }
   },
   { once: true }
 );
@@ -1866,7 +1845,7 @@ function mainLoop() {
     stage.resize(true);
   } //只让它执行一次
   if (fucktemp2) {
-    qwqdraw3(fucktemp2);
+    resultPageRenderer(fucktemp2);
     app.ctxos.globalAlpha = 0.5;
     app.ctxos.drawImage(
       res["Retry"],
@@ -2646,8 +2625,7 @@ function drawRoundRect(ctx, x, y, w, h, r) {
   return ctx;
 }
 
-function qwqdraw3(statData) {
-
+function resultPageRenderer(statData) {
   (app.ctxos.shadowBlur = 40), (app.ctxos.shadowColor = "#000000");
   app.ctxos.globalAlpha = 1;
   const k = 3.7320508075688776; //tan75°
@@ -2931,11 +2909,6 @@ function qwqdraw3(statData) {
   app.ctxos.resetTransform();
 }
 
-function clip(num) {
-  if (num < 0) return 0;
-  if (num > 1) return 1;
-  return num;
-}
 class ScaledNote {
   constructor(img, scale, compacted) {
     this.img = img;
@@ -3305,7 +3278,6 @@ emitter.addEventListener(
       if (!app.isFull && !shared.game.ptmain.gameConfig.allowNonFullscreen) doFullScreen();
       app.playMode = (shared.game.ptmain.gameConfig.autoplay && shared.game.ptmain.gameConfig.account && shared.game.ptmain.gameConfig.account.userBasicInfo.isPTDeveloper) || shared.game.ptmain.playConfig.mode === "preview" ? 1 : 0;
     }
-    // console.log(this);
   }
 );
 btnPlay.addEventListener("click", async function () {
@@ -3453,7 +3425,6 @@ async function qwqPause() {
       qwqIn.play();
       if (showTransition.checked && isOutStart) qwqOut.play();
       if (isInEnd && !isOutStart) playBgm(app.bgMusic, timeBgm * app.speed);
-      // console.log(app.bgVideo);
       emitter.emit("play");
       btnPause.classList.remove("disabled");
       return;
@@ -3472,7 +3443,6 @@ async function qwqPause() {
           qwqIn.play();
           if (showTransition.checked && isOutStart) qwqOut.play();
           if (isInEnd && !isOutStart) playBgm(app.bgMusic, timeBgm * app.speed);
-          // console.log(app.bgVideo);
           emitter.emit("play");
         }
         btnPause.classList.remove("disabled");
@@ -3484,7 +3454,6 @@ async function qwqPause() {
       qwqIn.play();
       if (showTransition.checked && isOutStart) qwqOut.play();
       if (isInEnd && !isOutStart) playBgm(app.bgMusic, timeBgm * app.speed);
-      // console.log(app.bgVideo);
       emitter.emit("play");
       btnPause.classList.add("disabled");
     }
@@ -3497,76 +3466,11 @@ hook.before.set(flag0, () => {
   const md5 = hook.chartsMD5.get(hook.selectchart.value);
   const hashDF = ['cdb5987ad81b70e3dc96153af2efaa61', '86d23af0cc595a703241536a2d29ee4b', 'f5f8c244d317006103b67e1cdf6eb85b', '0e8ff64e65bf35382e30f980b5eec041'];
   const hashD321 = ['4ddcd5d923007d661911989e79fe8a59'];
-  if (md5 === 'ab9d2cc3eb569236ead459ad4caba109') hook.now.set(flag0, loadModYukiOri());
+  if (md5 === 'ab9d2cc3eb569236ead459ad4caba109') hook.now.set(flag0, loadModYukiOri(hook));
   else if (hashDF.includes(md5) && inputName.value === 'Distorted Fate ') import('./plugins/demo/DFLevelEffect.js').then(({ loadMod }) => hook.now.set(flag0, loadMod()));
   else if (hashD321.includes(md5) && inputName.value === 'DESTRUCTION 3,2,1 ') import('./plugins/demo/321LevelEffect.js').then(({ loadMod }) => hook.now.set(flag0, loadMod()));
   else hook.now.delete(flag0);
 });
-
-function loadModYukiOri() {
-  console.log('好耶');
-  const analyser = hook.audio.actx.createAnalyser();
-  analyser.fftSize = 4096;
-  // analyser.minDecibels = -180;
-  const getFreq = () => {
-    // progress变为频谱图
-    const bufferLength = analyser.frequencyBinCount;
-    const freq = new Uint8Array(bufferLength);
-    analyser.getByteFrequencyData(freq);
-    const avg = freq.reduce((a, b) => a + b) / bufferLength;
-    return Math.min(1, avg / 255 * 2.15); // FIXME: more accurate formula
-  };
-  let flagMusic = null;
-  let flagPerfect = NaN;
-  let flagGood = NaN;
-  let flagBad = NaN;
-  let flagEm = '';
-  let flagN = false;
-  const setFlag = (flag, em, n) => {
-    flagEm = em;
-    flagN = n;
-    return flag;
-  };
-  return time => {
-    const time1 = time * 1.95;
-    const bgMusic = hook.tmps.bgMusic();
-    if (bgMusic && bgMusic !== flagMusic) {
-      bgMusic.connect(analyser); // ?
-      flagMusic = bgMusic;
-    }
-    if (time1 < 168) {
-      hook.stat.numOfNotes = 305;
-      hook.tmps.level = 'lN\u2002Lv.I2';
-      hook.tmps.progress = time1 / 218;
-    } else if (time1 < 169) {
-      const progress = 1 - (169 - time1) ** 3; // easeCubicOut
-      hook.stat.numOfNotes = 305 + 2195 * progress | 0;
-      hook.tmps.progress = getFreq();
-    } else {
-      hook.stat.numOfNotes = 2500;
-      hook.tmps.progress = getFreq();
-    }
-    if (time1 > 325 && time1 < 358) {
-      // 监听判定变化
-      const statusP = hook.stat.perfect;
-      const statusG = hook.stat.good;
-      const statusB = hook.stat.bad;
-      if (isNaN(flagPerfect)) flagPerfect = statusP;
-      if (isNaN(flagGood)) flagGood = statusG;
-      if (isNaN(flagBad)) flagBad = statusB;
-      if (statusP !== flagPerfect) flagPerfect = setFlag(statusP, '\uff2f(\u2267\u25bd\u2266)\uff2f', true);
-      else if (statusG !== flagGood) flagGood = setFlag(statusG, '(\uff3e\u03c9\uff3e)', true);
-      else if (statusB !== flagBad) flagBad = setFlag(statusB, '(\u2299\ufe4f\u2299;)', true);
-      // 监听时间变化
-      if (time1 < 327) setFlag(null, '(\u2299o\u2299)', false);
-      else if (time1 > 334 && time1 < 335) setFlag(null, '(\u2299o\u2299)', false);
-      else if (time1 > 342 && time1 < 343) setFlag(null, '(\u2299o\u2299)', false);
-      else if (time1 > 350 && time1 < 351) setFlag(null, '(\u2299o\u2299)', false);
-      else if (!flagN) flagEm = '(\u2299ω\u2299)';
-      hook.tmps.combo = flagEm;
-    }
-  };
-}
 
 //plugin(filter)
 const enableFilter = $id("enableFilter");

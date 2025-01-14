@@ -25,3 +25,9 @@ export class Emitter extends EventTarget {
         return this.status !== status;
     }
 }
+
+export function clip(num) {
+    if (num < 0) return 0;
+    if (num > 1) return 1;
+    return num;
+}
