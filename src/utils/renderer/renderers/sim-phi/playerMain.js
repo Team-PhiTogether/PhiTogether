@@ -1,6 +1,5 @@
 import simphi from "./simphi";
 import { audio } from "@utils/js/aup.js";
-import Notiflix from "notiflix";
 import {
   full,
   Timer,
@@ -18,6 +17,7 @@ import shared from "@utils/js/shared.js";
 import { recordMgr } from "@components/recordMgr/recordMgr.js";
 import { replayMgr } from "@components/recordMgr/replayMgr.js";
 
+import { loadModYukiOri } from "./plugins/aprfools/loadModYukiOri.js";
 import saveAdjustedChart from "./plugins/saveAdjustedChart";
 import videoRecorder from "./plugins/video-recorder";
 import { loadSkinFromBuffer, loadSkinFromDB } from "./plugins/skin";
@@ -27,13 +27,16 @@ import { createCanvas } from "./utils/canvas.js";
 
 import ptdb from "@utils/ptdb";
 import { msgHandler } from "@utils/js/msgHandler.js";
-import { tween, Emitter } from "./utils/simphiUtils.js";
+import { tween, Emitter, clip } from "./utils/simphiUtils.js";
+
+// import { judgeManager } from "./components/JudgeManager.js";
+import { HitManager } from "./components/HitManager.js";
 
 const $id = (query) => document.getElementById(query);
 const $ = (query) => document.body.querySelector(query);
 const $$ = (query) => document.body.querySelectorAll(query);
 
-const main = {};
+export const main = {};
 main.modify = (a) => a;
 main.pressTime = 0;
 // main.kfcFkXqsVw50 = [];
@@ -65,27 +68,29 @@ const status2 = {
     this.text = arr.length === 0 ? "" : `(${arr.join("+")})`;
   },
 };
-let levelText = "SP Lv.?";
-const bgs = new Map();
-const bgsBlur = new Map();
-const bgms = new Map();
-const charts = new Map();
-const chartsMD5 = new Map();
-const oriBuffers = new Map();
-const chartLineData = []; //line.csv
-const chartInfoData = []; //info.csv
+const chartData = {
+  levelText: "SP Lv.?",
+  bgs: new Map(),
+  bgsBlur: new Map(),
+  bgms: new Map(),
+  charts: new Map(),
+  chartsMD5: new Map(),
+  oriBuffers: new Map(),
+  chartLineData: [], //line.csv
+  chartInfoData: [], //info.csv
+}
 function clearStat() {
   while (selectbg.options.length) selectbg.options.remove(0);
   while (selectchart.options.length) selectchart.options.remove(0);
   while (selectbgm.options.length) selectbgm.options.remove(0);
-  bgs.clear();
-  bgsBlur.clear();
-  bgms.clear();
-  oriBuffers.clear();
-  charts.clear();
-  chartsMD5.clear();
-  chartLineData.length = 0;
-  chartInfoData.length = 0;
+  chartData.bgs.clear();
+  chartData.bgsBlur.clear();
+  chartData.bgms.clear();
+  chartData.oriBuffers.clear();
+  chartData.charts.clear();
+  chartData.chartsMD5.clear();
+  chartData.chartLineData.length = 0;
+  chartData.chartInfoData.length = 0;
 }
 const gauge = {
   value: 100,
@@ -213,15 +218,15 @@ async function checkSupport() {
 }
 //自动填写歌曲信息
 function adjustInfo() {
-  for (const i of chartInfoData) {
+  for (const i of chartData.chartInfoData) {
     if (selectchart.value.trim() === i.Chart) {
       if (i.Name) inputName.value = i.Name;
       if (i.Musician) inputArtist.value = i.Musician; //Alternative
       if (i.Composer) inputArtist.value = i.Composer; //Alternative
       if (i.Artist) inputArtist.value = i.Artist;
       if (i.Level) {
-        levelText = i.Level;
-        const p = levelText
+        chartData.levelText = i.Level;
+        const p = chartData.levelText
           .toLocaleUpperCase()
           .split("LV.")
           .map((a) => a.trim());
@@ -231,8 +236,8 @@ function adjustInfo() {
       if (i.Illustrator) inputIllustrator.value = i.Illustrator;
       if (i.Designer) inputCharter.value = i.Designer;
       if (i.Charter) inputCharter.value = i.Charter;
-      if (bgms.has(i.Music)) selectbgm.value = i.Music;
-      if (bgs.has(i.Image)) {
+      if (chartData.bgms.has(i.Music)) selectbgm.value = i.Music;
+      if (chartData.bgs.has(i.Image)) {
         selectbg.value = i.Image;
         selectbg.dispatchEvent(new Event("change"));
       }
@@ -372,37 +377,37 @@ self.addEventListener("resize", () => stage.resize());
   async function pick(data) {
     switch (data.type) {
       case "line":
-        chartLineData.push(...data.data);
+        chartData.chartLineData.push(...data.data);
         break;
       case "info":
-        chartInfoData.push(...data.data);
+        chartData.chartInfoData.push(...data.data);
         break;
       case "media":
       case "audio":
-        bgms.set(data.name, data.data);
+        chartData.bgms.set(data.name, data.data);
         selectbgm.appendChild(createOption(data.name, data.name));
         break;
       case "image":
-        bgs.set(data.name, data.data);
-        bgsBlur.set(data.name, await imgBlur(data.data));
+        chartData.bgs.set(data.name, data.data);
+        chartData.bgsBlur.set(data.name, await imgBlur(data.data));
         selectbg.appendChild(createOption(data.name, data.name));
         break;
       case "chart":
         if (data.msg) data.msg.forEach((v) => msgHandler.sendWarning(v));
-        if (data.info) chartInfoData.push(data.info);
-        if (data.line) chartLineData.push(...data.line);
+        if (data.info) chartData.chartInfoData.push(data.info);
+        if (data.line) chartData.chartLineData.push(...data.line);
         let basename = data.name;
-        while (charts.has(basename)) basename += "\n"; //qwq
+        while (chartData.charts.has(basename)) basename += "\n"; //qwq
         data.data.md5 = data.md5;
-        charts.set(basename, data.data);
-        chartsMD5.set(basename, data.md5);
+        chartData.charts.set(basename, data.data);
+        chartData.chartsMD5.set(basename, data.md5);
         selectchart.appendChild(createOption(basename, data.name));
         break;
       default:
         console.error(data["data"]);
         throw new Error(`Unsupported file: ${data["name"]}`, { cause: data });
     }
-    if (data.name && data.buffer) oriBuffers.set(data.name, data.buffer);
+    if (data.name && data.buffer) chartData.oriBuffers.set(data.name, data.buffer);
   }
   /**
    * @param {string} innerhtml
@@ -427,12 +432,6 @@ self.addEventListener("resize", () => stage.resize());
 //qwq[water,demo,democlick]
 const qwq = [null, false, null, null, 0, null];
 //qwq end
-const exitFull = () => {
-  hitManager.clear("keyboard"); //esc退出全屏只有onchange事件能检测到
-  app.isFull = full.check();
-  stage.resize();
-};
-// document.addEventListener(full.onchange, exitFull);
 const doFullScreen = async () => {
   try {
     const isFull = app.isFull;
@@ -473,8 +472,8 @@ const specialDrag = {
     {
       reg: () => {
         const oldOffset = app.chart.offset;
-        app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
-        stat.reset(app.chart.numOfNotes, chartsMD5.get(selectchart.value), selectspeed.value);
+        app.prerenderChart(main.modify(chartData.charts.get(selectchart.value))); //fuckqwq
+        stat.reset(app.chart.numOfNotes, chartData.chartsMD5.get(selectchart.value), selectspeed.value);
         loadLineData();
         app.chart.offset = oldOffset;
       },
@@ -483,16 +482,16 @@ const specialDrag = {
       },
       del: () => {
         const oldOffset = app.chart.offset;
-        app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
-        stat.reset(app.chart.numOfNotes, chartsMD5.get(selectchart.value), selectspeed.value);
+        app.prerenderChart(main.modify(chartData.charts.get(selectchart.value))); //fuckqwq
+        stat.reset(app.chart.numOfNotes, chartData.chartsMD5.get(selectchart.value), selectspeed.value);
         loadLineData();
         app.chart.offset = oldOffset;
       },
     },
     {
       reg: () => {
-        app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
-        stat.reset(app.chart.numOfNotes, chartsMD5.get(selectchart.value), selectspeed.value);
+        app.prerenderChart(main.modify(chartData.charts.get(selectchart.value))); //fuckqwq
+        stat.reset(app.chart.numOfNotes, chartData.chartsMD5.get(selectchart.value), selectspeed.value);
         loadLineData();
       },
       update: offsetX => {
@@ -503,8 +502,8 @@ const specialDrag = {
           (timeBgm = curTime = curTime * deltaSpeed);
       },
       del: () => {
-        app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
-        stat.reset(app.chart.numOfNotes, chartsMD5.get(selectchart.value), selectspeed.value);
+        app.prerenderChart(main.modify(chartData.charts.get(selectchart.value))); //fuckqwq
+        stat.reset(app.chart.numOfNotes, chartData.chartsMD5.get(selectchart.value), selectspeed.value);
         loadLineData();
       },
     },
@@ -596,8 +595,8 @@ const specialClick = {
           (app.speed = speedNew),
             (duration = app.bgMusic.duration / speedNew),
             (timeBgm = curTime = curTime * deltaSpeed);
-          app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
-          stat.reset(app.chart.numOfNotes, chartsMD5.get(selectchart.value), selectspeed.value);
+          app.prerenderChart(main.modify(chartData.charts.get(selectchart.value))); //fuckqwq
+          stat.reset(app.chart.numOfNotes, chartData.chartsMD5.get(selectchart.value), selectspeed.value);
           loadLineData();
         } else if (offsetX >= app.wlen * 1.5 + lineScale * 3.3 && offsetX <= app.wlen * 1.5 + lineScale * 4.1) {
           const speedNew = Math.min(app.speed + 0.05, 2);
@@ -605,8 +604,8 @@ const specialClick = {
           (app.speed = speedNew),
             (duration = app.bgMusic.duration / speedNew),
             (timeBgm = curTime = curTime * deltaSpeed);
-          app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
-          stat.reset(app.chart.numOfNotes, chartsMD5.get(selectchart.value), selectspeed.value);
+          app.prerenderChart(main.modify(chartData.charts.get(selectchart.value))); //fuckqwq
+          stat.reset(app.chart.numOfNotes, chartData.chartsMD5.get(selectchart.value), selectspeed.value);
           loadLineData();
         }
       }
@@ -647,7 +646,7 @@ const specialClick = {
       main.pressTime = main.pressTime > 0 ? -qwqEnd.second : qwqEnd.second;
   },
 };
-const hitManager = new simphi.HitManager();
+const hitManager = new HitManager();
 class JudgeEvent {
   constructor(offsetX, offsetY, type, event) {
     this.offsetX = offsetX;
@@ -1166,7 +1165,7 @@ const hitImageList = new HitEvents({
         );
         app.ctxos.fill();
         app.ctxos.closePath();
-      } else if (main.customResourceMeta["hitEvtDrawer"]) eval(main.customResourceMeta["hitEvtDrawer"]);
+      } else if (main.customResourceMeta["hitEvtDrawer"]) eval(`{ const ctxos = app.ctxos; ${main.customResourceMeta["hitEvtDrawer"]} }`);
     }
   },
 });
@@ -1195,15 +1194,12 @@ class HitFeedback {
     this.time = 0;
   }
   static tap(offsetX, offsetY) {
-    //console.log('Tap', offsetX, offsetY);
     return new HitFeedback(offsetX, offsetY, "cyan", "");
   }
   static hold(offsetX, offsetY) {
-    //console.log('Hold', offsetX, offsetY);
     return new HitFeedback(offsetX, offsetY, "lime", "");
   }
   static move(offsetX, offsetY) {
-    //console.log('Move', offsetX, offsetY);
     return new HitFeedback(offsetX, offsetY, "violet", "");
   }
 }
@@ -1222,11 +1218,9 @@ class HitImage {
     this.color = String(n3);
   }
   static perfect(offsetX, offsetY, note) {
-    //console.log(note);
     return new HitImage(offsetX, offsetY, "Perfect", tmps.hitPerfectColor || "#ffeca0", note.line.rotation);
   }
   static good(offsetX, offsetY, note) {
-    //console.log(note);
     return new HitImage(offsetX, offsetY, "Good", tmps.hitGoodColor || "#b4e1ff", note.line.rotation);
   }
 }
@@ -1240,11 +1234,9 @@ class HitWord {
     this.text = String(n2);
   }
   static early(offsetX, offsetY) {
-    //console.log('Tap', offsetX, offsetY);
     return new HitWord(offsetX, offsetY, "#03aaf9", "Early");
   }
   static late(offsetX, offsetY) {
-    //console.log('Hold', offsetX, offsetY);
     return new HitWord(offsetX, offsetY, "#ff4612", "Late");
   }
 }
@@ -1440,7 +1432,6 @@ const loadRes = shared.game.simphi.reloadRes = async (url, manual = false, setAs
                 true
               );
             } else {
-              // console.log(xhr.response)
               const a = new DataView(xhr.response, 0, 8);
               const header1 = a.getUint32(0);
               const header2 = a.getUint32(4);
@@ -1564,7 +1555,7 @@ window.addEventListener(
       init: true,
       app,
       res,
-      charts,
+      charts: chartData.charts,
       stat,
       hitManager,
       judgeManager,
@@ -1692,7 +1683,7 @@ window.addEventListener(
       })()
     )
       return msgHandler.sendError(
-        shared.game.i18n.t("simphi.loading.imgLoadingError", [err.cause.name])
+        shared.game.i18n.t("simphi.loading.imgLoadingError")
       );
     // if (ptSettings.resourcesType === "prpr-custom") await loadprprCustomRes();
     // msgHandler.sendError(shared.game.i18n.t("respack.unavailableNow"));  // diasble custom respack for now
@@ -1701,21 +1692,6 @@ window.addEventListener(
     $id("select").classList.remove("disabled");
     emitter.dispatchEvent(new CustomEvent("change"));
     btnPause.classList.add("disabled");
-
-    function decode(img, border = 0) {
-      const canvas = createCanvas(
-        img.width - border * 2,
-        img.height - border * 2
-      );
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, -border, -border);
-      const id = ctx.getImageData(0, 0, canvas.width, canvas.width);
-      const ab = new Uint8Array((id.data.length / 4) * 3);
-      for (let i = 0; i < ab.length; i++)
-        ab[i] = id.data[((i / 3) | 0) * 4 + (i % 3)] ^ (i * 3473);
-      const size = new DataView(ab.buffer, 0, 4).getUint32(0);
-      return { result: ab.buffer.slice(4, size + 4) };
-    }
   },
   { once: true }
 );
@@ -1844,7 +1820,7 @@ function mainLoop() {
     setTimeout(() => {
       if (!resultPageData) return; //避免快速重开后直接结算
       const difficulty = ["ez", "hd", "in", "at"].indexOf(
-        levelText.slice(0, 2).toLocaleLowerCase()
+        chartData.levelText.slice(0, 2).toLocaleLowerCase()
       );
       audio.play(
         res[
@@ -1859,7 +1835,7 @@ function mainLoop() {
       );
       qwqEnd.reset();
       qwqEnd.play();
-      stat.level = Number(levelText.match(/\d+$/));
+      stat.level = Number(chartData.levelText.match(/\d+$/));
       fucktemp2 = stat.getData(app.playMode === 1, selectspeed.value);
     }, 1e3);
     shared.game.ptmain.playFinished();
@@ -1868,7 +1844,7 @@ function mainLoop() {
     stage.resize(true);
   } //只让它执行一次
   if (fucktemp2) {
-    qwqdraw3(fucktemp2);
+    resultPageRenderer(fucktemp2);
     app.ctxos.globalAlpha = 0.5;
     app.ctxos.drawImage(
       res["Retry"],
@@ -1981,7 +1957,7 @@ function loopNoCanvas() {
   tmps.artist = inputArtist.value;
   tmps.illustrator = inputIllustrator.value || inputIllustrator.placeholder;
   tmps.charter = inputCharter.value || inputCharter.placeholder;
-  tmps.level = levelText;
+  tmps.level = chartData.levelText;
   if (stat.combo > 2) {
     tmps.combo = `${stat.combo}`;
     tmps.combo2 = shared.game.ptmain.playConfig.mode === "preview" ? "PREVIEW" : "COMBO";
@@ -2238,7 +2214,7 @@ function loopCanvas() {
   app.ctxos.textBaseline = "alphabetic";
   app.ctxos.textAlign = "right";
   app.ctxos.font = `${lineScale * 0.63}px Saira`;
-  const dxlvl = app.ctxos.measureText(levelText).width;
+  const dxlvl = app.ctxos.measureText(chartData.levelText).width;
   if (dxlvl > app.wlen - lineScale)
     app.ctxos.font = `${((lineScale * 0.63) / dxlvl) * (app.wlen - lineScale)}px Saira`;
   app.ctxos.globalAlpha = tmps.statStatus.level.alpha;
@@ -2626,7 +2602,7 @@ function drawLine(bool, lineScale) {
   }
 }
 function getColoredLineImage(line, hex) {
-  if (!hex) return line.imageL[i.imageC && shared.game.ptmain.gameConfig.lineColor ? stat.lineStatus : 0];
+  if (!hex) return line.imageL[line.imageC && shared.game.ptmain.gameConfig.lineColor ? stat.lineStatus : 0];
   hex = hex.toLowerCase();
   return line.imagesColored[hex] || (line.imagesColored[hex] = imgShader(line.imageL[0], hex, true));
 }
@@ -2648,8 +2624,7 @@ function drawRoundRect(ctx, x, y, w, h, r) {
   return ctx;
 }
 
-function qwqdraw3(statData) {
-
+function resultPageRenderer(statData) {
   (app.ctxos.shadowBlur = 40), (app.ctxos.shadowColor = "#000000");
   app.ctxos.globalAlpha = 1;
   const k = 3.7320508075688776; //tan75°
@@ -2745,12 +2720,12 @@ function qwqdraw3(statData) {
     830
   );
   app.ctxos.font = `30px Saira`;
-  const dxlvl = app.ctxos.measureText(levelText).width;
+  const dxlvl = app.ctxos.measureText(chartData.levelText).width;
   if (dxlvl > 150)
     app.ctxos.font = `${(30 / dxlvl) * 150}px Saira`;
   app.ctxos.textAlign = "right";
   app.ctxos.fillText(
-    levelText,
+    chartData.levelText,
     -1920 * tween.ease10(clip(qwqEnd.second * 1)) + 2860,
     835
   );
@@ -2933,11 +2908,6 @@ function qwqdraw3(statData) {
   app.ctxos.resetTransform();
 }
 
-function clip(num) {
-  if (num < 0) return 0;
-  if (num > 1) return 1;
-  return num;
-}
 class ScaledNote {
   constructor(img, scale, compacted) {
     this.img = img;
@@ -3242,14 +3212,14 @@ const updateLevelText = (type) => {
   return [diffString, levelString].join("\u2002Lv.");
 };
 function updateLevelTextOut(i) {
-  levelText = updateLevelText(i);
+  chartData.levelText = updateLevelText(i);
 }
 updateLevelText();
 selectDifficulty.addEventListener(
   "change",
-  () => (levelText = updateLevelText(0))
+  () => (chartData.levelText = updateLevelText(0))
 );
-selectLevel.addEventListener("change", () => (levelText = updateLevelText(1)));
+selectLevel.addEventListener("change", () => (chartData.levelText = updateLevelText(1)));
 $id("select-volume").addEventListener("change", (evt) => {
   const volume = Number(evt.target.value);
   app.musicVolume = Math.min(1, 1 / volume);
@@ -3278,8 +3248,8 @@ lowRes.addEventListener("change", (evt) => {
 });
 selectbg.onchange = () => {
   //qwq
-  app.bgImage = bgs.get(selectbg.value);
-  app.bgImageBlur = bgsBlur.get(selectbg.value);
+  app.bgImage = chartData.bgs.get(selectbg.value);
+  app.bgImageBlur = chartData.bgsBlur.get(selectbg.value);
   stage.resize();
 };
 maxFrame.addEventListener("change", function () {
@@ -3303,11 +3273,8 @@ emitter.addEventListener(
     btnPause.classList.toggle("disabled", this.eq("stop"));
     for (const i of $$(".disabled-when-playing"))
       i.classList.toggle("disabled", this.ne("stop"));
-    if (this.eq("play")) {
-      if (!app.isFull && !shared.game.ptmain.gameConfig.allowNonFullscreen) doFullScreen();
+    if (this.eq("play"))
       app.playMode = (shared.game.ptmain.gameConfig.autoplay && shared.game.ptmain.gameConfig.account && shared.game.ptmain.gameConfig.account.userBasicInfo.isPTDeveloper) || shared.game.ptmain.playConfig.mode === "preview" ? 1 : 0;
-    }
-    // console.log(this);
   }
 );
 btnPlay.addEventListener("click", async function () {
@@ -3337,14 +3304,14 @@ async function qwqStop() {
     app.stage.style.display = "block";
     for (const i of main.before.values()) await i();
     audio.play(res["mute"], { loop: true, isOut: false }); //播放空音频(避免音画不同步)
-    app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
-    const md5 = chartsMD5.get(selectchart.value);
-    stat.level = Number(levelText.match(/\d+$/));
+    app.prerenderChart(main.modify(chartData.charts.get(selectchart.value))); //fuckqwq
+    const md5 = chartData.chartsMD5.get(selectchart.value);
+    stat.level = Number(chartData.levelText.match(/\d+$/));
     stat.reset(app.chart.numOfNotes, md5, selectspeed.value);
     await loadLineData();
-    app.bgImage = bgs.get(selectbg.value) || res["NoImageWhite"];
-    app.bgImageBlur = bgsBlur.get(selectbg.value) || res["NoImageWhite"];
-    const bgm = bgms.get(selectbgm.value);
+    app.bgImage = chartData.bgs.get(selectbg.value) || res["NoImageWhite"];
+    app.bgImageBlur = chartData.bgsBlur.get(selectbg.value) || res["NoImageWhite"];
+    const bgm = chartData.bgms.get(selectbgm.value);
     app.bgMusic = bgm.audio;
     app.bgVideo = bgm.video;
     duration = app.bgMusic.duration / app.speed;
@@ -3393,15 +3360,15 @@ async function loadLineData() {
     i.imageC = true;
     i.imageU = true;
   }
-  for (const i of chartLineData) {
+  for (const i of chartData.chartLineData) {
     if (selectchart.value === i.Chart) {
       if (!app.lines[i.LineId]) {
         msgHandler.sendWarning(shared.game.i18n.t("simphi.playErr.judgeLineDoesentExist", [i.LineId]));
         continue;
       }
-      if (!bgs.has(i.Image)) msgHandler.sendWarning(shared.game.i18n.t("simphi.playErr.imageDoesentExist", [i.image]));
+      if (!chartData.bgs.has(i.Image)) msgHandler.sendWarning(shared.game.i18n.t("simphi.playErr.imageDoesentExist", [i.image]));
       /** @type {ImageBitmap} */
-      const image = bgs.get(i.Image) || res["NoImageBlack"];
+      const image = chartData.bgs.get(i.Image) || res["NoImageBlack"];
       app.lines[i.LineId].imageW = image.width;
       app.lines[i.LineId].imageH = image.height;
       if (!lineImages.has(image)) lineImages.set(image, new LineImage(image));
@@ -3412,7 +3379,7 @@ async function loadLineData() {
         await lineImage.getAP(),
         await lineImage.getFC(),
       ];
-      app.lines[i.LineId].isCustomImage = bgs.get(i.Image) ? true : false;
+      app.lines[i.LineId].isCustomImage = chartData.bgs.get(i.Image) ? true : false;
       if (isFinite((i.Vert = parseFloat(i.Vert)))) {
         //Legacy
         app.lines[i.LineId].imageS = (Math.abs(i.Vert) * 1080) / image.height;
@@ -3455,7 +3422,6 @@ async function qwqPause() {
       qwqIn.play();
       if (showTransition.checked && isOutStart) qwqOut.play();
       if (isInEnd && !isOutStart) playBgm(app.bgMusic, timeBgm * app.speed);
-      // console.log(app.bgVideo);
       emitter.emit("play");
       btnPause.classList.remove("disabled");
       return;
@@ -3474,7 +3440,6 @@ async function qwqPause() {
           qwqIn.play();
           if (showTransition.checked && isOutStart) qwqOut.play();
           if (isInEnd && !isOutStart) playBgm(app.bgMusic, timeBgm * app.speed);
-          // console.log(app.bgVideo);
           emitter.emit("play");
         }
         btnPause.classList.remove("disabled");
@@ -3486,7 +3451,6 @@ async function qwqPause() {
       qwqIn.play();
       if (showTransition.checked && isOutStart) qwqOut.play();
       if (isInEnd && !isOutStart) playBgm(app.bgMusic, timeBgm * app.speed);
-      // console.log(app.bgVideo);
       emitter.emit("play");
       btnPause.classList.add("disabled");
     }
@@ -3499,76 +3463,11 @@ hook.before.set(flag0, () => {
   const md5 = hook.chartsMD5.get(hook.selectchart.value);
   const hashDF = ['cdb5987ad81b70e3dc96153af2efaa61', '86d23af0cc595a703241536a2d29ee4b', 'f5f8c244d317006103b67e1cdf6eb85b', '0e8ff64e65bf35382e30f980b5eec041'];
   const hashD321 = ['4ddcd5d923007d661911989e79fe8a59'];
-  if (md5 === 'ab9d2cc3eb569236ead459ad4caba109') hook.now.set(flag0, loadModYukiOri());
+  if (md5 === 'ab9d2cc3eb569236ead459ad4caba109') hook.now.set(flag0, loadModYukiOri(hook));
   else if (hashDF.includes(md5) && inputName.value === 'Distorted Fate ') import('./plugins/demo/DFLevelEffect.js').then(({ loadMod }) => hook.now.set(flag0, loadMod()));
   else if (hashD321.includes(md5) && inputName.value === 'DESTRUCTION 3,2,1 ') import('./plugins/demo/321LevelEffect.js').then(({ loadMod }) => hook.now.set(flag0, loadMod()));
   else hook.now.delete(flag0);
 });
-
-function loadModYukiOri() {
-  console.log('好耶');
-  const analyser = hook.audio.actx.createAnalyser();
-  analyser.fftSize = 4096;
-  // analyser.minDecibels = -180;
-  const getFreq = () => {
-    // progress变为频谱图
-    const bufferLength = analyser.frequencyBinCount;
-    const freq = new Uint8Array(bufferLength);
-    analyser.getByteFrequencyData(freq);
-    const avg = freq.reduce((a, b) => a + b) / bufferLength;
-    return Math.min(1, avg / 255 * 2.15); // FIXME: more accurate formula
-  };
-  let flagMusic = null;
-  let flagPerfect = NaN;
-  let flagGood = NaN;
-  let flagBad = NaN;
-  let flagEm = '';
-  let flagN = false;
-  const setFlag = (flag, em, n) => {
-    flagEm = em;
-    flagN = n;
-    return flag;
-  };
-  return time => {
-    const time1 = time * 1.95;
-    const bgMusic = hook.tmps.bgMusic();
-    if (bgMusic && bgMusic !== flagMusic) {
-      bgMusic.connect(analyser); // ?
-      flagMusic = bgMusic;
-    }
-    if (time1 < 168) {
-      hook.stat.numOfNotes = 305;
-      hook.tmps.level = 'lN\u2002Lv.I2';
-      hook.tmps.progress = time1 / 218;
-    } else if (time1 < 169) {
-      const progress = 1 - (169 - time1) ** 3; // easeCubicOut
-      hook.stat.numOfNotes = 305 + 2195 * progress | 0;
-      hook.tmps.progress = getFreq();
-    } else {
-      hook.stat.numOfNotes = 2500;
-      hook.tmps.progress = getFreq();
-    }
-    if (time1 > 325 && time1 < 358) {
-      // 监听判定变化
-      const statusP = hook.stat.perfect;
-      const statusG = hook.stat.good;
-      const statusB = hook.stat.bad;
-      if (isNaN(flagPerfect)) flagPerfect = statusP;
-      if (isNaN(flagGood)) flagGood = statusG;
-      if (isNaN(flagBad)) flagBad = statusB;
-      if (statusP !== flagPerfect) flagPerfect = setFlag(statusP, '\uff2f(\u2267\u25bd\u2266)\uff2f', true);
-      else if (statusG !== flagGood) flagGood = setFlag(statusG, '(\uff3e\u03c9\uff3e)', true);
-      else if (statusB !== flagBad) flagBad = setFlag(statusB, '(\u2299\ufe4f\u2299;)', true);
-      // 监听时间变化
-      if (time1 < 327) setFlag(null, '(\u2299o\u2299)', false);
-      else if (time1 > 334 && time1 < 335) setFlag(null, '(\u2299o\u2299)', false);
-      else if (time1 > 342 && time1 < 343) setFlag(null, '(\u2299o\u2299)', false);
-      else if (time1 > 350 && time1 < 351) setFlag(null, '(\u2299o\u2299)', false);
-      else if (!flagN) flagEm = '(\u2299ω\u2299)';
-      hook.tmps.combo = flagEm;
-    }
-  };
-}
 
 //plugin(filter)
 const enableFilter = $id("enableFilter");
@@ -3603,12 +3502,12 @@ main.audio = audio;
 main.msgHandler = msgHandler;
 main.frameAnimater = frameAnimater;
 main.qwqEnd = qwqEnd;
-main.bgms = bgms;
+main.bgms = chartData.bgms;
 // main.inputName = inputName;
-main.oriBuffers = oriBuffers;
+main.oriBuffers = chartData.oriBuffers;
 main.selectbgm = selectbgm;
 main.selectchart = selectchart;
-main.chartsMD5 = chartsMD5;
+main.chartsMD5 = chartData.chartsMD5;
 // shared.game.simphi.chartsMD5 = main.chartsMD5;
 // shared.game.simphi.selectchart = main.selectchart;
 main.noteRender = noteRender;
