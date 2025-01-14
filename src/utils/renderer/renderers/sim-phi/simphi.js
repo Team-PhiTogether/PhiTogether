@@ -274,8 +274,6 @@ class Renderer {
     /** @type {NoteExtends[]} */
     this.tapholds = [];
 
-    /** @type {offScreenCanvas{}} */
-    this.offScreenCanvases = {};
     //qwq2
     this._setLowResFactor(1);
     this.resizeCanvas();
@@ -317,8 +315,6 @@ class Renderer {
       canvasos.height = heightLowRes;
     }
 
-    for (const i in this.offScreenCanvases)
-      this.offScreenCanvases[i].resetScale();
     this.wlen = canvasos.width / 2;
     this.hlen = canvasos.height / 2;
     this.mirrorView();
@@ -624,41 +620,6 @@ class Renderer {
         i.sinr = -line.sinr;
         setAlpha(i, -this.scaleX * i.positionX, this.scaleY * getY(i));
       }
-    }
-  }
-}
-
-/**
- * 陈年废弃代码😅
- * @author sbrealtvop
- */
-class OffScreenCanvas {
-  constructor(update, canvas) {
-    this.canvasos = document.createElement("canvas");
-    this.ctxos = this.canvasos.getContext("2d");
-    this.stat = "";
-    this.mainCanvas = canvas;
-    this.resetScale();
-    this.updateCanvas = update;
-  }
-  resetScale() {
-    this.canvasos.width = this.mainCanvas.width;
-    this.canvasos.height = this.mainCanvas.height;
-  }
-  clearCanvas() {
-    // this.canvasos.height = this.canvasos.height;
-    this.ctxos.clearRect(0, 0, this.canvasos.width, this.canvasos.height);
-  }
-  update(externalInfo) {
-    this.clearCanvas();
-    this.updateCanvas(this, ...externalInfo);
-    return this.canvasos;
-  }
-  get(stat, forceUpdate = false, externalInfo = []) {
-    if (stat && this.stat == stat && !forceUpdate) return this.canvasos;
-    else {
-      this.stat = stat;
-      return this.update(externalInfo);
     }
   }
 }
@@ -973,13 +934,5 @@ function getAdjustedOffset(chart) {
       })
       .catch(e => res(chart.offset || 0))
   });
-
-
-  // const savedChartOffsets = JSON.parse(
-  //   localStorage.getItem("savedChartOffsets")
-  // );
-  // if (!savedChartOffsets || !chart.md5 || !savedChartOffsets[chart.md5])
-  //   return parseFloat(chart.offset) || 0;
-  // return parseFloat(savedChartOffsets[chart.md5]);
 }
-export default { Stat, Renderer, OffScreenCanvas };
+export default { Stat, Renderer };

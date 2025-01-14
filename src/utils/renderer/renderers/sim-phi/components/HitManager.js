@@ -1,3 +1,5 @@
+import shared from '@utils/js/shared.js';
+
 class HitEvent {
     /**
      * @param {'mouse'|'keyboard'|'touch'} type
