@@ -1,6 +1,5 @@
 import simphi from "./simphi";
 import { audio } from "@utils/js/aup.js";
-import Notiflix from "notiflix";
 import {
   full,
   Timer,
@@ -65,27 +64,29 @@ const status2 = {
     this.text = arr.length === 0 ? "" : `(${arr.join("+")})`;
   },
 };
-let levelText = "SP Lv.?";
-const bgs = new Map();
-const bgsBlur = new Map();
-const bgms = new Map();
-const charts = new Map();
-const chartsMD5 = new Map();
-const oriBuffers = new Map();
-const chartLineData = []; //line.csv
-const chartInfoData = []; //info.csv
+const chartData = {
+  levelText: "SP Lv.?",
+  bgs: new Map(),
+  bgsBlur: new Map(),
+  bgms: new Map(),
+  charts: new Map(),
+  chartsMD5: new Map(),
+  oriBuffers: new Map(),
+  chartLineData: [], //line.csv
+  chartInfoData: [], //info.csv
+}
 function clearStat() {
   while (selectbg.options.length) selectbg.options.remove(0);
   while (selectchart.options.length) selectchart.options.remove(0);
   while (selectbgm.options.length) selectbgm.options.remove(0);
-  bgs.clear();
-  bgsBlur.clear();
-  bgms.clear();
-  oriBuffers.clear();
-  charts.clear();
-  chartsMD5.clear();
-  chartLineData.length = 0;
-  chartInfoData.length = 0;
+  chartData.bgs.clear();
+  chartData.bgsBlur.clear();
+  chartData.bgms.clear();
+  chartData.oriBuffers.clear();
+  chartData.charts.clear();
+  chartData.chartsMD5.clear();
+  chartData.chartLineData.length = 0;
+  chartData.chartInfoData.length = 0;
 }
 const gauge = {
   value: 100,
@@ -213,15 +214,15 @@ async function checkSupport() {
 }
 //自动填写歌曲信息
 function adjustInfo() {
-  for (const i of chartInfoData) {
+  for (const i of chartData.chartInfoData) {
     if (selectchart.value.trim() === i.Chart) {
       if (i.Name) inputName.value = i.Name;
       if (i.Musician) inputArtist.value = i.Musician; //Alternative
       if (i.Composer) inputArtist.value = i.Composer; //Alternative
       if (i.Artist) inputArtist.value = i.Artist;
       if (i.Level) {
-        levelText = i.Level;
-        const p = levelText
+        chartData.levelText = i.Level;
+        const p = chartData.levelText
           .toLocaleUpperCase()
           .split("LV.")
           .map((a) => a.trim());
@@ -231,8 +232,8 @@ function adjustInfo() {
       if (i.Illustrator) inputIllustrator.value = i.Illustrator;
       if (i.Designer) inputCharter.value = i.Designer;
       if (i.Charter) inputCharter.value = i.Charter;
-      if (bgms.has(i.Music)) selectbgm.value = i.Music;
-      if (bgs.has(i.Image)) {
+      if (chartData.bgms.has(i.Music)) selectbgm.value = i.Music;
+      if (chartData.bgs.has(i.Image)) {
         selectbg.value = i.Image;
         selectbg.dispatchEvent(new Event("change"));
       }
@@ -372,37 +373,37 @@ self.addEventListener("resize", () => stage.resize());
   async function pick(data) {
     switch (data.type) {
       case "line":
-        chartLineData.push(...data.data);
+        chartData.chartLineData.push(...data.data);
         break;
       case "info":
-        chartInfoData.push(...data.data);
+        chartData.chartInfoData.push(...data.data);
         break;
       case "media":
       case "audio":
-        bgms.set(data.name, data.data);
+        chartData.bgms.set(data.name, data.data);
         selectbgm.appendChild(createOption(data.name, data.name));
         break;
       case "image":
-        bgs.set(data.name, data.data);
-        bgsBlur.set(data.name, await imgBlur(data.data));
+        chartData.bgs.set(data.name, data.data);
+        chartData.bgsBlur.set(data.name, await imgBlur(data.data));
         selectbg.appendChild(createOption(data.name, data.name));
         break;
       case "chart":
         if (data.msg) data.msg.forEach((v) => msgHandler.sendWarning(v));
-        if (data.info) chartInfoData.push(data.info);
-        if (data.line) chartLineData.push(...data.line);
+        if (data.info) chartData.chartInfoData.push(data.info);
+        if (data.line) chartData.chartLineData.push(...data.line);
         let basename = data.name;
-        while (charts.has(basename)) basename += "\n"; //qwq
+        while (chartData.charts.has(basename)) basename += "\n"; //qwq
         data.data.md5 = data.md5;
-        charts.set(basename, data.data);
-        chartsMD5.set(basename, data.md5);
+        chartData.charts.set(basename, data.data);
+        chartData.chartsMD5.set(basename, data.md5);
         selectchart.appendChild(createOption(basename, data.name));
         break;
       default:
         console.error(data["data"]);
         throw new Error(`Unsupported file: ${data["name"]}`, { cause: data });
     }
-    if (data.name && data.buffer) oriBuffers.set(data.name, data.buffer);
+    if (data.name && data.buffer) chartData.oriBuffers.set(data.name, data.buffer);
   }
   /**
    * @param {string} innerhtml
@@ -427,12 +428,6 @@ self.addEventListener("resize", () => stage.resize());
 //qwq[water,demo,democlick]
 const qwq = [null, false, null, null, 0, null];
 //qwq end
-const exitFull = () => {
-  hitManager.clear("keyboard"); //esc退出全屏只有onchange事件能检测到
-  app.isFull = full.check();
-  stage.resize();
-};
-// document.addEventListener(full.onchange, exitFull);
 const doFullScreen = async () => {
   try {
     const isFull = app.isFull;
@@ -473,8 +468,8 @@ const specialDrag = {
     {
       reg: () => {
         const oldOffset = app.chart.offset;
-        app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
-        stat.reset(app.chart.numOfNotes, chartsMD5.get(selectchart.value), selectspeed.value);
+        app.prerenderChart(main.modify(chartData.charts.get(selectchart.value))); //fuckqwq
+        stat.reset(app.chart.numOfNotes, chartData.chartsMD5.get(selectchart.value), selectspeed.value);
         loadLineData();
         app.chart.offset = oldOffset;
       },
@@ -483,16 +478,16 @@ const specialDrag = {
       },
       del: () => {
         const oldOffset = app.chart.offset;
-        app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
-        stat.reset(app.chart.numOfNotes, chartsMD5.get(selectchart.value), selectspeed.value);
+        app.prerenderChart(main.modify(chartData.charts.get(selectchart.value))); //fuckqwq
+        stat.reset(app.chart.numOfNotes, chartData.chartsMD5.get(selectchart.value), selectspeed.value);
         loadLineData();
         app.chart.offset = oldOffset;
       },
     },
     {
       reg: () => {
-        app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
-        stat.reset(app.chart.numOfNotes, chartsMD5.get(selectchart.value), selectspeed.value);
+        app.prerenderChart(main.modify(chartData.charts.get(selectchart.value))); //fuckqwq
+        stat.reset(app.chart.numOfNotes, chartData.chartsMD5.get(selectchart.value), selectspeed.value);
         loadLineData();
       },
       update: offsetX => {
@@ -503,8 +498,8 @@ const specialDrag = {
           (timeBgm = curTime = curTime * deltaSpeed);
       },
       del: () => {
-        app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
-        stat.reset(app.chart.numOfNotes, chartsMD5.get(selectchart.value), selectspeed.value);
+        app.prerenderChart(main.modify(chartData.charts.get(selectchart.value))); //fuckqwq
+        stat.reset(app.chart.numOfNotes, chartData.chartsMD5.get(selectchart.value), selectspeed.value);
         loadLineData();
       },
     },
@@ -596,8 +591,8 @@ const specialClick = {
           (app.speed = speedNew),
             (duration = app.bgMusic.duration / speedNew),
             (timeBgm = curTime = curTime * deltaSpeed);
-          app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
-          stat.reset(app.chart.numOfNotes, chartsMD5.get(selectchart.value), selectspeed.value);
+          app.prerenderChart(main.modify(chartData.charts.get(selectchart.value))); //fuckqwq
+          stat.reset(app.chart.numOfNotes, chartData.chartsMD5.get(selectchart.value), selectspeed.value);
           loadLineData();
         } else if (offsetX >= app.wlen * 1.5 + lineScale * 3.3 && offsetX <= app.wlen * 1.5 + lineScale * 4.1) {
           const speedNew = Math.min(app.speed + 0.05, 2);
@@ -605,8 +600,8 @@ const specialClick = {
           (app.speed = speedNew),
             (duration = app.bgMusic.duration / speedNew),
             (timeBgm = curTime = curTime * deltaSpeed);
-          app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
-          stat.reset(app.chart.numOfNotes, chartsMD5.get(selectchart.value), selectspeed.value);
+          app.prerenderChart(main.modify(chartData.charts.get(selectchart.value))); //fuckqwq
+          stat.reset(app.chart.numOfNotes, chartData.chartsMD5.get(selectchart.value), selectspeed.value);
           loadLineData();
         }
       }
@@ -1564,7 +1559,7 @@ window.addEventListener(
       init: true,
       app,
       res,
-      charts,
+      charts: chartData.charts,
       stat,
       hitManager,
       judgeManager,
@@ -1844,7 +1839,7 @@ function mainLoop() {
     setTimeout(() => {
       if (!resultPageData) return; //避免快速重开后直接结算
       const difficulty = ["ez", "hd", "in", "at"].indexOf(
-        levelText.slice(0, 2).toLocaleLowerCase()
+        chartData.levelText.slice(0, 2).toLocaleLowerCase()
       );
       audio.play(
         res[
@@ -1859,7 +1854,7 @@ function mainLoop() {
       );
       qwqEnd.reset();
       qwqEnd.play();
-      stat.level = Number(levelText.match(/\d+$/));
+      stat.level = Number(chartData.levelText.match(/\d+$/));
       fucktemp2 = stat.getData(app.playMode === 1, selectspeed.value);
     }, 1e3);
     shared.game.ptmain.playFinished();
@@ -1981,7 +1976,7 @@ function loopNoCanvas() {
   tmps.artist = inputArtist.value;
   tmps.illustrator = inputIllustrator.value || inputIllustrator.placeholder;
   tmps.charter = inputCharter.value || inputCharter.placeholder;
-  tmps.level = levelText;
+  tmps.level = chartData.levelText;
   if (stat.combo > 2) {
     tmps.combo = `${stat.combo}`;
     tmps.combo2 = shared.game.ptmain.playConfig.mode === "preview" ? "PREVIEW" : "COMBO";
@@ -2238,7 +2233,7 @@ function loopCanvas() {
   app.ctxos.textBaseline = "alphabetic";
   app.ctxos.textAlign = "right";
   app.ctxos.font = `${lineScale * 0.63}px Saira`;
-  const dxlvl = app.ctxos.measureText(levelText).width;
+  const dxlvl = app.ctxos.measureText(chartData.levelText).width;
   if (dxlvl > app.wlen - lineScale)
     app.ctxos.font = `${((lineScale * 0.63) / dxlvl) * (app.wlen - lineScale)}px Saira`;
   app.ctxos.globalAlpha = tmps.statStatus.level.alpha;
@@ -2745,12 +2740,12 @@ function qwqdraw3(statData) {
     830
   );
   app.ctxos.font = `30px Saira`;
-  const dxlvl = app.ctxos.measureText(levelText).width;
+  const dxlvl = app.ctxos.measureText(chartData.levelText).width;
   if (dxlvl > 150)
     app.ctxos.font = `${(30 / dxlvl) * 150}px Saira`;
   app.ctxos.textAlign = "right";
   app.ctxos.fillText(
-    levelText,
+    chartData.levelText,
     -1920 * tween.ease10(clip(qwqEnd.second * 1)) + 2860,
     835
   );
@@ -3242,14 +3237,14 @@ const updateLevelText = (type) => {
   return [diffString, levelString].join("\u2002Lv.");
 };
 function updateLevelTextOut(i) {
-  levelText = updateLevelText(i);
+  chartData.levelText = updateLevelText(i);
 }
 updateLevelText();
 selectDifficulty.addEventListener(
   "change",
-  () => (levelText = updateLevelText(0))
+  () => (chartData.levelText = updateLevelText(0))
 );
-selectLevel.addEventListener("change", () => (levelText = updateLevelText(1)));
+selectLevel.addEventListener("change", () => (chartData.levelText = updateLevelText(1)));
 $id("select-volume").addEventListener("change", (evt) => {
   const volume = Number(evt.target.value);
   app.musicVolume = Math.min(1, 1 / volume);
@@ -3278,8 +3273,8 @@ lowRes.addEventListener("change", (evt) => {
 });
 selectbg.onchange = () => {
   //qwq
-  app.bgImage = bgs.get(selectbg.value);
-  app.bgImageBlur = bgsBlur.get(selectbg.value);
+  app.bgImage = chartData.bgs.get(selectbg.value);
+  app.bgImageBlur = chartData.bgsBlur.get(selectbg.value);
   stage.resize();
 };
 maxFrame.addEventListener("change", function () {
@@ -3337,14 +3332,14 @@ async function qwqStop() {
     app.stage.style.display = "block";
     for (const i of main.before.values()) await i();
     audio.play(res["mute"], { loop: true, isOut: false }); //播放空音频(避免音画不同步)
-    app.prerenderChart(main.modify(charts.get(selectchart.value))); //fuckqwq
-    const md5 = chartsMD5.get(selectchart.value);
-    stat.level = Number(levelText.match(/\d+$/));
+    app.prerenderChart(main.modify(chartData.charts.get(selectchart.value))); //fuckqwq
+    const md5 = chartData.chartsMD5.get(selectchart.value);
+    stat.level = Number(chartData.levelText.match(/\d+$/));
     stat.reset(app.chart.numOfNotes, md5, selectspeed.value);
     await loadLineData();
-    app.bgImage = bgs.get(selectbg.value) || res["NoImageWhite"];
-    app.bgImageBlur = bgsBlur.get(selectbg.value) || res["NoImageWhite"];
-    const bgm = bgms.get(selectbgm.value);
+    app.bgImage = chartData.bgs.get(selectbg.value) || res["NoImageWhite"];
+    app.bgImageBlur = chartData.bgsBlur.get(selectbg.value) || res["NoImageWhite"];
+    const bgm = chartData.bgms.get(selectbgm.value);
     app.bgMusic = bgm.audio;
     app.bgVideo = bgm.video;
     duration = app.bgMusic.duration / app.speed;
@@ -3393,15 +3388,15 @@ async function loadLineData() {
     i.imageC = true;
     i.imageU = true;
   }
-  for (const i of chartLineData) {
+  for (const i of chartData.chartLineData) {
     if (selectchart.value === i.Chart) {
       if (!app.lines[i.LineId]) {
         msgHandler.sendWarning(shared.game.i18n.t("simphi.playErr.judgeLineDoesentExist", [i.LineId]));
         continue;
       }
-      if (!bgs.has(i.Image)) msgHandler.sendWarning(shared.game.i18n.t("simphi.playErr.imageDoesentExist", [i.image]));
+      if (!chartData.bgs.has(i.Image)) msgHandler.sendWarning(shared.game.i18n.t("simphi.playErr.imageDoesentExist", [i.image]));
       /** @type {ImageBitmap} */
-      const image = bgs.get(i.Image) || res["NoImageBlack"];
+      const image = chartData.bgs.get(i.Image) || res["NoImageBlack"];
       app.lines[i.LineId].imageW = image.width;
       app.lines[i.LineId].imageH = image.height;
       if (!lineImages.has(image)) lineImages.set(image, new LineImage(image));
@@ -3412,7 +3407,7 @@ async function loadLineData() {
         await lineImage.getAP(),
         await lineImage.getFC(),
       ];
-      app.lines[i.LineId].isCustomImage = bgs.get(i.Image) ? true : false;
+      app.lines[i.LineId].isCustomImage = chartData.bgs.get(i.Image) ? true : false;
       if (isFinite((i.Vert = parseFloat(i.Vert)))) {
         //Legacy
         app.lines[i.LineId].imageS = (Math.abs(i.Vert) * 1080) / image.height;
@@ -3603,12 +3598,12 @@ main.audio = audio;
 main.msgHandler = msgHandler;
 main.frameAnimater = frameAnimater;
 main.qwqEnd = qwqEnd;
-main.bgms = bgms;
+main.bgms = chartData.bgms;
 // main.inputName = inputName;
-main.oriBuffers = oriBuffers;
+main.oriBuffers = chartData.oriBuffers;
 main.selectbgm = selectbgm;
 main.selectchart = selectchart;
-main.chartsMD5 = chartsMD5;
+main.chartsMD5 = chartData.chartsMD5;
 // shared.game.simphi.chartsMD5 = main.chartsMD5;
 // shared.game.simphi.selectchart = main.selectchart;
 main.noteRender = noteRender;
