@@ -1683,7 +1683,7 @@ window.addEventListener(
       })()
     )
       return msgHandler.sendError(
-        shared.game.i18n.t("simphi.loading.imgLoadingError", [err.cause.name])
+        shared.game.i18n.t("simphi.loading.imgLoadingError")
       );
     // if (ptSettings.resourcesType === "prpr-custom") await loadprprCustomRes();
     // msgHandler.sendError(shared.game.i18n.t("respack.unavailableNow"));  // diasble custom respack for now
@@ -2602,7 +2602,7 @@ function drawLine(bool, lineScale) {
   }
 }
 function getColoredLineImage(line, hex) {
-  if (!hex) return line.imageL[i.imageC && shared.game.ptmain.gameConfig.lineColor ? stat.lineStatus : 0];
+  if (!hex) return line.imageL[line.imageC && shared.game.ptmain.gameConfig.lineColor ? stat.lineStatus : 0];
   hex = hex.toLowerCase();
   return line.imagesColored[hex] || (line.imagesColored[hex] = imgShader(line.imageL[0], hex, true));
 }
@@ -3273,10 +3273,8 @@ emitter.addEventListener(
     btnPause.classList.toggle("disabled", this.eq("stop"));
     for (const i of $$(".disabled-when-playing"))
       i.classList.toggle("disabled", this.ne("stop"));
-    if (this.eq("play")) {
-      if (!app.isFull && !shared.game.ptmain.gameConfig.allowNonFullscreen) doFullScreen();
+    if (this.eq("play"))
       app.playMode = (shared.game.ptmain.gameConfig.autoplay && shared.game.ptmain.gameConfig.account && shared.game.ptmain.gameConfig.account.userBasicInfo.isPTDeveloper) || shared.game.ptmain.playConfig.mode === "preview" ? 1 : 0;
-    }
   }
 );
 btnPlay.addEventListener("click", async function () {
