@@ -26,7 +26,7 @@ import { imgBlur, imgShader, imgPainter, imgSplit, hex2rgba, rgba2hex } from "./
 import { createCanvas } from "./utils/canvas.js";
 
 import ptdb from "@utils/ptdb";
-import { spMsgHandler } from "@utils/js/msgHandler.js";
+import { msgHandler } from "@utils/js/msgHandler.js";
 import { tween, Emitter } from "./utils/simphiUtils.js";
 
 const $id = (query) => document.getElementById(query);
@@ -168,12 +168,12 @@ async function checkSupport() {
     const errmsg3 = shared.game.i18n.t("simphi.loadLib.err.msg3", { name });
     if (
       !(await loadJS(urls).catch((e) =>
-        spMsgHandler.sendError(errmsg1, e.message.replace(/.+/, errmsg2), true)
+        msgHandler.sendError(errmsg1, e.message.replace(/.+/, errmsg2), true)
       ))
     )
       return false;
     if (!check()) return true;
-    return spMsgHandler.sendError(errmsg1, errmsg3, true);
+    return msgHandler.sendError(errmsg1, errmsg3, true);
   };
   await Utils.addFont("Cairo", { alt: "Custom" });
   // await Utils.addFont('Saira', { alt: 'Custom' });
@@ -186,7 +186,7 @@ async function checkSupport() {
   if (navigator.userAgent.indexOf("MiuiBrowser") > -1) {
     //实测 v17.1.8 问题仍然存在，v17.4.80113 问题已修复
     const version = navigator.userAgent.match(/MiuiBrowser\/(\d+\.\d+)/);
-    if (!version || parseFloat(version[1]) < 17.4) spMsgHandler.sendWarning(shared.game.i18n.t("simphi.compatibilityWarning.miBrowser"));
+    if (!version || parseFloat(version[1]) < 17.4) msgHandler.sendWarning(shared.game.i18n.t("simphi.compatibilityWarning.miBrowser"));
   }
   if (
     !(await loadLib(shared.game.i18n.t("simphi.loadLib.libNames.createImageBitmap"), urls.bitmap, () =>
@@ -286,7 +286,7 @@ self.addEventListener("resize", () => stage.resize());
     uploader_total = Object.values(totals).reduce((a, b) => a + b, 0);
     if (!(promise instanceof Promise)) promise = Promise.resolve();
     await promise.catch((err) =>
-      spMsgHandler.sendWarning(shared.game.i18n.t("simphi.handleFile.unsupportedFile", [err.cause.name]))
+      msgHandler.sendWarning(shared.game.i18n.t("simphi.handleFile.unsupportedFile", [err.cause.name]))
     );
     dones[tag] = (dones[tag] || 0) + 1;
     uploader_done = Object.values(dones).reduce((a, b) => a + b, 0);
@@ -388,7 +388,7 @@ self.addEventListener("resize", () => stage.resize());
         selectbg.appendChild(createOption(data.name, data.name));
         break;
       case "chart":
-        if (data.msg) data.msg.forEach((v) => spMsgHandler.sendWarning(v));
+        if (data.msg) data.msg.forEach((v) => msgHandler.sendWarning(v));
         if (data.info) chartInfoData.push(data.info);
         if (data.line) chartLineData.push(...data.line);
         let basename = data.name;
@@ -1397,7 +1397,7 @@ const loadRes = shared.game.simphi.reloadRes = async (url, manual = false, setAs
     main.customResourceMeta = crm;
     if (setAsDefault) defaultCRM = crm;
   }).then(() => main.customResourceMeta.loaded = true)).catch(e => {
-    spMsgHandler.sendError(shared.game.i18n.t("respack.err"));
+    msgHandler.sendError(shared.game.i18n.t("respack.err"));
     return;
   });
   const erc = (name, src) => {
@@ -1431,7 +1431,7 @@ const loadRes = shared.game.simphi.reloadRes = async (url, manual = false, setAs
           xhr.send();
           xhr.onloadend = async () => {
             if (!xhr.response || !xhr.response.byteLength) {
-              spMsgHandler.sendError(
+              msgHandler.sendError(
                 shared.game.i18n.t("simphi.loading.resLoadFailed1", [++errorNum]),
                 shared.game.i18n.t("simphi.loading.resLoadFailed2", [new URL(
                   src,
@@ -1449,7 +1449,7 @@ const loadRes = shared.game.simphi.reloadRes = async (url, manual = false, setAs
               else if (header1 === 0x89504e47 && header2 === 0x0d0a1a0a)
                 newres[name] = await createImageBitmap(new Blob([xhr.response]));
               else
-                spMsgHandler.sendError(
+                msgHandler.sendError(
                   shared.game.i18n.t("simphi.loading.resLoadFailed1", [++errorNum]),
                   shared.game.i18n.t("simphi.loading.resLoadFailed2", [new URL(
                     src,
@@ -1464,7 +1464,7 @@ const loadRes = shared.game.simphi.reloadRes = async (url, manual = false, setAs
     )
   );
   if (errorNum)
-    return spMsgHandler.sendError(
+    return msgHandler.sendError(
       shared.game.i18n.t("simphi.loading.resLoadFailed1", [errorNum])
     );
   if (manual) defaultCRM = main.customResourceMeta;
@@ -1644,7 +1644,7 @@ window.addEventListener(
             xhr.send();
             xhr.onloadend = async () => {
               if (!xhr.response || !xhr.response.byteLength) {
-                spMsgHandler.sendError(
+                msgHandler.sendError(
                   shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [++errorNum]),
                   "",
                   true
@@ -1658,7 +1658,7 @@ window.addEventListener(
                 else if (header1 === 0x89504e47 && header2 === 0x0d0a1a0a)
                   res[name] = await createImageBitmap(new Blob([xhr.response]));
                 else
-                  spMsgHandler.sendError(
+                  msgHandler.sendError(
                     shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [++errorNum]),
                     "",
                     true
@@ -1670,7 +1670,7 @@ window.addEventListener(
       )
     );
     if (errorNum)
-      return spMsgHandler.sendError(
+      return msgHandler.sendError(
         shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [errorNum])
       );
     res["NoImageBlack"] = await createImageBitmap(
@@ -1691,7 +1691,7 @@ window.addEventListener(
         return b.getImageData(0, 0, 1, 1).data[0];
       })()
     )
-      return spMsgHandler.sendError(
+      return msgHandler.sendError(
         shared.game.i18n.t("simphi.loading.imgLoadingError", [err.cause.name])
       );
     // if (ptSettings.resourcesType === "prpr-custom") await loadprprCustomRes();
@@ -3332,8 +3332,8 @@ status2.reg(emitter, "change", (/** @type {Emitter} */ target) =>
 );
 async function qwqStop() {
   if (emitter.eq("stop")) {
-    if (!selectchart.value) return spMsgHandler.sendError(shared.game.i18n.t("simphi.playErr.noChartSelected"));
-    if (!selectbgm.value) return spMsgHandler.sendError(shared.game.i18n.t("simphi.playErr.noMusicSelected"));
+    if (!selectchart.value) return msgHandler.sendError(shared.game.i18n.t("simphi.playErr.noChartSelected"));
+    if (!selectbgm.value) return msgHandler.sendError(shared.game.i18n.t("simphi.playErr.noMusicSelected"));
     app.stage.style.display = "block";
     for (const i of main.before.values()) await i();
     audio.play(res["mute"], { loop: true, isOut: false }); //播放空音频(避免音画不同步)
@@ -3396,10 +3396,10 @@ async function loadLineData() {
   for (const i of chartLineData) {
     if (selectchart.value === i.Chart) {
       if (!app.lines[i.LineId]) {
-        spMsgHandler.sendWarning(shared.game.i18n.t("simphi.playErr.judgeLineDoesentExist", [i.LineId]));
+        msgHandler.sendWarning(shared.game.i18n.t("simphi.playErr.judgeLineDoesentExist", [i.LineId]));
         continue;
       }
-      if (!bgs.has(i.Image)) spMsgHandler.sendWarning(shared.game.i18n.t("simphi.playErr.imageDoesentExist", [i.image]));
+      if (!bgs.has(i.Image)) msgHandler.sendWarning(shared.game.i18n.t("simphi.playErr.imageDoesentExist", [i.image]));
       /** @type {ImageBitmap} */
       const image = bgs.get(i.Image) || res["NoImageBlack"];
       app.lines[i.LineId].imageW = image.width;
@@ -3600,7 +3600,7 @@ main.stat = stat;
 main.app = app;
 main.res = res;
 main.audio = audio;
-main.msgHandler = spMsgHandler;
+main.msgHandler = msgHandler;
 main.frameAnimater = frameAnimater;
 main.qwqEnd = qwqEnd;
 main.bgms = bgms;

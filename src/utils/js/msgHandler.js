@@ -121,39 +121,12 @@ export const msgHandler = {
       );
     });
   },
-}; 
-
-export const spMsgHandler = {
-  lastMessage: "",
   msgbox(msg, type, fatal) {
     return;
-  },
-  sendMessage(msg, type) {
-    if (!msg) return;
-    if (type === "error") {
-      Notiflix.Notify.failure(msg, {
-        ID: "msgHandlerErr",
-        zindex: 114515,
-        cssAnimationStyle: "fade",
-        opacity: "0.8",
-        borderRadius: "15px",
-      });
-    } else {
-      Notiflix.Notify.info(msg, {
-        ID: "msgHandlerInfo",
-        showOnlyTheLastOne: true,
-        zindex: 114515,
-        cssAnimationStyle: "fade",
-        clickToClose: true,
-        opacity: "0.8",
-        borderRadius: "15px",
-      });
-    }
   },
   sendWarning(msg, isHTML) {
     const msgText = isHTML ? msg : Utils.escapeHTML(msg);
     this.msgbox(msgText, "warn");
-    //this.sendMessage(this.lastMessage);
   },
   sendError(msg, html, fatal) {
     if (html) {
