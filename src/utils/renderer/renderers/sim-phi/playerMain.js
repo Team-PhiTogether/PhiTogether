@@ -646,7 +646,7 @@ const specialClick = {
       main.pressTime = main.pressTime > 0 ? -qwqEnd.second : qwqEnd.second;
   },
 };
-const hitManager = new simphi.HitManager();
+const hitManager = new HitManager();
 class JudgeEvent {
   constructor(offsetX, offsetY, type, event) {
     this.offsetX = offsetX;
@@ -1087,7 +1087,6 @@ const judgeManager = {
     }
   },
 };
-const hitManager = new HitManager();
 class HitEvents extends Array {
   constructor({
     updateCallback = (_) => { },
@@ -1166,7 +1165,7 @@ const hitImageList = new HitEvents({
         );
         app.ctxos.fill();
         app.ctxos.closePath();
-      } else if (main.customResourceMeta["hitEvtDrawer"]) eval(main.customResourceMeta["hitEvtDrawer"]);
+      } else if (main.customResourceMeta["hitEvtDrawer"]) eval(`{ const ctxos = app.ctxos; ${main.customResourceMeta["hitEvtDrawer"]} }`);
     }
   },
 });
