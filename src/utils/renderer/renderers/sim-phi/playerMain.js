@@ -28,6 +28,8 @@ import ptdb from "@utils/ptdb";
 import { msgHandler } from "@utils/js/msgHandler.js";
 import { tween, Emitter } from "./utils/simphiUtils.js";
 
+import { HitManager } from "./components/HitManager.js";
+
 const $id = (query) => document.getElementById(query);
 const $ = (query) => document.body.querySelector(query);
 const $$ = (query) => document.body.querySelectorAll(query);
@@ -1083,6 +1085,7 @@ const judgeManager = {
     }
   },
 };
+const hitManager = new HitManager();
 class HitEvents extends Array {
   constructor({
     updateCallback = (_) => { },
