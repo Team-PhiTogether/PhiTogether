@@ -1,5 +1,5 @@
 {
-  "appId": "fun.phitogether.browser",
+  "appId": "fun.phitogether.app",
   "appName": "PhiTogether",
   "webDir": "dist",
   "ios": {
