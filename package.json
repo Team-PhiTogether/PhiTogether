@@ -11,6 +11,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/ios": "^6.2.0",
     "@types/node": "^20.8.0",
     "devtools-detector": "^2.0.14",
     "eruda": "^3.0.1",
@@ -23,6 +25,7 @@
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
+    "@capacitor/cli": "^6.2.0",
     "@vitejs/plugin-vue": "^4.2.3",
     "vite": "^4.4.9"
   },
