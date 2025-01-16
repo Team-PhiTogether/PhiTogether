@@ -15,6 +15,13 @@ class MyViewController: CAPBridgeViewController {
     }
     
     
+    override var prefersHomeIndicatorAutoHidden: Bool {
+        return true  // Returns true to hide the home indicator
+    }
+//    override var childForHomeIndicatorAutoHidden: UIViewController? {
+//           return self
+//       }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated);
 //        NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
@@ -24,5 +31,17 @@ class MyViewController: CAPBridgeViewController {
         self.navigationController?.navigationBar.isHidden = true
         self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         self.navigationController?.navigationBar.shadowImage = UIImage()
+        // Call this when you want to update the home indicator's visibility
+        setNeedsUpdateOfHomeIndicatorAutoHidden()
     }
 }
+
+//class CustomNavigationController: UINavigationController {
+//    override var prefersHomeIndicatorAutoHidden: Bool {
+//        return true
+//    }
+//    
+//    override var childForHomeIndicatorAutoHidden: UIViewController? {
+//        return topViewController
+//    }
+//}

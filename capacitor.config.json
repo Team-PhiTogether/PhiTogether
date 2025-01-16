@@ -1,5 +1,15 @@
 {
   "appId": "fun.phitogether.browser",
   "appName": "PhiTogether",
-  "webDir": "dist"
+  "webDir": "dist",
+  "ios": {
+    "appendUserAgent": "PTForAppStore (PTWithCapacitor, like PhiTogetherApp)"
+  },
+  "android": {
+    "appendUserAgent": "PTForAndroid (PTWithCapacitor, like PhiTogetherApp)"
+  },
+  "server": {
+    "hostname": "phitogether.fun",
+    "cleartext": true
+  }
 }

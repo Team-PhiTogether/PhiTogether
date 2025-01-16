@@ -8,6 +8,7 @@
     "build": "vite build && node ./script/build.js",
     "build4dev": "vite build && node ./script/build4dev.js",
     "build4dev2pub": "node ./script/build4dev2pub.js && vite build",
+    "build4ios": "pnpm build && npx cap sync",
     "preview": "vite preview"
   },
   "dependencies": {
