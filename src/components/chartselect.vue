@@ -321,13 +321,8 @@ export default {
             shared.game.loadHandler.l(this.$t("chartSelect.loadingChartList"));
             if (renew) this.page = 1;
             try {
-                let myHeaders = new Headers();
-                myHeaders.append("User-Agent", "PhiZoneRegularAccess");
                 const chartList = await (
-                    await fetch(
-                        url.replace(/https?:\/\/api.phi.zone/, "https://api.phi.zone"),
-                        { headers: myHeaders }
-                    )
+                    await fetch(url)
                 ).json();
                 // if (this.selectChoice === "custom")
                 //     chartList.results.forEach(
