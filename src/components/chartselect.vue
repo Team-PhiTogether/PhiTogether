@@ -39,6 +39,8 @@ export default {
             canEdit: false,
             favouriteSongs: [],
             showBlank: false,
+            loadingImages: new Map(),
+            imageCache: new Map(),
         };
     },
     computed: {
@@ -635,6 +637,28 @@ export default {
                 main.appendChild(video);
             });
         },
+        async fetchImage(url) {
+            if (!url.startsWith("/PTVirtual/")) return;
+            if (this.imageCache.has(url)) return this.imageCache.get(url);
+
+            this.loadingImages.set(url, true);
+            
+            try {
+                const response = await ptdb.fetch(url);
+                const blob = await response.blob();
+                const objectURL = URL.createObjectURL(blob);
+                
+                this.imageCache.set(url, objectURL);
+                this.loadingImages.set(url, false);
+
+                return objectURL;
+            } catch (error) {
+                alert(error)
+                console.error('Error loading image:', error);
+                this.loadingImages.set(url, false);
+                return url; // Fallback to original URL
+            }
+        }
     },
     watch: {
         selectChoice: {
@@ -664,6 +688,15 @@ export default {
                 ptdb.gameConfig.save(newVal, "favouriteSongs");
             },
             deep: true,
+        },
+        "chartList.results": {
+            handler(newVal) {
+                this.imageCache.clear();
+                newVal.forEach(chart => {
+                    if (chart.illustration) this.fetchImage(chart.illustration);
+                });
+            },
+            // deep: true,
         },
     },
     meta: {
@@ -729,10 +762,12 @@ export default {
                             @click="showBlank = true; goDetails(chart).catch(e => showBlank = false);"
                             :style="{ display: 'flex', background: (selectedSongData == chart) ? 'rgba(255,255,255,0.75)' : 'rgba(237,247,255,0.4)' }">
                             <div style="flex: 3; overflow: hidden; aspect-ratio: 3 / 2;">
-                                <img :src="chart.illustration" style="object-fit: cover; height: 100%; width: 100%;" />
+                                <img 
+                                    :src="loadingImages.get(chart.illustration) ? null : (imageCache.get(chart.illustration) || chart.illustration)"
+                                    style="object-fit: cover; height: 100%; width: 100%;" />
                                 <div class="songCardCover" v-show="!selectedSongData"
                                     style="font-size: 1.25vw; color: white; line-height: 1.2em;"
-                                    :style="{ '--bg': `url(${processIllustrationURL(chart.illustration)})` }">
+                                    :style="{ '--bg': `url(${loadingImages.get(chart.illustration) ? null : (imageCache.get(chart.illustration) || chart.illustration)})` }">
                                     <div class="songCardName">{{ chart.name }}</div>
                                     <br />
                                     <div class="songCardComposer">{{ chart.composer }}</div>
@@ -771,7 +806,7 @@ export default {
             <div id="chartSelect" v-if="selectedSongData" :style="{ width: selectedSongData ? '100%' : '40vw' }">
                 <div v-if="selectedSongData" style="margin-top: 2.5vh; overflow-y: scroll; height: calc(100% - 2.5vh);">
                     <div class="scoreSongCard" style="width:90%;height:30vh;">
-                        <img :src="selectedSongData.illustration.replace('res.phi.zone', pzResUrlGlobal)"
+                        <img :src="loadingImages.get(selectedSongData.illustration) ? null : (imageCache.get(selectedSongData.illustration) || selectedSongData.illustration)"
                             style="object-fit: cover;">
                     </div>
                     <div style="display: flex; justify-content: space-evenly; flex-wrap: wrap; height: max-content;">
