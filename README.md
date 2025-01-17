@@ -6,7 +6,7 @@
 
 [Status Page](https://status.phitogether.fun)
 
-Combining multiplayer gaming with Phigros gameplay! A non-profit open-source community game based on Phigros gameplay. Integrated with PhiZone.
+Bringing multiplayer to Phigros gameplay! An open-source, non-commercial & community-based rhythm game with PhiZone intergrated. 
 
 ## 👍 Support Our Continuous Operation
 

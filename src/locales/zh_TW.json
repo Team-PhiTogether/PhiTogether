@@ -63,7 +63,7 @@
         "recoverMP": "正在恢復多人遊戲",
         "recoverMPFailed": "嘗試恢復未正常退出的多人遊戲失敗，如需開啓新的多人遊戲請重新點擊多人遊戲按鈕。",
         "recoverMPNetProblem": "恢復未正常退出的多人遊戲時遇到網路錯誤，請點擊多人遊戲按鈕重試",
-        "mpMaintainanceNotice": "多人遊戲正在維護",
+        "mpMaintainanceNotice": "您必須在設置中填寫聯機服務器地址以進行多人遊戲",
         "antiAddictionIssue": "實名認證錯誤"
     },
     "multiIndex": {
@@ -515,6 +515,7 @@
         "iOSCannotExport": "iOS 裝置暫時無匯出遊玩記錄"
     },
     "settings": {
+        "mpServerURL": "多人遊戲服務器地址",
         "uploader": {
             "loadFile": "加載本地文件",
             "loadFileType": {

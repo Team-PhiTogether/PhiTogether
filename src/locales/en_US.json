@@ -63,7 +63,7 @@
     "recoverMP": "Reconnecting",
     "recoverMPFailed": "Failed to reconnect. Please tap the multiplayer button to start a new session. ",
     "recoverMPNetProblem": "Failed to reconnect due to network issue. Retry by tapping the multiplayer button. ",
-    "mpMaintainanceNotice": "Multiplayer is under maintainance. ",
+    "mpMaintainanceNotice": "You can't use multiplayer function unless you fill in a custom MPCenter URL in the settings. ",
     "antiAddictionIssue": "Antiaddiction Error"
   },
   "multiIndex": {
@@ -515,6 +515,7 @@
     "iOSCannotExport": "Replay export is not supported on an Apple mobile device. "
   },
   "settings": {
+    "mpServerURL": "MPCenter URL",
     "uploader": {
       "loadFile": "Load from Local File",
       "loadFileType": {

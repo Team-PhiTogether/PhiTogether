@@ -11,7 +11,8 @@
 	<link rel="stylesheet" href="/src/style.css">
 	<link rel="stylesheet" href="/src/animation.css">
 	<link rel="stylesheet" href="/src/components/background/background.css">
-	<meta name='description' content='PhiTogether: 将多人游戏与Phigros玩法结合起来！集成PhiZone且拥有自有社区谱面。Bringing multiplayer to Phigros gameplay! An rhythm game with PhiZone intergrated and its own chart library.'>
+	<meta name='description'
+		content='PhiTogether: 将多人游戏与Phigros玩法结合起来！集成PhiZone且拥有自有社区谱面。Bringing multiplayer to Phigros gameplay! An rhythm game with PhiZone intergrated and its own chart library.'>
 	<meta name='keyword' content='PhiTogether, PhiZone'>
 	<meta name="author" content="Team PhiTogether">
 	<script src="/src/utils/js/wasm_exec.js" type="module"></script>
@@ -75,7 +76,7 @@
 						const dateNow = new Date().getTime();
 						return (
 							dateNow >= new Date("2024/04/01 00:00:00").getTime()
-							&& 
+							&&
 							dateNow <= new Date("2024/04/07 23:59:59").getTime()
 						);
 					},
@@ -83,39 +84,6 @@
 						rtPlayed: false,
 					},
 					songList: {
-/* 						"rt": {
-							info: {
-								id: "24aprflxtrack01",
-								title: "BPM=RT",
-								composer: "Camellia",
-								illustrator: "Camellia",
-								level: "SP",
-								difficulty: "?",
-								ranked: false,
-							},
-							files: {
-								chart: "/src/core/charts/24AprFl/rt/chart.json",
-								song: "/src/core/charts/24AprFl/rt/song.mp3",
-								illustration: "/src/core/charts/24AprFl/rt/illustration.jpg",
-							}
-						},
-						"2024": {
-							info: {
-								id: "24aprflxtrack02",
-								title: "Hello (BPM) 2024",
-								composer: "かめりあ",
-								illustrator: "Camellia",
-								charter: "a \"giFT\" from 2023 to 2024",
-								level: "SP",
-								difficulty: "?",
-								ranked: false,
-							},
-							files: {
-								chart: "/src/core/charts/24AprFl/2024/chart.json",
-								song: "/src/core/charts/24AprFl/2024/song.mp3",
-								illustration: "/src/core/charts/24AprFl/2024/illustration.jpg",
-							}
-						} */
 						"rt": {
 							chart: "https://ptc.realtvop.top/song/r55828450/55828450.json",
 							unlockVideo: null,
@@ -133,45 +101,45 @@
 									"gray",
 									"15px",
 									0.6
-								], 
-								"0000000", 
+								],
+								"0000000",
 								"0.00%"
 							]
 						},
 						"2024": {
-								chart: "https://ptc.realtvop.top/song/r55828450/55828450.json",
-								unlockVideo: null,
-								charter: "o1b",
-								difficulty: "?",
-								id: "r60287348",
-								level: "SP",
-								notes: "0",
-								ranked: false,
-								selected: true,
-								song: "r60287348",
-								userScore: [
+							chart: "https://ptc.realtvop.top/song/r55828450/55828450.json",
+							unlockVideo: null,
+							charter: "o1b",
+							difficulty: "?",
+							id: "r60287348",
+							level: "SP",
+							notes: "0",
+							ranked: false,
+							selected: true,
+							song: "r60287348",
+							userScore: [
 								[
 									"NEW",
 									"gray",
 									"15px",
 									0.6
-								], 
-								"0000000", 
+								],
+								"0000000",
 								"0.00%"
 							]
 						}
 					},
 					hook(search, loadChart) {
 						if (
-								search.name
-                && this.activate
-                && search.name.includes("2024")
-                && this.status.rtPlayed
-            ) {
-								console.log("flag 2024 activated");
-                this.payload("2024", loadChart);
-                return true;
-            } else return false;
+							search.name
+							&& this.activate
+							&& search.name.includes("2024")
+							&& this.status.rtPlayed
+						) {
+							console.log("flag 2024 activated");
+							this.payload("2024", loadChart);
+							return true;
+						} else return false;
 					},
 					hookCheckRT(id) {
 						if (id == "r55828450") this.status.rtPlayed = true;
@@ -187,43 +155,6 @@
 					async payload(item, loadChart) {
 						const chartObj = this.songList[item];
 						loadChart(chartObj);
-/* 						shared.game.ptmain.loadChart(
-							{
-								composer: chartObj.info.composer,
-								id: chartObj.info.id,
-								illustration: chartObj.files.illustration,
-								illustrator: chartObj.info.illustrator,
-								isFromPhiZone: false,
-								isFromURL: true,
-								name: chartObj.info.title,
-								origin: null,
-								song: chartObj.files.song,
-							}, 
-							{
-								assetsNum: 0,
-								chart: chartObj.files.chart,
-								charter: chartObj.info.charter,
-								difficulty: chartObj.info.difficulty,
-								id: chartObj.info.id,
-								isFromPhiZone: false,
-								isFromURL: true,
-								level: chartObj.info.level,
-								origin: null,
-								selected: false,
-								song: chartObj.files.song,
-								userScore: [
-									[
-										"NEW",
-										"gray",
-										"15px",
-										0.6
-									],
-									"0000000",
-									"0.00%"
-								]
-							},
-							songLoadedCallback
-						) */
 					}
 				}
 			},
@@ -252,7 +183,7 @@
 			gtag('config', 'G-NVFVE35LMW');
 		}
 	</script>
-	<script defer> 
+	<script defer>
 		setTimeout(() => { window.scrollTo({ top: 0 }) }, 500);
 	</script>
 </head>
@@ -267,9 +198,11 @@
 			<canvas id="backgroundCanvas" class="backgroundCanvas"></canvas>
 			<canvas id="gradientCanvas" class="backgroundCanvas visible" style="z-index:-2;"></canvas>
 			<h1 class="title blur" id="ptTitle">
-				<span style="margin-left: 12px;"><Transition name="sameSlide-fade"><img src="/src/core/icons/return.svg" v-if="canBack"
-						style="height: 32.5px; padding-top: 9px;" @click="$router.back()"
-						class="btn-smooth"></img></Transition></span>
+				<span style="margin-left: 12px;">
+					<Transition name="sameSlide-fade"><img src="/src/core/icons/return.svg" v-if="canBack"
+							style="height: 32.5px; padding-top: 9px;" @click="$router.back()" class="btn-smooth"></img>
+					</Transition>
+				</span>
 				<div style="display: grid; margin-left: 12px;">
 					<span style="font-size: 47.5%; margin-top: 2px;">Phi<span
 							:style="{color: gameMode==='single'?'unset':'#009000'}"
@@ -278,23 +211,32 @@
 						@click="gameMode==='multi'&&openMultiPanel()">PhiTogether</span>
 				</div>
 				<div class="userInfoBar">
-					<div
-						style="margin-top: 5px; margin-left: 2px; margin-right: 5px; margin-bottom: 5px;">
+					<div style="margin-top: 5px; margin-left: 2px; margin-right: 5px; margin-bottom: 5px;">
 						<div style="display: flex;">
 							<div style="display: flex; margin-right: 12px; margin-top: -3px;">
 								<div style="display: flex;">
-									<span style="font-size: 85%;" id="pzUsername"> {{ gameConfig.account.userBasicInfo ? gameConfig.account.userBasicInfo.userName : "GUEST" }} </span>
-									<div id="pzNamePlates" style="display: flex;" v-if="gameConfig.account.userBasicInfo && gameConfig.account.userBasicInfo.nameplates">
-										<div class="namePlate" v-for="i in gameConfig.account.userBasicInfo.nameplates" :style="{background: i[1]}"><span> {{ i[0] }} </span></div>
+									<span style="font-size: 85%;" id="pzUsername"> {{ gameConfig.account.userBasicInfo ?
+										gameConfig.account.userBasicInfo.userName : "GUEST" }} </span>
+									<div id="pzNamePlates" style="display: flex;"
+										v-if="gameConfig.account.userBasicInfo && gameConfig.account.userBasicInfo.nameplates">
+										<div class="namePlate" v-for="i in gameConfig.account.userBasicInfo.nameplates"
+											:style="{background: i[1]}"><span> {{ i[0] }} </span></div>
 									</div>
 								</div>
 								<div style="display: grid; padding-left: 12px;">
-									<span style="font-size: 50%; white-space: nowrap;" id="pzrks">RKS {{ gameConfig.account.userBasicInfo ? gameConfig.account.userBasicInfo.rks.toFixed(3) : "----" }}</span>
-									<span style="font-size: 50%; white-space: nowrap; margin-top: -30px;" id="pzexp">EXP {{ gameConfig.account.userBasicInfo ? Math.floor(gameConfig.account.userBasicInfo.experience) : "----" }}</span>
+									<span style="font-size: 50%; white-space: nowrap;" id="pzrks">RKS {{
+										gameConfig.account.userBasicInfo ?
+										gameConfig.account.userBasicInfo.rks.toFixed(3) : "----" }}</span>
+									<span style="font-size: 50%; white-space: nowrap; margin-top: -30px;" id="pzexp">EXP
+										{{ gameConfig.account.userBasicInfo ?
+										Math.floor(gameConfig.account.userBasicInfo.experience) : "----" }}</span>
 								</div>
 							</div>
-							<div id="playerCardUsrAvatar" style="margin-top: -5px; background: #66bbff; z-index: 11451419; box-shadow: 0px 0px 30px #0000001f;" :style='{"border-color": userColor}'>
-								<img id="pzUserAvatar" :src="gameConfig.account.userBasicInfo ? gameConfig.account.userBasicInfo.avatar : null">
+							<div id="playerCardUsrAvatar"
+								style="margin-top: -5px; background: #66bbff; z-index: 11451419; box-shadow: 0px 0px 30px #0000001f;"
+								:style='{"border-color": userColor}'>
+								<img id="pzUserAvatar"
+									:src="gameConfig.account.userBasicInfo ? gameConfig.account.userBasicInfo.avatar : null">
 							</div>
 						</div>
 					</div>
@@ -304,7 +246,8 @@
 				<div class="ptPadding ptPaddingFake"></div>
 				<router-view v-slot="{ Component }">
 					<transition name="slide-fade">
-						<keep-alive exclude="login,calibrate,aboutpage,chartupload,userChartEdit,playerB20,pzRankSingle,multiIndex">
+						<keep-alive
+							exclude="login,calibrate,aboutpage,chartupload,userChartEdit,playerB20,pzRankSingle,multiIndex">
 							<component :is="Component" />
 						</keep-alive>
 					</transition>
@@ -319,26 +262,33 @@
 							</div>
 						</div><br />
 						<br /><br />
-						<div>{{ $t("settings.uploader.chart") }}{{ $t("info.colon") }}<select id="select-chart" class="disabled-when-selected" style="width:6em"></select>
+						<div>{{ $t("settings.uploader.chart") }}{{ $t("info.colon") }}<select id="select-chart"
+								class="disabled-when-selected" style="width:6em"></select>
 						</div>
-						<div>{{ $t("settings.uploader.music") }}{{ $t("info.colon") }}<select id="select-bgm" style="width:6em" class="disabled-when-selected"></select></div>
-						<div>{{ $t("settings.uploader.illustration") }}{{ $t("info.colon") }}<select id="select-bg" style="width:6em" class="disabled-when-selected"></select></div>
+						<div>{{ $t("settings.uploader.music") }}{{ $t("info.colon") }}<select id="select-bgm"
+								style="width:6em" class="disabled-when-selected"></select></div>
+						<div>{{ $t("settings.uploader.illustration") }}{{ $t("info.colon") }}<select id="select-bg"
+								style="width:6em" class="disabled-when-selected"></select></div>
 						<br>
 						<div>
-							<div>{{ $t("settings.uploader.info.name") }}{{ $t("info.colon") }}<input id="input-name" class="input textInput" style="width:7em"
-									placeholder="&#60; Untitled &#62;">
+							<div>{{ $t("settings.uploader.info.name") }}{{ $t("info.colon") }}<input id="input-name"
+									class="input textInput" style="width:7em" placeholder="&#60; Untitled &#62;">
 							</div>
-							<div>{{ $t("settings.uploader.info.artist") }}{{ $t("info.colon") }}<input id="input-artist" class="input textInput" style="width:7em"
-									placeholder="&#60; nameless &#62;">
+							<div>{{ $t("settings.uploader.info.artist") }}{{ $t("info.colon") }}<input id="input-artist"
+									class="input textInput" style="width:7em" placeholder="&#60; nameless &#62;">
 							</div><br>
-							<div>{{ $t("settings.uploader.info.illustrator") }}{{ $t("info.colon") }}<input id="input-illustrator" class="input textInput" style="width:7em"
+							<div>{{ $t("settings.uploader.info.illustrator") }}{{ $t("info.colon") }}<input
+									id="input-illustrator" class="input textInput" style="width:7em"
 									placeholder="&#60; nameless &#62;"></div>
-							<div>{{ $t("settings.uploader.info.charter") }}{{ $t("info.colon") }}<input id="input-charter" class="input textInput" style="width:7em"
+							<div>{{ $t("settings.uploader.info.charter") }}{{ $t("info.colon") }}<input
+									id="input-charter" class="input textInput" style="width:7em"
 									placeholder="&#60; nameless &#62;"></div><br>
-							<div>{{ $t("settings.uploader.info.difficulty") }}{{ $t("info.colon") }}<input id="select-difficulty" value="SP" style="width:3em">
+							<div>{{ $t("settings.uploader.info.difficulty") }}{{ $t("info.colon") }}<input
+									id="select-difficulty" value="SP" style="width:3em">
 								</input>
 							</div>
-							<div>{{ $t("settings.uploader.info.level") }}{{ $t("info.colon") }}<input id="select-level" value="?" class="input textInput" style="width:3em">
+							<div>{{ $t("settings.uploader.info.level") }}{{ $t("info.colon") }}<input id="select-level"
+									value="?" class="input textInput" style="width:3em">
 								</input>
 							</div><br>
 						</div><br />
@@ -360,14 +310,14 @@
 
 						<div style="display: block; text-align: left; margin-left: 5%;">
 							<div style="display: block;">
-								<span
-									style="font-size:xx-large; font-weight: bold; color:darkslategray; margin:auto">{{ $t("settings.settings.display.title") }}</span>
+								<span style="font-size:xx-large; font-weight: bold; color:darkslategray; margin:auto">{{
+									$t("settings.settings.display.title") }}</span>
 								<br />
 								<div>语言 / Language: <select v-model="localeValue">
-									<option value="zh_CN">简体中文</option>
-									<option value="zh_TW">正體中文</option>
-									<option value="en_US">English</option>
-								</select></div><br /><br />
+										<option value="zh_CN">简体中文</option>
+										<option value="zh_TW">正體中文</option>
+										<option value="en_US">English</option>
+									</select></div><br /><br />
 								<div><input type="checkbox" id="showAcc" v-model="gameConfig.showAcc"><label
 										for="showAcc">{{ $t("settings.settings.display.showAcc") }}</label></div>
 								<div><input type="checkbox" id="highLight" v-model="gameConfig.highLight"><label
@@ -390,20 +340,23 @@
 										for="JITSOpen">{{ $t("settings.settings.display.JITSOpen") }}</label>
 								</div>
 								<div><input type="checkbox" id="enhanceRankVis"
-										v-model="gameConfig.enhanceRankVis"><label
-										for="enhanceRankVis">{{ $t("settings.settings.display.enhanceRankVis") }}</label></div>
+										v-model="gameConfig.enhanceRankVis"><label for="enhanceRankVis">{{
+										$t("settings.settings.display.enhanceRankVis") }}</label></div>
 								<br />
 								<div><input type="checkbox" id="enableLife" v-model="gameConfig.enableLife"><label
-									for="enableLife">{{ $t("settings.settings.display.enableLife") }}</label></div>
-									<div><input type="checkbox" id="followAspectRatio" v-model="gameConfig._followAspectRatio"><label
-										for="followAspectRatio">{{ $t("settings.settings.display.followAspectRatio") }}</label></div>
+										for="enableLife">{{ $t("settings.settings.display.enableLife") }}</label></div>
+								<div><input type="checkbox" id="followAspectRatio"
+										v-model="gameConfig._followAspectRatio"><label for="followAspectRatio">{{
+										$t("settings.settings.display.followAspectRatio") }}</label></div>
 								<div><input type="checkbox" id="enableFilter" v-model="gameConfig.enableFilter"><label
-										for="enableFilter">{{ $t("settings.settings.display.enableFilter") }}</label></div><br />
+										for="enableFilter">{{ $t("settings.settings.display.enableFilter") }}</label>
+								</div><br />
 								<div :style="{display:gameConfig.enableFilter?'block':'none'}"><textarea
-										id="filterInput" class="textInput" v-model="gameConfig.filterInput" :placeholder='$t("settings.settings.display.filterInputPlaceholder")'
+										id="filterInput" class="textInput" v-model="gameConfig.filterInput"
+										:placeholder='$t("settings.settings.display.filterInputPlaceholder")'
 										style="width:150px;height:1em;margin-left:10px"></textarea></div><br />
-								<div>{{ $t("settings.settings.display.aspectRatio") }}{{ $t("info.colon") }}<select id="select-aspect-ratio" style="width:4em"
-										v-model="gameConfig.aspectRatio">
+								<div>{{ $t("settings.settings.display.aspectRatio") }}{{ $t("info.colon") }}<select
+										id="select-aspect-ratio" style="width:4em" v-model="gameConfig.aspectRatio">
 										<option value="1.25">5:4</option>
 										<option value="1.333333">4:3</option>
 										<option value="1.428571">10:7</option>
@@ -415,37 +368,52 @@
 										<option value="1.5">3:2</option>
 									</select>
 								</div>
-								<div>{{ $t("settings.settings.display.noteScale") }}{{ $t("info.colon") }}<select id="select-note-scale" style="width:4em"
-										v-model="gameConfig.noteScale">
-										<option value="0.8">{{ $t("settings.settings.display.noteScaleOptions.smaller") }}</option>
-										<option value="0.9">{{ $t("settings.settings.display.noteScaleOptions.small") }}</option>
-										<option value="1">{{ $t("settings.settings.display.noteScaleOptions.default") }}</option>
-										<option value="1.15">{{ $t("settings.settings.display.noteScaleOptions.large") }}</option>
-										<option value="1.3">{{ $t("settings.settings.display.noteScaleOptions.larger") }}</option>
+								<div>{{ $t("settings.settings.display.noteScale") }}{{ $t("info.colon") }}<select
+										id="select-note-scale" style="width:4em" v-model="gameConfig.noteScale">
+										<option value="0.8">{{ $t("settings.settings.display.noteScaleOptions.smaller")
+											}}</option>
+										<option value="0.9">{{ $t("settings.settings.display.noteScaleOptions.small") }}
+										</option>
+										<option value="1">{{ $t("settings.settings.display.noteScaleOptions.default") }}
+										</option>
+										<option value="1.15">{{ $t("settings.settings.display.noteScaleOptions.large")
+											}}</option>
+										<option value="1.3">{{ $t("settings.settings.display.noteScaleOptions.larger")
+											}}</option>
 									</select>
 								</div><br>
-								<div>{{ $t("settings.settings.display.backgroundDim") }}{{ $t("info.colon") }}<select id="select-background-dim" style="width:4em"
-										v-model="gameConfig.backgroundDim">
-										<option value="1">{{ $t("settings.settings.display.backgroundDimOptions.dark") }}</option>
-										<option value="0.8">{{ $t("settings.settings.display.backgroundDimOptions.dim") }}</option>
-										<option value="0.6">{{ $t("settings.settings.display.backgroundDimOptions.default") }}</option>
-										<option value="0.4">{{ $t("settings.settings.display.backgroundDimOptions.bright") }}</option>
-										<option value="0.2">{{ $t("settings.settings.display.backgroundDimOptions.light") }}</option>
+								<div>{{ $t("settings.settings.display.backgroundDim") }}{{ $t("info.colon") }}<select
+										id="select-background-dim" style="width:4em" v-model="gameConfig.backgroundDim">
+										<option value="1">{{ $t("settings.settings.display.backgroundDimOptions.dark")
+											}}</option>
+										<option value="0.8">{{ $t("settings.settings.display.backgroundDimOptions.dim")
+											}}</option>
+										<option value="0.6">{{
+											$t("settings.settings.display.backgroundDimOptions.default") }}</option>
+										<option value="0.4">{{
+											$t("settings.settings.display.backgroundDimOptions.bright") }}</option>
+										<option value="0.2">{{
+											$t("settings.settings.display.backgroundDimOptions.light") }}</option>
 									</select>
 								</div>
-								<div>{{ $t("settings.settings.display.defaultRankMethod") }}{{ $t("info.colon") }}<select id="select-rankmethod" style="width:5em"
+								<div>{{ $t("settings.settings.display.defaultRankMethod") }}{{ $t("info.colon")
+									}}<select id="select-rankmethod" style="width:5em"
 										v-model="gameConfig.defaultRankMethod">
-										<option value="score">{{ $t("settings.settings.display.defaultRankMethodOptions.score") }}</option>
-										<option value="acc">{{ $t("settings.settings.display.defaultRankMethodOptions.acc") }}</option>
+										<option value="score">{{
+											$t("settings.settings.display.defaultRankMethodOptions.score") }}</option>
+										<option value="acc">{{
+											$t("settings.settings.display.defaultRankMethodOptions.acc") }}</option>
 									</select>
 								</div>
 							</div>
 							<br />
 							<div style="display: block;">
-								<span
-									style="font-size:xx-large; font-weight: bold; color:darkslategray; margin:auto">{{ $t("settings.settings.performance.title") }}</span>
+								<span style="font-size:xx-large; font-weight: bold; color:darkslategray; margin:auto">{{
+									$t("settings.settings.performance.title") }}</span>
 								<br />
-								<input type="button" @click="(gameConfig.noUIBlur = gameConfig.lowRes = true),(gameConfig.autoDelay = false)" v-if="!gameConfig.noUIBlur || !gameConfig.lowRes || gameConfig.autoDelay"
+								<input type="button"
+									@click="(gameConfig.noUIBlur = gameConfig.lowRes = true),(gameConfig.autoDelay = false)"
+									v-if="!gameConfig.noUIBlur || !gameConfig.lowRes || gameConfig.autoDelay"
 									:value='$t("settings.settings.performance.useRecommendConfigurationsForLowPerformanceDevices")'>
 								<br v-if="!gameConfig.noUIBlur || !gameConfig.lowRes || gameConfig.autoDelay" />
 								<div><input type="checkbox" id="noUIBlur" v-model="gameConfig.noUIBlur"><label
@@ -454,88 +422,114 @@
 										for="lowRes">{{ $t("settings.settings.performance.lowRes") }}</label></div>
 								<br />
 								<div><input type="checkbox" id="autoDelay" v-model="gameConfig.autoDelay"><label
-										for="autoDelay">{{ $t("settings.settings.performance.autoDelay") }}</label></div>
+										for="autoDelay">{{ $t("settings.settings.performance.autoDelay") }}</label>
+								</div>
 								<br />
 								<div><input type="checkbox" id="isMaxFrame" v-model="gameConfig.isMaxFrame"><label
-										for="isMaxFrame">{{ $t("settings.settings.performance.isMaxFrame") }}</label></div>
-								<input id="maxFrame" type="number" min="25" max="1000" class="input"
-									style="width:4em" placeholder="60"
-									:style="{display: gameConfig.isMaxFrame?'inline-block':'none'}"
+										for="isMaxFrame">{{ $t("settings.settings.performance.isMaxFrame") }}</label>
+								</div>
+								<input id="maxFrame" type="number" min="25" max="1000" class="input" style="width:4em"
+									placeholder="60" :style="{display: gameConfig.isMaxFrame?'inline-block':'none'}"
 									v-model="gameConfig.maxFrame">
 							</div><br />
 							<div style="display: block;">
-								<span
-									style="font-size:xx-large; font-weight: bold; color:darkslategray; margin:auto">{{ $t("settings.settings.resources.title") }}</span>
+								<span style="font-size:xx-large; font-weight: bold; color:darkslategray; margin:auto">{{
+									$t("settings.settings.resources.title") }}</span>
 								<br />
 								<div><input type="checkbox" id="usekwlevelOverbgm"
-										v-model="gameConfig.usekwlevelOverbgm"><label
-										for="usekwlevelOverbgm">{{ $t("settings.settings.resources.usekwlevelOverbgm") }}</label></div><br>
-								<div>{{ $t("settings.settings.resources.resourcesType") }}{{ $t("info.colon") }}<select id="select-resource-type" style="width:8em"
-										v-model="gameConfig.resourcesType">
-										<option value="together-pack-1">{{ $t("settings.settings.resources.resourceTypes.preset1") }}</option>
-										<option value="together-pack-2">{{ $t("settings.settings.resources.resourceTypes.preset2") }}</option>
-										<option value="prpr-custom">{{ $t("settings.settings.resources.resourceTypes.prprCustom") }}</option>
-										<option value="pt-custom">{{ $t("settings.settings.resources.resourceTypes.PTCustom") }}</option>
+										v-model="gameConfig.usekwlevelOverbgm"><label for="usekwlevelOverbgm">{{
+										$t("settings.settings.resources.usekwlevelOverbgm") }}</label></div><br>
+								<div>{{ $t("settings.settings.resources.resourcesType") }}{{ $t("info.colon") }}<select
+										id="select-resource-type" style="width:8em" v-model="gameConfig.resourcesType">
+										<option value="together-pack-1">{{
+											$t("settings.settings.resources.resourceTypes.preset1") }}</option>
+										<option value="together-pack-2">{{
+											$t("settings.settings.resources.resourceTypes.preset2") }}</option>
+										<option value="prpr-custom">{{
+											$t("settings.settings.resources.resourceTypes.prprCustom") }}</option>
+										<option value="pt-custom">{{
+											$t("settings.settings.resources.resourceTypes.PTCustom") }}</option>
 									</select>
 								</div>
 								<div v-if="gameConfig.resourcesType==='prpr-custom'">
-									{{ $t("settings.settings.resources.respack") }}{{ $t("info.colon") }}<select id="select-resource-id" style="width:8em"
-										v-model="gameConfig.prprRespackID">
-										<option v-for="respack in prprRespacks" v-bind:value="respack.id">{{ `${respack.name} (by ${respack.author})` }}</option>
+									{{ $t("settings.settings.resources.respack") }}{{ $t("info.colon") }}<select
+										id="select-resource-id" style="width:8em" v-model="gameConfig.prprRespackID">
+										<option v-for="respack in prprRespacks" v-bind:value="respack.id">{{
+											`${respack.name} (by ${respack.author})` }}</option>
 									</select>
 								</div>
 								<input type="button" @click="removeThisRespack"
-									v-if="gameConfig.resourcesType==='prpr-custom' && gameConfig.prprRespackID" :value='$t("settings.settings.resources.removeThisRespack")'>
+									v-if="gameConfig.resourcesType==='prpr-custom' && gameConfig.prprRespackID"
+									:value='$t("settings.settings.resources.removeThisRespack")'>
 								<input type="button" @click="uploadCustomRespack"
-									v-if="gameConfig.resourcesType==='prpr-custom'" :value='$t("settings.settings.resources.uploadCustomRespack")'>
+									v-if="gameConfig.resourcesType==='prpr-custom'"
+									:value='$t("settings.settings.resources.uploadCustomRespack")'>
 								<input type="button"
 									onclick='shared.game.msgHandler.info(shared.game.ptmain.$t("settings.settings.resources.ptTutorialMessage"), shared.game.ptmain.$t("settings.settings.resources.ptTutorialTitle"))'
-									v-if="gameConfig.resourcesType==='pt-custom'" :value='$t("settings.settings.resources.ptTutorial")'>
+									v-if="gameConfig.resourcesType==='pt-custom'"
+									:value='$t("settings.settings.resources.ptTutorial")'>
 								<input id="customResourceLink" class="input textInput" style="width:15em"
 									:placeholder='$t("settings.settings.resources.customResourceLinkPlaceholder")'
 									:style="{display: gameConfig.resourcesType==='pt-custom'?'inline-block':'none'}"
 									v-model="gameConfig.customResourceLink">
 								<input type="button" @click="loadCustomRes"
-									v-if="gameConfig.resourcesType==='pt-custom'" :value='$t("settings.settings.resources.loadResButton")'>
+									v-if="gameConfig.resourcesType==='pt-custom'"
+									:value='$t("settings.settings.resources.loadResButton")'>
 								<br />
-								<input id="input-offset" type="number" step="5" class="input textInput" style="display:none;"
-									placeholder="0" v-bind:value="chartOffsetActual">
-								<div class="disabled-when-playing textInput">{{ $t("settings.settings.resources.inputOffset") }}(ms){{ $t("info.colon") }}<input id="input-offset-surface"
-										type="number" step="5" class="input textInput" style="width:4em" placeholder="0"
-										v-model="gameConfig.inputOffset"></div>
-								<input type="button" v-on:click="doCalibrate()" :value='$t("settings.settings.resources.doCalibrate")'><br />
-								<div>{{ $t("settings.settings.resources.volume") }}{{ $t("info.colon") }}<select id="select-volume" style="width:5em" v-model="gameConfig.volume">
-										<option value="0">{{ $t("settings.settings.resources.volumeOptions.off") }}</option>
-										<option value="0.5">{{ $t("settings.settings.resources.volumeOptions.low") }}</option>
-										<option value="1" selected>{{ $t("settings.settings.resources.volumeOptions.veryLow") }}</option>
-										<option value="1.25">{{ $t("settings.settings.resources.volumeOptions.mediumLow") }}</option>
-										<option value="1.5">{{ $t("settings.settings.resources.volumeOptions.regular") }}</option>
-										<option value="2">{{ $t("settings.settings.resources.volumeOptions.high") }}</option>
-										<option value="4">{{ $t("settings.settings.resources.volumeOptions.veryHigh") }}</option>
+								<input id="input-offset" type="number" step="5" class="input textInput"
+									style="display:none;" placeholder="0" v-bind:value="chartOffsetActual">
+								<div class="disabled-when-playing textInput">{{
+									$t("settings.settings.resources.inputOffset") }}(ms){{ $t("info.colon") }}<input
+										id="input-offset-surface" type="number" step="5" class="input textInput"
+										style="width:4em" placeholder="0" v-model="gameConfig.inputOffset"></div>
+								<input type="button" v-on:click="doCalibrate()"
+									:value='$t("settings.settings.resources.doCalibrate")'><br />
+								<div>{{ $t("settings.settings.resources.volume") }}{{ $t("info.colon") }}<select
+										id="select-volume" style="width:5em" v-model="gameConfig.volume">
+										<option value="0">{{ $t("settings.settings.resources.volumeOptions.off") }}
+										</option>
+										<option value="0.5">{{ $t("settings.settings.resources.volumeOptions.low") }}
+										</option>
+										<option value="1" selected>{{
+											$t("settings.settings.resources.volumeOptions.veryLow") }}</option>
+										<option value="1.25">{{
+											$t("settings.settings.resources.volumeOptions.mediumLow") }}</option>
+										<option value="1.5">{{ $t("settings.settings.resources.volumeOptions.regular")
+											}}</option>
+										<option value="2">{{ $t("settings.settings.resources.volumeOptions.high") }}
+										</option>
+										<option value="4">{{ $t("settings.settings.resources.volumeOptions.veryHigh") }}
+										</option>
 									</select>
 								</div>
 							</div>
 							<br />
 							<div style="display: block;">
-								<span
-									style="font-size:xx-large; font-weight: bold; color:darkslategray; margin:auto">{{ $t("settings.settings.experimental.title") }}</span>
+								<span style="font-size:xx-large; font-weight: bold; color:darkslategray; margin:auto">{{
+									$t("settings.settings.experimental.title") }}</span>
 								<br />
 								<div style="margin:auto;">
-									<input type="button" @click="modJudgment()" :value='$t("settings.settings.experimental.adjustJudgmentRangeButton")'>
+									<input type="button" @click="modJudgment()"
+										:value='$t("settings.settings.experimental.adjustJudgmentRangeButton")'>
 								</div>
 								<div style="margin:auto;">
 									<input type="button" @click="debugEnabled=!debugEnabled"
-									:value='debugEnabled? $t("settings.settings.experimental.disableDebugToolsButton") : $t("settings.settings.experimental.enableDebugToolsButton")' id="debugBtn">
+										:value='debugEnabled? $t("settings.settings.experimental.disableDebugToolsButton") : $t("settings.settings.experimental.enableDebugToolsButton")'
+										id="debugBtn">
 								</div><br />
 								<input type="checkbox" id="fullScreenJudge" v-model="gameConfig.fullScreenJudge"><label
-									for="fullScreenJudge">{{ $t("settings.settings.experimental.fullScreenJudge") }}</label>
+									for="fullScreenJudge">{{ $t("settings.settings.experimental.fullScreenJudge")
+									}}</label>
 								<input type="checkbox" id="stopWhenNoLife" v-model="gameConfig.stopWhenNoLife"><label
-									for="stopWhenNoLife">{{ $t("settings.settings.experimental.stopWhenNoLife") }}</label>
+									for="stopWhenNoLife">{{ $t("settings.settings.experimental.stopWhenNoLife")
+									}}</label>
 								<input type="checkbox" id="reviewWhenResume"
-									v-model="gameConfig.reviewWhenResume"><label for="reviewWhenResume">{{ $t("settings.settings.experimental.reviewWhenResume") }}</label>
+									v-model="gameConfig.reviewWhenResume"><label for="reviewWhenResume">{{
+									$t("settings.settings.experimental.reviewWhenResume") }}</label>
 								<br />
-								<div><input type="checkbox" id="isForcedMaxFrame" v-model="gameConfig.isForcedMaxFrame"><label
-										for="isForcedMaxFrame">{{ $t("settings.settings.experimental.isForcedMaxFrame") }}</label></div>
+								<div><input type="checkbox" id="isForcedMaxFrame"
+										v-model="gameConfig.isForcedMaxFrame"><label for="isForcedMaxFrame">{{
+										$t("settings.settings.experimental.isForcedMaxFrame") }}</label></div><br />
 							</div>
 							<br />
 							<div v-if="gameConfig.account.userBasicInfo && gameConfig.account.userBasicInfo.isPTDeveloper"
@@ -547,9 +541,15 @@
 									for="autoplay">Autoplay</label>
 								<input type="checkbox" id="competeMode" v-model="gameConfig.competeMode"><label
 									for="competeMode">CM</label>
+								<input type="checkbox" id="allowNonFullscreen"
+									v-model="gameConfig.allowNonFullscreen"><label for="allowNonFullscreen">AnF</label>
 								<br />
 								<input id="customChartServer" class="input textInput" style="width:15em"
 									placeholder="Input custom chart lib url" v-model="gameConfig.customChartServer">
+								<div class="disabled-when-playing textInput">{{
+									$t("settings.mpServerURL") }}{{ $t("info.colon") }}<input
+										id="mpcenterurl" class="input textInput"
+										style="width:8em" v-model="gameConfig.mpServerURL"></div>
 							</div>
 						</div>
 					</div>
@@ -601,7 +601,8 @@
 			</div>
 		</div>
 	</div>
-	<noscript><strong style="color:red">此浏览器不支持JavaScript，PhiTogether 无法运行。 / PhiTogether can't run as this browser doesn't support JavaScript.</strong></noscript>
+	<noscript><strong style="color:red">此浏览器不支持JavaScript，PhiTogether 无法运行。 / PhiTogether can't run as this browser
+			doesn't support JavaScript.</strong></noscript>
 	<script>
 		if (spec.isPhiTogetherApp || [80, 443, 1443, "1443", "", "1145"].includes(location.port))
 			navigator.serviceWorker.register('/sw.v2.1.js', { scope: '/' })
