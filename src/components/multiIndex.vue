@@ -54,7 +54,7 @@ export default {
                 const t = JSON.parse(
                     await (
                         await fetch(
-                            `${import.meta.env.VITE_MP_SERVER}/api/multi/searchRoom?by=${by}&param1=${param1}&param2=${param2}`
+                            `${shared.game.ptmain.gameConfig.mpServerURL}/api/multi/searchRoom?by=${by}&param1=${param1}&param2=${param2}`
                         )
                     ).text()
                 ); //别用.json()
@@ -79,7 +79,7 @@ export default {
         },
         joinRoom(roomid) {
             shared.game.loadHandler.l(this.$t("multiIndex.joining"), "joinRoom");
-            fetch(`${import.meta.env.VITE_MP_SERVER}/api/multi/requestRoom/${roomid}?v=${spec.thisVersion}`)
+            fetch(`${shared.game.ptmain.gameConfig.mpServerURL}/api/multi/requestRoom/${roomid}?v=${spec.thisVersion}`)
                 .then((response) => response.json())
                 .then((result) => {
                     const server_addr = result.server_addr;
@@ -111,7 +111,7 @@ export default {
             if (!this.createConfig.description)
                 this.createConfig.description = "No description.";
             shared.game.loadHandler.l(this.$t("multiIndex.joining"), "createRoom");
-            fetch(`${import.meta.env.VITE_MP_SERVER}/api/multi/requestRoom/${roomid}?v=${spec.thisVersion}`)
+            fetch(`${shared.game.ptmain.gameConfig.mpServerURL}/api/multi/requestRoom/${roomid}?v=${spec.thisVersion}`)
                 .then((response) => response.json())
                 .then((result) => {
                     const server_addr = result.server_addr;

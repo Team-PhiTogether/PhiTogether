@@ -215,6 +215,7 @@ const ptAppInstance = createApp({
     return {
       _pzFollowAspectRatio: false,
       currentRenderer: renderers.simphi,
+      mpServerURL: "",
       gameConfig: {
         _followAspectRatio: false,
         account: {
@@ -659,6 +660,13 @@ const ptAppInstance = createApp({
             return;
           }
 
+          const stdDeviation = recordMgr.stdDeviation;
+
+          if(isNaN(stdDeviation) ||stdDeviation === "NaN") {
+            res(true);
+            return;
+          }
+
           scoreLoadingAndResultData.display = true;
           scoreLoadingAndResultData.text = this.$t(
             "phizone.scoreUpload.uploading"
@@ -675,7 +683,7 @@ const ptAppInstance = createApp({
             good_late: stat.noteRank[3],
             bad: stat.noteRank[6],
             miss: stat.noteRank[2],
-            stdDeviation: recordMgr.stdDeviation,
+            stdDeviation,
           };
           phizoneApi
             .recordEncrypted(pzStat, this.gameConfig.account)

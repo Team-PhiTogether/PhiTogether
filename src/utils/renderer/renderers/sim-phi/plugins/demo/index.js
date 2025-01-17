@@ -1,4 +1,4 @@
-import { decodeAlt } from "/src/utils/imgAny";
+import { decodeAlt } from "@utils/imgAny";
 const $id = query => document.getElementById(query);
 const $ = query => document.body.querySelector(query);
 const flag0 = "flag{\x71w\x71}";

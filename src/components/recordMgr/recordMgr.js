@@ -49,6 +49,6 @@ export const recordMgr = {
     }
   },
   get stdDeviation() {
-    return (Math.standardDeviation((function (data) { const a = []; for (const i in data) if (i.endsWith("t") || i.endsWith("h")) a.push(data[i].s); return a; }(this.data))) * 1000).toFixed(3);
+    return (Math.standardDeviation((function (data) { const a = []; for (const i in data) if ((i.endsWith("t") || i.endsWith("h")) && data[i].s && !isNaN(data[i].s)) a.push(data[i].s); return a; }(this.data))) * 1000).toFixed(3);
   },
 };
