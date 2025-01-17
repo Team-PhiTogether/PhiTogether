@@ -512,7 +512,7 @@
 	}
 })();
 
-import pzEncrypted from "/src/utils/wasm/pzEncrypted.wasm?url";
+import pzEncrypted from "@utils/wasm/pzEncrypted.wasm?url";
 if (!WebAssembly.instantiateStreaming) WebAssembly.instantiateStreaming = async (resp, importObject) => await WebAssembly.instantiate(await (await resp).arrayBuffer(), importObject);
 {
     const go = new Go();

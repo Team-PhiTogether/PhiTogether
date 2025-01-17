@@ -128,7 +128,7 @@ export default {
         },
         async multiGame() {
             if (this.checkIfCantPlay()) return;
-            if (JSON.parse(import.meta.env.VITE_MP_MAINTAINANCE)) {
+            if (!shared.game.ptmain.gameConfig.mpServerURL) {
                 shared.game.msgHandler.failure(
                     this.$t("startPage.mpMaintainanceNotice")
                 );
@@ -180,7 +180,7 @@ export default {
                     try {
                         shared.game.loadHandler.l(this.$t("startPage.recoverMP"), "recoverMulti");
                         const resp = await fetch(
-                            `${import.meta.env.VITE_MP_SERVER}/api/multi/requestRoom/${lastMultiInfo.room.id}?v=${spec.thisVersion}`
+                            `${shared.game.ptmain.gameConfig.mpServerURL}/api/multi/requestRoom/${lastMultiInfo.room.id}?v=${spec.thisVersion}`
                         );
                         const result = await resp.json();
                         if (result.code === -2) {
