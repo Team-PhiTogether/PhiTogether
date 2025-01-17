@@ -1,5 +1,6 @@
 <script>
 import shared from "../utils/js/shared.js";
+import { partyMgr } from "@utils/js/partyMgr";
 import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
 export default {
     name: "startPage",
@@ -7,12 +8,8 @@ export default {
         return {
             ver: spec.thisVersion,
             verClicked: 0,
-            // localeValue: "",
         };
     },
-    // created() {
-    //     this.localeValue = localStorage.getItem("ptlocale") || "zh-CN";
-    // },
     computed: {
         pzResUrlGlobal() {
             "res.phizone.cn";

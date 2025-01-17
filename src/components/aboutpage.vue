@@ -1,5 +1,6 @@
 <script>
 import sponsors from "./sponsors";
+import { partyMgr } from "@utils/js/partyMgr";
 export default {
     name: "aboutpage",
     data() {

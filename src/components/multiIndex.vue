@@ -1,5 +1,6 @@
 <script>
 import shared from "../utils/js/shared.js";
+import { partyMgr } from "@utils/js/partyMgr";
 
 export default {
     name: "multiIndex",

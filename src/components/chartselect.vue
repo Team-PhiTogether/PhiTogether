@@ -1,5 +1,6 @@
 <script>
 import shared from "../utils/js/shared.js";
+import { partyMgr } from "@utils/js/partyMgr";
 import { audio } from "../utils/js/aup.js";
 import ptdb from "../utils/ptdb";
 import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
