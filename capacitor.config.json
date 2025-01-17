@@ -6,7 +6,8 @@
     "appendUserAgent": "PTForAppStore (PTWithCapacitor, like PhiTogetherApp)"
   },
   "android": {
-    "appendUserAgent": "PTForAndroid (PTWithCapacitor, like PhiTogetherApp)"
+    "appendUserAgent": "PTForAndroid (PTWithCapacitor, like PhiTogetherApp)",
+    "webContentsDebuggingEnabled": true
   },
   "server": {
     "hostname": "phitogether.fun",
