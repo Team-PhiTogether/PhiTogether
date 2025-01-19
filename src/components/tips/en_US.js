@@ -10,7 +10,7 @@ export default [
     "Pipe falling.mp3",
     "Math Homework AT Lv.17",
     "You are right, but PhiTogether is",
-    "If your game gets locked at 30fps, you are probably on low battery mode. ",
+    "If your game gets locked at 30fps, you are probably on Low Power Mode. ",
     "If your current device is a PC, you are using a PC. How smart I am! ",
     "Is there any possibility that one single player can still play multiplayer mode? ",
     "It is said that your PhiZone token was 2FcA9R67jZZpXZcPG",
