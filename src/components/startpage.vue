@@ -1,198 +1,214 @@
 <script>
-import shared from "../utils/js/shared.js";
-import { partyMgr } from "@utils/js/partyMgr";
-import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
-export default {
-    name: "startPage",
-    data() {
-        return {
-            ver: spec.thisVersion,
-            verClicked: 0,
-        };
-    },
-    computed: {
-        pzResUrlGlobal() {
-            "res.phizone.cn";
-        },
-        loginInfo() {
-            return shared.game.ptmain.gameConfig.account.userBasicInfo;
-        },
-        loginStatus() {
-            return !shared.game.ptmain.noAccountMode;
-        },
-        isPTFun() {
-            return (
-                [80, 443, 1443, "1443"].includes(location.port) ||
-                location.host.endsWith("phitogether.fun")
-            );
-        },
-        isPTApp() {
-            return window.spec.isPhiTogetherApp;
-        },
-        userColor() {
-            return shared.game.ptmain.userColor;
-        },
-        mpMaintainanceStatus() {
-            return JSON.parse(import.meta.env.VITE_MP_MAINTAINANCE);
-        },
-        lastLogin() {
-            return shared.game.ptmain.gameConfig.account.userBasicInfo
-                ? new Date(
-                      shared.game.ptmain.gameConfig.account.userBasicInfo.dateLastLoggedIn
-                  ).format("Y-m-d H:i:s")
-                : "";
-        },
-        isAprFl() {
-            return partyMgr.list.aprfool2024.activate;
-        },
-    },
-    methods: {
-        forcedFullscreen() {
-            shared.game.requestFullscreen(true);
-        },
-        toB20() {
-            shared.game.ptmain.$router.push({
-                path: "/playerB20",
-                query: { id: this.loginInfo.id },
-            });
-        },
-        async versionNumber() {
-            if (!spec.isPhiTogetherApp && (!this.loginStatus || !this.loginInfo.isPTDeveloper))
-                this.to("/aboutpage");
-            this.verClicked++;
-            if (this.verClicked == 7) {
-                const url = await shared.game.msgHandler.prompt(
-                    this.$t("startPage.redirectToCustomURL")
-                );
-                if (url) {
-                    window.location.href = url;
-                }
-                this.verClicked = 0;
-            }
-        },
-        to(page) {
-            if (page == "/replayPage") {
-                shared.game.msgHandler.warning(this.$t("replayPage.toBeOptimized"));
-            }
-            this.$router.push(page);
-        },
-        logIn() {
-            this.to("/login");
-        },
-        async logOut() {
-            if (!(await shared.game.msgHandler.confirm(this.$t("startPage.logoutConfirm")))) return;
-            shared.game.ptmain.gameConfig.account = {
-                tokenInfo: null,
-                userBasicInfo: null,
-                defaultConfigID: null,
+    import shared from "../utils/js/shared.js";
+    import { partyMgr } from "@utils/js/partyMgr";
+    import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
+    export default {
+        name: "startPage",
+        data() {
+            return {
+                ver: spec.thisVersion,
+                verClicked: 0,
             };
-            shared.game.ptmain.noAccountMode = true;
-            // shared.game.ptmain.refreshUserInfoBar();
-            shared.game.msgHandler.success(this.$t("startPage.logoutSuccessfully"));
         },
-        checkIfCantPlay() {
-            const isCantPlay = !shared.game.ptmain.canplay;
-            if (isCantPlay)
-                shared.game.msgHandler.sendMessage(
-                    this.$t("startPage.antiAddictionIssue"),
-                    "error"
+        computed: {
+            pzResUrlGlobal() {
+                "res.phizone.cn";
+            },
+            loginInfo() {
+                return shared.game.ptmain.gameConfig.account.userBasicInfo;
+            },
+            loginStatus() {
+                return !shared.game.ptmain.noAccountMode;
+            },
+            isPTFun() {
+                return (
+                    [80, 443, 1443, "1443"].includes(location.port) ||
+                    location.host.endsWith("phitogether.fun")
                 );
-            return isCantPlay;
+            },
+            isPTApp() {
+                return window.spec.isPhiTogetherApp;
+            },
+            userColor() {
+                return shared.game.ptmain.userColor;
+            },
+            mpMaintainanceStatus() {
+                return JSON.parse(import.meta.env.VITE_MP_MAINTAINANCE);
+            },
+            lastLogin() {
+                return shared.game.ptmain.gameConfig.account.userBasicInfo
+                    ? new Date(
+                          shared.game.ptmain.gameConfig.account.userBasicInfo.dateLastLoggedIn
+                      ).format("Y-m-d H:i:s")
+                    : "";
+            },
+            isAprFl() {
+                return partyMgr.list.aprfool2024.activate;
+            },
         },
-        async singleGame() {
-            if (this.checkIfCantPlay()) return;
-            shared.game.ptmain.gameMode = "single";
-            if (!navigator.onLine) {
-                await shared.game.msgHandler.warning(this.$t("startPage.offlineNotice"));
-                this.to({ path: "/chartSelect", query: { offline: 1 } });
-                return;
-            }
-            if (shared.game.ptmain.noAccountMode) {
-                if (this.loginInfo) {
-                    if (await shared.game.msgHandler.confirm(this.$t("startPage.askForRelogin"))) {
-                        if (!this.loginInfo) this.to({ path: "/login" });
-                        else this.reLogin();
+        methods: {
+            forcedFullscreen() {
+                shared.game.requestFullscreen(true);
+            },
+            toB20() {
+                shared.game.ptmain.$router.push({
+                    path: "/playerB20",
+                    query: { id: this.loginInfo.id },
+                });
+            },
+            async versionNumber() {
+                if (!spec.isPhiTogetherApp && (!this.loginStatus || !this.loginInfo.isPTDeveloper))
+                    this.to("/aboutpage");
+                this.verClicked++;
+                if (this.verClicked == 7) {
+                    const url = await shared.game.msgHandler.prompt(
+                        this.$t("startPage.redirectToCustomURL")
+                    );
+                    if (url) {
+                        window.location.href = url;
+                    }
+                    this.verClicked = 0;
+                }
+            },
+            to(page) {
+                if (page == "/replayPage") {
+                    shared.game.msgHandler.warning(this.$t("replayPage.toBeOptimized"));
+                }
+                this.$router.push(page);
+            },
+            logIn() {
+                this.to("/login");
+            },
+            async logOut() {
+                if (!(await shared.game.msgHandler.confirm(this.$t("startPage.logoutConfirm"))))
+                    return;
+                shared.game.ptmain.gameConfig.account = {
+                    tokenInfo: null,
+                    userBasicInfo: null,
+                    defaultConfigID: null,
+                };
+                shared.game.ptmain.noAccountMode = true;
+                // shared.game.ptmain.refreshUserInfoBar();
+                shared.game.msgHandler.success(this.$t("startPage.logoutSuccessfully"));
+            },
+            checkIfCantPlay() {
+                const isCantPlay = !shared.game.ptmain.canplay;
+                if (isCantPlay)
+                    shared.game.msgHandler.sendMessage(
+                        this.$t("startPage.antiAddictionIssue"),
+                        "error"
+                    );
+                return isCantPlay;
+            },
+            async singleGame() {
+                if (this.checkIfCantPlay()) return;
+                shared.game.ptmain.gameMode = "single";
+                if (!navigator.onLine) {
+                    await shared.game.msgHandler.warning(this.$t("startPage.offlineNotice"));
+                    this.to({ path: "/chartSelect", query: { offline: 1 } });
+                    return;
+                }
+                if (shared.game.ptmain.noAccountMode) {
+                    if (this.loginInfo) {
+                        if (
+                            await shared.game.msgHandler.confirm(this.$t("startPage.askForRelogin"))
+                        ) {
+                            if (!this.loginInfo) this.to({ path: "/login" });
+                            else this.reLogin();
+                            return;
+                        }
+                    } else
+                        shared.game.msgHandler.sendMessage(
+                            this.$t("startPage.askForLogin"),
+                            "error"
+                        );
+                }
+                this.to({ path: "/chartSelect" });
+            },
+            async multiGame() {
+                if (this.checkIfCantPlay()) return;
+                if (!shared.game.ptmain.gameConfig.mpServerURL) {
+                    shared.game.msgHandler.failure(this.$t("startPage.mpMaintainanceNotice"));
+                    return;
+                }
+                if (!navigator.onLine) {
+                    shared.game.msgHandler.failure(this.$t("startPage.offlineMPNotice"));
+                    return;
+                }
+                if (shared.game.ptmain.noAccountMode) {
+                    shared.game.msgHandler.failure(this.$t("startPage.noaccountmodeMPNotice"));
+                    if (!this.loginInfo) this.to({ path: "/login" });
+                    else this.reLogin();
+                    return;
+                }
+                try {
+                    shared.game.loadHandler.l(
+                        this.$t("startPage.loadingUserConfig"),
+                        "multiGetJudg"
+                    );
+                    const current = await phizoneApi.getSpecConfiguration(
+                        shared.game.ptmain.gameConfig.account.tokenInfo.access_token,
+                        shared.game.ptmain.gameConfig.account.defaultConfigID
+                    );
+                    shared.game.loadHandler.r("multiGetJudg");
+                    if (current.goodJudgment != 160 || current.perfectJudgment != 80) {
+                        shared.game.msgHandler.failure(this.$t("startPage.judgeRangeMPNotice"));
                         return;
                     }
-                } else
-                    shared.game.msgHandler.sendMessage(this.$t("startPage.askForLogin"), "error");
-            }
-            this.to({ path: "/chartSelect" });
-        },
-        async multiGame() {
-            if (this.checkIfCantPlay()) return;
-            if (!shared.game.ptmain.gameConfig.mpServerURL) {
-                shared.game.msgHandler.failure(this.$t("startPage.mpMaintainanceNotice"));
-                return;
-            }
-            if (!navigator.onLine) {
-                shared.game.msgHandler.failure(this.$t("startPage.offlineMPNotice"));
-                return;
-            }
-            if (shared.game.ptmain.noAccountMode) {
-                shared.game.msgHandler.failure(this.$t("startPage.noaccountmodeMPNotice"));
-                if (!this.loginInfo) this.to({ path: "/login" });
-                else this.reLogin();
-                return;
-            }
-            try {
-                shared.game.loadHandler.l(this.$t("startPage.loadingUserConfig"), "multiGetJudg");
-                const current = await phizoneApi.getSpecConfiguration(
-                    shared.game.ptmain.gameConfig.account.tokenInfo.access_token,
-                    shared.game.ptmain.gameConfig.account.defaultConfigID
-                );
-                shared.game.loadHandler.r("multiGetJudg");
-                if (current.goodJudgment != 160 || current.perfectJudgment != 80) {
-                    shared.game.msgHandler.failure(this.$t("startPage.judgeRangeMPNotice"));
-                    return;
-                }
-                if (shared.game.ptmain.gameConfig.fullScreenJudge) {
-                    shared.game.msgHandler.failure(this.$t("startPage.fullscreenjudgeMPNotice"));
-                    return;
-                }
-            } catch {
-                shared.game.loadHandler.r("multiGetJudg");
-                shared.game.msgHandler.sendMessage(
-                    this.$t("startPage.errLoadingUserConfig"),
-                    "error"
-                );
-                return;
-            }
-            if (localStorage.lastMultiInfo) {
-                if (await shared.game.msgHandler.confirm(this.$t("startPage.restoreMP"))) {
-                    const lastMultiInfo = JSON.parse(localStorage.lastMultiInfo);
-                    try {
-                        shared.game.loadHandler.l(this.$t("startPage.recoverMP"), "recoverMulti");
-                        const resp = await fetch(
-                            `${shared.game.ptmain.gameConfig.mpServerURL}/api/multi/requestRoom/${lastMultiInfo.room.id}?v=${spec.thisVersion}`
+                    if (shared.game.ptmain.gameConfig.fullScreenJudge) {
+                        shared.game.msgHandler.failure(
+                            this.$t("startPage.fullscreenjudgeMPNotice")
                         );
-                        const result = await resp.json();
-                        if (result.code === -2) {
-                            shared.game.loadHandler.r("recoverMulti");
-                            await shared.game.msgHandler.warning(
-                                this.$t("startPage.recoverMPFailed")
-                            );
-                            localStorage.removeItem("lastMultiInfo");
-                            return;
-                        } else {
-                            shared.game.multiInstance.recoverMulti(lastMultiInfo);
-                        }
-                    } catch {
-                        shared.game.loadHandler.r("recoverMulti");
-                        shared.game.msgHandler.warning(this.$t("startPage.recoverMPNetProblem"));
+                        return;
                     }
+                } catch {
+                    shared.game.loadHandler.r("multiGetJudg");
+                    shared.game.msgHandler.sendMessage(
+                        this.$t("startPage.errLoadingUserConfig"),
+                        "error"
+                    );
                     return;
-                } else {
-                    localStorage.removeItem("lastMultiInfo");
                 }
-            }
-            this.to({ path: "/multiIndex" });
+                if (localStorage.lastMultiInfo) {
+                    if (await shared.game.msgHandler.confirm(this.$t("startPage.restoreMP"))) {
+                        const lastMultiInfo = JSON.parse(localStorage.lastMultiInfo);
+                        try {
+                            shared.game.loadHandler.l(
+                                this.$t("startPage.recoverMP"),
+                                "recoverMulti"
+                            );
+                            const resp = await fetch(
+                                `${shared.game.ptmain.gameConfig.mpServerURL}/api/multi/requestRoom/${lastMultiInfo.room.id}?v=${spec.thisVersion}`
+                            );
+                            const result = await resp.json();
+                            if (result.code === -2) {
+                                shared.game.loadHandler.r("recoverMulti");
+                                await shared.game.msgHandler.warning(
+                                    this.$t("startPage.recoverMPFailed")
+                                );
+                                localStorage.removeItem("lastMultiInfo");
+                                return;
+                            } else {
+                                shared.game.multiInstance.recoverMulti(lastMultiInfo);
+                            }
+                        } catch {
+                            shared.game.loadHandler.r("recoverMulti");
+                            shared.game.msgHandler.warning(
+                                this.$t("startPage.recoverMPNetProblem")
+                            );
+                        }
+                        return;
+                    } else {
+                        localStorage.removeItem("lastMultiInfo");
+                    }
+                }
+                this.to({ path: "/multiIndex" });
+            },
+            reLogin() {
+                shared.game.ptmain.pzRefreshLogin();
+            },
         },
-        reLogin() {
-            shared.game.ptmain.pzRefreshLogin();
-        },
-    },
-};
+    };
 </script>
 
 <template>
@@ -369,16 +385,16 @@ export default {
 </template>
 
 <style>
-div#playerCardActions {
-    text-align: right;
-    padding-top: 0.5em;
-    margin-bottom: -1.6em;
-    font-size: 0.9em;
-    margin-right: 1.1em;
-    color: midnightblue;
-}
+    div#playerCardActions {
+        text-align: right;
+        padding-top: 0.5em;
+        margin-bottom: -1.6em;
+        font-size: 0.9em;
+        margin-right: 1.1em;
+        color: midnightblue;
+    }
 
-/*
+    /*
 div#versionInfo {
     font-size: 1em;
     color: rgb(100, 100, 100);
@@ -390,147 +406,147 @@ div#versionInfo {
 }
 */
 
-#startPage {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    align-content: center;
-    position: fixed;
-    top: 7.5vh;
-}
-
-.startPageRow {
-    width: 100%;
-    left: 5%;
-    right: 5%;
-}
-
-.startPageRow input[type="button"] {
-    font-size: 1.6em;
-    margin: 6px;
-    width: 240px;
-    max-width: 100%;
-    -webkit-appearance: none;
-    appearance: none;
-    box-shadow: 0px 0px 20px #00000033;
-}
-
-.startPageRow2 {
-    display: inline-flex;
-}
-
-.startPageRow2 input[type="button"] {
-    width: 50%;
-}
-
-.startBtn {
-    color: white;
-}
-
-.startBtn.forbidden {
-    background-color: #6e6e6e70;
-}
-
-#playerCard {
-    text-align: center;
-    z-index: 1;
-    width: 300px;
-    max-width: 100%;
-    height: auto;
-    margin: auto;
-    background-color: #ffffff3a;
-    border-radius: 20px;
-    box-shadow:
-        #002a8328 0px 0px 20px 5px,
-        inset #002a8328 0px 0px 50px 8px;
-}
-
-#playerCardUsrName {
-    text-align: center;
-    margin-left: 10px;
-    color: rgb(45, 86, 149);
-    font-size: 1.5em;
-    display: -webkit-inline-box;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    -webkit-line-clamp: 1;
-}
-
-#playerCardUsrAvatarParent {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-    margin-top: 20px;
-}
-
-#playerCardUsrAvatar {
-    height: 64px;
-    width: 64px;
-    border-radius: 100%;
-    border: 3px solid white;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#playerCardUsrAvatar img {
-    height: 64px;
-}
-
-#playerCardUsrInfo {
-    color: rgba(0, 0, 0, 0.35);
-    font-size: 1em;
-    line-height: 0.85em;
-}
-
-#flexCol {
-    margin-top: -10vh;
-    margin-left: 1vw;
-    margin-right: 5vw;
-}
-
-@media screen and (orientation: landscape) {
-    #flexCol {
-        max-width: 45vw;
-    }
-
-    #flexCol2 {
-        max-width: 35vw;
-    }
-
-    /* #flexCol2 {
-        margin-top: -75px;
-    } */
-}
-
-@media screen and (min-width: 752px) {
-    #flexCol {
-        max-width: 45vw;
-    }
-
-    #flexCol2 {
-        max-width: 35vw;
-    }
-
-    /* #flexCol2 {
-        margin-top: -75px;
-    } */
-}
-
-@media screen and (max-width: 751px) {
     #startPage {
-        margin-top: 8vh;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        align-content: center;
+        position: fixed;
+        top: 7.5vh;
     }
-}
 
-#startPage {
-    margin-top: 10vh;
-}
+    .startPageRow {
+        width: 100%;
+        left: 5%;
+        right: 5%;
+    }
 
-footer {
-    line-height: 1.25rem;
-}
+    .startPageRow input[type="button"] {
+        font-size: 1.6em;
+        margin: 6px;
+        width: 240px;
+        max-width: 100%;
+        -webkit-appearance: none;
+        appearance: none;
+        box-shadow: 0px 0px 20px #00000033;
+    }
+
+    .startPageRow2 {
+        display: inline-flex;
+    }
+
+    .startPageRow2 input[type="button"] {
+        width: 50%;
+    }
+
+    .startBtn {
+        color: white;
+    }
+
+    .startBtn.forbidden {
+        background-color: #6e6e6e70;
+    }
+
+    #playerCard {
+        text-align: center;
+        z-index: 1;
+        width: 300px;
+        max-width: 100%;
+        height: auto;
+        margin: auto;
+        background-color: #ffffff3a;
+        border-radius: 20px;
+        box-shadow:
+            #002a8328 0px 0px 20px 5px,
+            inset #002a8328 0px 0px 50px 8px;
+    }
+
+    #playerCardUsrName {
+        text-align: center;
+        margin-left: 10px;
+        color: rgb(45, 86, 149);
+        font-size: 1.5em;
+        display: -webkit-inline-box;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -webkit-line-clamp: 1;
+    }
+
+    #playerCardUsrAvatarParent {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        margin-top: 20px;
+    }
+
+    #playerCardUsrAvatar {
+        height: 64px;
+        width: 64px;
+        border-radius: 100%;
+        border: 3px solid white;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #playerCardUsrAvatar img {
+        height: 64px;
+    }
+
+    #playerCardUsrInfo {
+        color: rgba(0, 0, 0, 0.35);
+        font-size: 1em;
+        line-height: 0.85em;
+    }
+
+    #flexCol {
+        margin-top: -10vh;
+        margin-left: 1vw;
+        margin-right: 5vw;
+    }
+
+    @media screen and (orientation: landscape) {
+        #flexCol {
+            max-width: 45vw;
+        }
+
+        #flexCol2 {
+            max-width: 35vw;
+        }
+
+        /* #flexCol2 {
+        margin-top: -75px;
+    } */
+    }
+
+    @media screen and (min-width: 752px) {
+        #flexCol {
+            max-width: 45vw;
+        }
+
+        #flexCol2 {
+            max-width: 35vw;
+        }
+
+        /* #flexCol2 {
+        margin-top: -75px;
+    } */
+    }
+
+    @media screen and (max-width: 751px) {
+        #startPage {
+            margin-top: 8vh;
+        }
+    }
+
+    #startPage {
+        margin-top: 10vh;
+    }
+
+    footer {
+        line-height: 1.25rem;
+    }
 </style>

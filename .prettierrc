@@ -8,5 +8,6 @@
     "bracketSpacing": true,
     "arrowParens": "avoid",
     "endOfLine": "lf",
-    "htmlWhitespaceSensitivity": "ignore"
+    "htmlWhitespaceSensitivity": "ignore",
+    "vueIndentScriptAndStyle": true
 }

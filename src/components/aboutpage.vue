@@ -1,31 +1,31 @@
 <script>
-import sponsors from "./sponsors";
-import { partyMgr } from "@utils/js/partyMgr";
-export default {
-    name: "aboutpage",
-    data() {
-        return {
-            ver: spec.thisVersion,
-            vt: 0,
-            sponsors,
-        };
-    },
-    computed: {
-        getLifeSpan() {
-            let launchDate = new Date("March 11, 2023 20:20:00");
-            let timeNow = new Date();
-            let elapsedTime = (timeNow - launchDate) / 1000;
-            let elapsedDays = Math.ceil(elapsedTime) / 86400;
-            // console.log(elapsedTime);
-            return this.$t("aboutPage.life", [Math.round(elapsedDays)]);
+    import sponsors from "./sponsors";
+    import { partyMgr } from "@utils/js/partyMgr";
+    export default {
+        name: "aboutpage",
+        data() {
+            return {
+                ver: spec.thisVersion,
+                vt: 0,
+                sponsors,
+            };
         },
-        instanceName() {
-            if (partyMgr.list.aprfool2024.activate) return "皮在一起";
-            else return "PhiTogether";
+        computed: {
+            getLifeSpan() {
+                let launchDate = new Date("March 11, 2023 20:20:00");
+                let timeNow = new Date();
+                let elapsedTime = (timeNow - launchDate) / 1000;
+                let elapsedDays = Math.ceil(elapsedTime) / 86400;
+                // console.log(elapsedTime);
+                return this.$t("aboutPage.life", [Math.round(elapsedDays)]);
+            },
+            instanceName() {
+                if (partyMgr.list.aprfool2024.activate) return "皮在一起";
+                else return "PhiTogether";
+            },
         },
-    },
-    methods: {},
-};
+        methods: {},
+    };
 </script>
 
 <template>
@@ -316,19 +316,19 @@ export default {
 </template>
 
 <style>
-#aboutLogo {
-    width: 50%;
-}
-
-@media screen and (min-width: 600px) and (max-width: 1500px) {
     #aboutLogo {
-        width: 25%;
+        width: 50%;
     }
-}
 
-@media screen and (min-width: 1500px) {
-    #aboutLogo {
-        width: 15%;
+    @media screen and (min-width: 600px) and (max-width: 1500px) {
+        #aboutLogo {
+            width: 25%;
+        }
     }
-}
+
+    @media screen and (min-width: 1500px) {
+        #aboutLogo {
+            width: 15%;
+        }
+    }
 </style>

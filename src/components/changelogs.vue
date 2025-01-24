@@ -1,20 +1,20 @@
 <script>
-import releaseNotes from "./changelogs";
-export default {
-    name: "changelogs",
-    data() {
-        return {
-            ver: spec.thisVersion,
-            vt: 0,
-        };
-    },
-    computed: {
-        releaseNotes() {
-            return releaseNotes.releaseNotes;
+    import releaseNotes from "./changelogs";
+    export default {
+        name: "changelogs",
+        data() {
+            return {
+                ver: spec.thisVersion,
+                vt: 0,
+            };
         },
-    },
-    methods: {},
-};
+        computed: {
+            releaseNotes() {
+                return releaseNotes.releaseNotes;
+            },
+        },
+        methods: {},
+    };
 </script>
 
 <template>
@@ -32,8 +32,8 @@ export default {
 </template>
 
 <style>
-#changelogs {
-    text-align: left;
-    margin-left: 5%;
-}
+    #changelogs {
+        text-align: left;
+        margin-left: 5%;
+    }
 </style>

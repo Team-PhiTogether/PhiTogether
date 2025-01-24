@@ -1,33 +1,33 @@
 <script>
-import shared from "../utils/js/shared.js";
-export default {
-    name: "replayPage",
-    data() {
-        return {
-            recordFile: null,
-        };
-    },
-    async mounted() {
-        const extra = $id("recordFile");
-        const _this = this;
-        extra.onchange = () => {
-            const i = extra.files[0];
-            const reader = new FileReader();
-            reader.readAsText(i);
-            reader.onload = evt => {
-                _this.recordFile = evt.target.result;
+    import shared from "../utils/js/shared.js";
+    export default {
+        name: "replayPage",
+        data() {
+            return {
+                recordFile: null,
             };
-        };
-    },
-    methods: {
-        playRecord() {
-            shared.game.ptmain.playConfig = { practiseMode: true };
-            shared.game.replayMgr.read(this.recordFile);
         },
-    },
-};
+        async mounted() {
+            const extra = $id("recordFile");
+            const _this = this;
+            extra.onchange = () => {
+                const i = extra.files[0];
+                const reader = new FileReader();
+                reader.readAsText(i);
+                reader.onload = evt => {
+                    _this.recordFile = evt.target.result;
+                };
+            };
+        },
+        methods: {
+            playRecord() {
+                shared.game.ptmain.playConfig = { practiseMode: true };
+                shared.game.replayMgr.read(this.recordFile);
+            },
+        },
+    };
 
-const $id = e => document.getElementById(e);
+    const $id = e => document.getElementById(e);
 </script>
 
 <template>

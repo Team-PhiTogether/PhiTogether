@@ -1,123 +1,131 @@
 <script>
-import shared from "../utils/js/shared.js";
-import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
+    import shared from "../utils/js/shared.js";
+    import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
 
-const $ = query => document.getElementById(query);
-const $$ = query => document.body.querySelector(query);
-const $$$ = query => document.body.querySelectorAll(query);
+    const $ = query => document.getElementById(query);
+    const $$ = query => document.body.querySelector(query);
+    const $$$ = query => document.body.querySelectorAll(query);
 
-export default {
-    name: "pzRankSingle",
-    data() {
-        return {
-            loaded: false,
-            data: null,
-            display: [],
-            songdata: null,
-            ct: null,
-        };
-    },
-    computed: {
-        token() {
-            return shared.game.ptmain.gameConfig.account.tokenInfo.access_token;
+    export default {
+        name: "pzRankSingle",
+        data() {
+            return {
+                loaded: false,
+                data: null,
+                display: [],
+                songdata: null,
+                ct: null,
+            };
         },
-        userInfo() {
-            return shared.game.ptmain.gameConfig.account.userBasicInfo;
+        computed: {
+            token() {
+                return shared.game.ptmain.gameConfig.account.tokenInfo.access_token;
+            },
+            userInfo() {
+                return shared.game.ptmain.gameConfig.account.userBasicInfo;
+            },
         },
-    },
-    async mounted() {
-        this.songdata = JSON.parse(sessionStorage.getItem("chartDetailsData"));
-        this.ct = JSON.parse(sessionStorage.getItem("loadedChart"));
+        async mounted() {
+            this.songdata = JSON.parse(sessionStorage.getItem("chartDetailsData"));
+            this.ct = JSON.parse(sessionStorage.getItem("loadedChart"));
 
-        try {
-            shared.game.loadHandler.l("正在加载数据...", "loadrecord");
-            const id = this.$route.query.id;
-            this.data = await phizoneApi.getRecords(this.token, id, 1);
-            //const me = this.userInfo.id;
-            //const idx = this.data.findIndex(x=>x.player.id===me);
-            //this.page = idx===-1?1:Math.ceil(idx/30);
-            //this.updatePagination();
-            this.loaded = true;
-        } catch (e) {
-            shared.game.msgHandler.sendMessage("加载数据时遇到错误", "error");
-        } finally {
+            try {
+                shared.game.loadHandler.l("正在加载数据...", "loadrecord");
+                const id = this.$route.query.id;
+                this.data = await phizoneApi.getRecords(this.token, id, 1);
+                //const me = this.userInfo.id;
+                //const idx = this.data.findIndex(x=>x.player.id===me);
+                //this.page = idx===-1?1:Math.ceil(idx/30);
+                //this.updatePagination();
+                this.loaded = true;
+            } catch (e) {
+                shared.game.msgHandler.sendMessage("加载数据时遇到错误", "error");
+            } finally {
+                shared.game.loadHandler.r("loadrecord");
+            }
+        },
+        deactivated() {
             shared.game.loadHandler.r("loadrecord");
-        }
-    },
-    deactivated() {
-        shared.game.loadHandler.r("loadrecord");
-    },
-    methods: {
-        async goJustPageAsk() {
-            const res = await shared.game.msgHandler.prompt(
-                `请输入您要跳转的页码 (1 - ${this.pageAll})`
-            );
-            if (res) this.goJustPage(res);
         },
-        async goJustPage(i) {
-            if (!(i >= 1 && i <= this.pageAll)) {
-                shared.game.msgHandler.sendMessage("您的输入不合法", "error");
-                return;
-            }
-            let link = this.data.previous || this.data.next || null;
-            if (!link) return;
-            link = link.replace(/page=\d+&?/, "") + `&page=${i}`;
-            try {
-                shared.game.loadHandler.l("正在加载数据...", "loadrecord");
-                this.data = await phizoneApi.getRecords(this.token, null, null, link);
-                this.page = i;
-            } catch {
-            } finally {
-                shared.game.loadHandler.r("loadrecord");
-            }
-        },
+        methods: {
+            async goJustPageAsk() {
+                const res = await shared.game.msgHandler.prompt(
+                    `请输入您要跳转的页码 (1 - ${this.pageAll})`
+                );
+                if (res) this.goJustPage(res);
+            },
+            async goJustPage(i) {
+                if (!(i >= 1 && i <= this.pageAll)) {
+                    shared.game.msgHandler.sendMessage("您的输入不合法", "error");
+                    return;
+                }
+                let link = this.data.previous || this.data.next || null;
+                if (!link) return;
+                link = link.replace(/page=\d+&?/, "") + `&page=${i}`;
+                try {
+                    shared.game.loadHandler.l("正在加载数据...", "loadrecord");
+                    this.data = await phizoneApi.getRecords(this.token, null, null, link);
+                    this.page = i;
+                } catch {
+                } finally {
+                    shared.game.loadHandler.r("loadrecord");
+                }
+            },
 
-        getDifficultyActual(chartInfo) {
-            if (typeof chartInfo.difficulty === "string") return chartInfo.difficulty;
-            else return chartInfo.difficulty === 0 ? "?" : chartInfo.difficulty.toFixed(1);
+            getDifficultyActual(chartInfo) {
+                if (typeof chartInfo.difficulty === "string") return chartInfo.difficulty;
+                else return chartInfo.difficulty === 0 ? "?" : chartInfo.difficulty.toFixed(1);
+            },
+            cleanStr(i) {
+                return i.replace(
+                    new RegExp(
+                        [
+                            ...i.matchAll(
+                                new RegExp(
+                                    "\\[PZ([A-Za-z]+):([0-9]+):((?:(?!:PZRT\]).)*):PZRT\\]",
+                                    "g"
+                                )
+                            ),
+                        ].length === 0
+                            ? "\\[PZ([A-Za-z]+):([0-9]+):([^\\]]+)\\]" // legacy support
+                            : "\\[PZ([A-Za-z]+):([0-9]+):((?:(?!:PZRT\]).)*):PZRT\\]",
+                        "gi"
+                    ),
+                    "$3"
+                );
+            },
+            scoreStr(t) {
+                const a = t.toFixed(0);
+                return "0".repeat(a.length < 7 ? 7 - a.length : 0) + a;
+            },
+            async loadNextPage() {
+                try {
+                    shared.game.loadHandler.l("正在加载数据...", "loadrecord");
+                    this.data = await phizoneApi.getRecords(this.token, null, null, this.data.next);
+                    this.page++;
+                } catch {
+                } finally {
+                    shared.game.loadHandler.r("loadrecord");
+                }
+            },
+            async loadPrevPage() {
+                try {
+                    shared.game.loadHandler.l("正在加载数据...", "loadrecord");
+                    this.data = await phizoneApi.getRecords(
+                        this.token,
+                        null,
+                        null,
+                        this.data.previous
+                    );
+                    this.page--;
+                } catch {
+                } finally {
+                    shared.game.loadHandler.r("loadrecord");
+                }
+            },
         },
-        cleanStr(i) {
-            return i.replace(
-                new RegExp(
-                    [
-                        ...i.matchAll(
-                            new RegExp("\\[PZ([A-Za-z]+):([0-9]+):((?:(?!:PZRT\]).)*):PZRT\\]", "g")
-                        ),
-                    ].length === 0
-                        ? "\\[PZ([A-Za-z]+):([0-9]+):([^\\]]+)\\]" // legacy support
-                        : "\\[PZ([A-Za-z]+):([0-9]+):((?:(?!:PZRT\]).)*):PZRT\\]",
-                    "gi"
-                ),
-                "$3"
-            );
-        },
-        scoreStr(t) {
-            const a = t.toFixed(0);
-            return "0".repeat(a.length < 7 ? 7 - a.length : 0) + a;
-        },
-        async loadNextPage() {
-            try {
-                shared.game.loadHandler.l("正在加载数据...", "loadrecord");
-                this.data = await phizoneApi.getRecords(this.token, null, null, this.data.next);
-                this.page++;
-            } catch {
-            } finally {
-                shared.game.loadHandler.r("loadrecord");
-            }
-        },
-        async loadPrevPage() {
-            try {
-                shared.game.loadHandler.l("正在加载数据...", "loadrecord");
-                this.data = await phizoneApi.getRecords(this.token, null, null, this.data.previous);
-                this.page--;
-            } catch {
-            } finally {
-                shared.game.loadHandler.r("loadrecord");
-            }
-        },
-    },
-    watch: {},
-};
+        watch: {},
+    };
 </script>
 
 <template>
