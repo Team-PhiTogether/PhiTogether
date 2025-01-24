@@ -1,5 +1,5 @@
-import { canvasRGBA as StackBlurCanvasRGBA } from 'stackblur-canvas';
-import { createCanvas } from '../utils/canvas.js';
+import { canvasRGBA as StackBlurCanvasRGBA } from "stackblur-canvas";
+import { createCanvas } from "../utils/canvas.js";
 
 /**
  * 图片模糊(css filter或StackBlur)
@@ -7,17 +7,17 @@ import { createCanvas } from '../utils/canvas.js';
  */
 function imgBlur(img) {
     const canvas = createCanvas(img.width * 0.9, img.height * 0.9);
-    canvas.style.cssText += ";overflow:hidden;"
+    canvas.style.cssText += ";overflow:hidden;";
     const ctx = canvas.getContext("2d");
-    if (typeof ctx.filter == 'string') {
-        ctx.filter = 'blur(60px)';
+    if (typeof ctx.filter == "string") {
+        ctx.filter = "blur(60px)";
         ctx.drawImage(img, -img.width * 0.05, -img.height * 0.05);
     } else {
         const w = canvas.width;
         const h = canvas.height;
         ctx.drawImage(img, -img.width * 0.05, -img.height * 0.05);
 
-        StackBlurCanvasRGBA(canvas, 0, 0, w, h, Math.ceil(Math.min(w, h) * 0.10));
+        StackBlurCanvasRGBA(canvas, 0, 0, w, h, Math.ceil(Math.min(w, h) * 0.1));
     }
     return createImageBitmap(canvas);
 }
@@ -101,12 +101,8 @@ function hex2rgba(color) {
 function rgba2hex(...rgba) {
     return (
         "#" +
-        rgba
-            .map((i) =>
-                ("00" + Math.round(Number(i) * 255 || 0).toString(16)).slice(-2)
-            )
-            .join("")
+        rgba.map(i => ("00" + Math.round(Number(i) * 255 || 0).toString(16)).slice(-2)).join("")
     );
 }
 
-export { imgBlur, imgShader, imgPainter, imgSplit, hex2rgba, rgba2hex }
+export { imgBlur, imgShader, imgPainter, imgSplit, hex2rgba, rgba2hex };

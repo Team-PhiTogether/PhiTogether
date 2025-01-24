@@ -1,6 +1,6 @@
 <script>
 import shared from "../utils/js/shared.js";
-import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
+import { partyMgr } from "@utils/js/partyMgr";
 import { recordMgr } from "./recordMgr/recordMgr.js";
 import { checkLocalChart } from "../utils/ptdb/charts";
 import md5 from "md5";

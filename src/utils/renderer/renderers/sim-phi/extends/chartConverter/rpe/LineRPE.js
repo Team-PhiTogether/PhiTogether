@@ -9,16 +9,48 @@ class EventLayer {
         this.speedEvents = [];
     }
     pushMoveXEvent(startTime, endTime, start, end, easingType, easingLeft, easingRight) {
-        this.moveXEvents.push({ startTime, endTime, start, end, easingType, easingLeft, easingRight });
+        this.moveXEvents.push({
+            startTime,
+            endTime,
+            start,
+            end,
+            easingType,
+            easingLeft,
+            easingRight,
+        });
     }
     pushMoveYEvent(startTime, endTime, start, end, easingType, easingLeft, easingRight) {
-        this.moveYEvents.push({ startTime, endTime, start, end, easingType, easingLeft, easingRight });
+        this.moveYEvents.push({
+            startTime,
+            endTime,
+            start,
+            end,
+            easingType,
+            easingLeft,
+            easingRight,
+        });
     }
     pushRotateEvent(startTime, endTime, start, end, easingType, easingLeft, easingRight) {
-        this.rotateEvents.push({ startTime, endTime, start, end, easingType, easingLeft, easingRight });
+        this.rotateEvents.push({
+            startTime,
+            endTime,
+            start,
+            end,
+            easingType,
+            easingLeft,
+            easingRight,
+        });
     }
     pushAlphaEvent(startTime, endTime, start, end, easingType, easingLeft, easingRight) {
-        this.alphaEvents.push({ startTime, endTime, start, end, easingType, easingLeft, easingRight });
+        this.alphaEvents.push({
+            startTime,
+            endTime,
+            start,
+            end,
+            easingType,
+            easingLeft,
+            easingRight,
+        });
     }
     pushSpeedEvent(startTime, endTime, start, end) {
         this.speedEvents.push({ startTime, endTime, start, end });
@@ -37,9 +69,31 @@ class LineRPE {
         this.attachUI = null;
         if (!isNaN(bpm)) this.bpm = bpm;
     }
-    pushNote(type, time, positionX, holdTime, speed, isAbove, isFake, size = 1, alpha = 255, visibleTime = Infinity) {
+    pushNote(
+        type,
+        time,
+        positionX,
+        holdTime,
+        speed,
+        isAbove,
+        isFake,
+        size = 1,
+        alpha = 255,
+        visibleTime = Infinity
+    ) {
         alpha = parseInt(alpha) / 255;
-        this.notes.push({ type, time, positionX, holdTime, speed, isAbove, isFake, size, alpha, visibleTime });
+        this.notes.push({
+            type,
+            time,
+            positionX,
+            holdTime,
+            speed,
+            isAbove,
+            isFake,
+            size,
+            alpha,
+            visibleTime,
+        });
     }
     setId(id = NaN) {
         this.id = id;
@@ -81,7 +135,12 @@ class LineRPE {
     fitFather(stack = [], onwarning = console.warn) {
         if (!this.settled) this.preset();
         if (stack.includes(this)) {
-            onwarning(`检测到循环继承：${stack.concat(this).map(i => i.id).join('->')}(对应的father将被视为-1)`);
+            onwarning(
+                `检测到循环继承：${stack
+                    .concat(this)
+                    .map(i => i.id)
+                    .join("->")}(对应的father将被视为-1)`
+            );
             stack.map(i => i.setFather(null));
             return;
         }
@@ -112,71 +171,78 @@ class LineRPE {
             judgeLineScaleXEvents: [],
             judgeLineScaleYEvents: [],
         };
-        for (const i of this.moveEvents) result.judgeLineMoveEvents.push({
-            startTime: i.startTime,
-            endTime: i.endTime,
-            start: (i.start + 675) / 1350,
-            end: (i.end + 675) / 1350,
-            start2: (i.start2 + 450) / 900,
-            end2: (i.end2 + 450) / 900
-        });
-        for (const i of this.rotateEvents) result.judgeLineRotateEvents.push({
-            startTime: i.startTime,
-            endTime: i.endTime,
-            start: -i.start,
-            end: -i.end,
-            start2: 0,
-            end2: 0
-        });
-        for (const i of this.alphaEvents) result.judgeLineDisappearEvents.push({
-            startTime: i.startTime,
-            endTime: i.endTime,
-            start: parseFloat(i.start) / 255,
-            end: parseFloat(i.end) / 255,
-            start2: 0,
-            end2: 0
-        });
-        for (const i of this.colorEvents) result.judgeLineColorEvents.push({
-            startTime: i.startTime,
-            endTime: i.endTime,
-            start: i.start.join(","),
-            end: i.end.join(","),
-            start2: 0,
-            end2: 0
-        });
-        for (const i of this.textEvents) result.judgeLineTextEvents.push({
-            startTime: i.startTime,
-            endTime: i.endTime,
-            start: i.start,
-            end: i.end,
-            start2: 0,
-            end2: 0
-        });
-        for (const i of this.scaleXEvents) result.judgeLineScaleXEvents.push({
-            startTime: i.startTime,
-            endTime: i.endTime,
-            start: i.start,
-            end: i.end,
-            start2: 0,
-            end2: 0
-        });
-        for (const i of this.scaleYEvents) result.judgeLineScaleYEvents.push({
-            startTime: i.startTime,
-            endTime: i.endTime,
-            start: i.start,
-            end: i.end,
-            start2: 0,
-            end2: 0
-        });
+        for (const i of this.moveEvents)
+            result.judgeLineMoveEvents.push({
+                startTime: i.startTime,
+                endTime: i.endTime,
+                start: (i.start + 675) / 1350,
+                end: (i.end + 675) / 1350,
+                start2: (i.start2 + 450) / 900,
+                end2: (i.end2 + 450) / 900,
+            });
+        for (const i of this.rotateEvents)
+            result.judgeLineRotateEvents.push({
+                startTime: i.startTime,
+                endTime: i.endTime,
+                start: -i.start,
+                end: -i.end,
+                start2: 0,
+                end2: 0,
+            });
+        for (const i of this.alphaEvents)
+            result.judgeLineDisappearEvents.push({
+                startTime: i.startTime,
+                endTime: i.endTime,
+                start: parseFloat(i.start) / 255,
+                end: parseFloat(i.end) / 255,
+                start2: 0,
+                end2: 0,
+            });
+        for (const i of this.colorEvents)
+            result.judgeLineColorEvents.push({
+                startTime: i.startTime,
+                endTime: i.endTime,
+                start: i.start.join(","),
+                end: i.end.join(","),
+                start2: 0,
+                end2: 0,
+            });
+        for (const i of this.textEvents)
+            result.judgeLineTextEvents.push({
+                startTime: i.startTime,
+                endTime: i.endTime,
+                start: i.start,
+                end: i.end,
+                start2: 0,
+                end2: 0,
+            });
+        for (const i of this.scaleXEvents)
+            result.judgeLineScaleXEvents.push({
+                startTime: i.startTime,
+                endTime: i.endTime,
+                start: i.start,
+                end: i.end,
+                start2: 0,
+                end2: 0,
+            });
+        for (const i of this.scaleYEvents)
+            result.judgeLineScaleYEvents.push({
+                startTime: i.startTime,
+                endTime: i.endTime,
+                start: i.start,
+                end: i.end,
+                start2: 0,
+                end2: 0,
+            });
         //添加floorPosition
         let floorPos = 0;
         const speedEvents = this.speedEvents;
         for (let i = 0; i < speedEvents.length; i++) {
             const startTime = Math.max(speedEvents[i].time, 0);
             const endTime = i < speedEvents.length - 1 ? speedEvents[i + 1].time : 1e9;
-            const value = speedEvents[i].value * 2 / 9;
+            const value = (speedEvents[i].value * 2) / 9;
             const floorPosition = floorPos;
-            floorPos += (endTime - startTime) * value / this.bpm * 1.875;
+            floorPos += (((endTime - startTime) * value) / this.bpm) * 1.875;
             floorPos = Math.fround(floorPos);
             result.speedEvents.push({ startTime, endTime, value, floorPosition });
         }
@@ -198,7 +264,7 @@ class LineRPE {
         const getHoldSpeedValue = (time, holdTime) => {
             const start = getPositionValues(time);
             const end = getPositionValues(time + holdTime);
-            return ((end.v1 - start.v1) / 1.875 * this.bpm + (end.v4 - start.v4)) / holdTime;
+            return (((end.v1 - start.v1) / 1.875) * this.bpm + (end.v4 - start.v4)) / holdTime;
         };
         for (const i of this.notes.sort(sortFn)) {
             const { v1, v4 } = getPositionValues(i.time);
@@ -210,7 +276,7 @@ class LineRPE {
                 positionX: i.positionX,
                 holdTime: i.holdTime,
                 speed: i.speed * (i.type === 3 ? getHoldSpeedValue(i.time, i.holdTime) : 1),
-                floorPosition: Math.fround(v1 + v4 / this.bpm * 1.875),
+                floorPosition: Math.fround(v1 + (v4 / this.bpm) * 1.875),
                 size: i.size,
                 alpha: i.alpha,
             };
@@ -240,7 +306,7 @@ class LineRPE {
  * @property {number} [easingLeft]
  * @property {number} [easingRight]
  * @property {number} [delta]
- * 
+ *
  * @param {LineEvent[]} ls
  * @param {LineEvent} le
  */
@@ -250,15 +316,24 @@ function pushLineEvent(ls, le) {
     // 插入之前考虑事件时间的相互关系
     for (let i = ls.length - 1; i >= 0; i--) {
         const e = ls[i];
-        if (e.endTime < startTime) { // 相离：补全空隙
-            ls[i + 1] = { startTime: e.endTime, endTime: startTime, start: e.end, end: e.end, delta: 0 };
+        if (e.endTime < startTime) {
+            // 相离：补全空隙
+            ls[i + 1] = {
+                startTime: e.endTime,
+                endTime: startTime,
+                start: e.end,
+                end: e.end,
+                delta: 0,
+            };
             break;
         }
-        if (e.startTime === startTime) { // 相切：直接截断
+        if (e.startTime === startTime) {
+            // 相切：直接截断
             ls.length = i;
             break;
         }
-        if (e.startTime < startTime) { // 相交：截断交点以后的部分
+        if (e.startTime < startTime) {
+            // 相交：截断交点以后的部分
             e.end = e.start + (startTime - e.startTime) * e.delta;
             e.endTime = startTime;
             e.delta = (e.end - e.start) / (startTime - e.startTime);
@@ -284,7 +359,13 @@ function pushLineEvent(ls, le) {
         for (let j = startTime; j < endTime; j++) {
             v1 = v2;
             v2 = (tween[easingType]((j + 1 - startTime) * eSpeed + easingLeft) - eHead) / eDelta;
-            ls.push({ startTime: j, endTime: j + 1, start: start + v1, end: start + v2, delta: v2 - v1 });
+            ls.push({
+                startTime: j,
+                endTime: j + 1,
+                start: start + v1,
+                end: start + v2,
+                delta: v2 - v1,
+            });
         }
     }
 }
@@ -294,7 +375,8 @@ function toSpeedEvent(le) {
     for (const i of le) {
         const { startTime, endTime, start, end } = i;
         result.push({ time: startTime, value: start });
-        if (start !== end) { //暂未考虑开始时间大于结束时间的情况
+        if (start !== end) {
+            //暂未考虑开始时间大于结束时间的情况
             const t1 = (end - start) / (endTime - startTime);
             for (let j = startTime; j < endTime; j++) {
                 const x = j + 0.5 - startTime;
@@ -305,8 +387,8 @@ function toSpeedEvent(le) {
     return result;
 }
 /**
- * @param {LineEvent[]} e 
- * @param {number} t 
+ * @param {LineEvent[]} e
+ * @param {number} t
  * @param {boolean} d
  */
 function getRotateValue(e, t, d) {
@@ -316,7 +398,7 @@ function getRotateValue(e, t, d) {
         if (t < startTime) break;
         if (d && t === startTime) break;
         if (t >= endTime) result = end;
-        else result = start + (t - startTime) * (end - start) / (endTime - startTime);
+        else result = start + ((t - startTime) * (end - start)) / (endTime - startTime);
     }
     return result;
 }
@@ -377,9 +459,9 @@ function mergeFather(child, father) {
         if (startTime === endTime) continue;
         //计算父级移动和旋转
         const [fatherX, fatherY] = getMoveValue(father.moveEvents, startTime, false);
-        const fatherR = getRotateValue(father.rotateEvents, startTime, false) * -Math.PI / 180;
+        const fatherR = (getRotateValue(father.rotateEvents, startTime, false) * -Math.PI) / 180;
         const [fatherX2, fatherY2] = getMoveValue(father.moveEvents, endTime, true);
-        const fatherR2 = getRotateValue(father.rotateEvents, endTime, true) * -Math.PI / 180;
+        const fatherR2 = (getRotateValue(father.rotateEvents, endTime, true) * -Math.PI) / 180;
         //计算子级移动
         const [childX, childY] = getMoveValue(child.moveEvents, startTime, false);
         const [childX2, childY2] = getMoveValue(child.moveEvents, endTime, true);
@@ -388,13 +470,13 @@ function mergeFather(child, father) {
         const end = fatherX2 + childX2 * Math.cos(fatherR2) - childY2 * Math.sin(fatherR2);
         const start2 = fatherY + childX * Math.sin(fatherR) + childY * Math.cos(fatherR);
         const end2 = fatherY2 + childX2 * Math.sin(fatherR2) + childY2 * Math.cos(fatherR2);
-        moveEvents.push({ startTime, endTime, start, end, start2, end2 })
+        moveEvents.push({ startTime, endTime, start, end, start2, end2 });
     }
     child.moveEvents = moveEvents;
 }
 /**
- * @param {LineEvent[]} e 
- * @param {number} t 
+ * @param {LineEvent[]} e
+ * @param {number} t
  * @param {boolean} d
  */
 function getEventsValue(e, t, d) {
@@ -409,8 +491,8 @@ function getEventsValue(e, t, d) {
     return result;
 }
 /**
- * @param {LineEvent[]} e 
- * @param {number} t 
+ * @param {LineEvent[]} e
+ * @param {number} t
  * @param {boolean} d
  */
 function getMoveValue(e, t, d) {
@@ -424,8 +506,8 @@ function getMoveValue(e, t, d) {
             result = end;
             result2 = end2;
         } else {
-            result = start + (t - startTime) * (end - start) / (endTime - startTime);
-            result2 = start2 + (t - startTime) * (end2 - start2) / (endTime - startTime);
+            result = start + ((t - startTime) * (end - start)) / (endTime - startTime);
+            result2 = start2 + ((t - startTime) * (end2 - start2)) / (endTime - startTime);
         }
     }
     return [result, result2];

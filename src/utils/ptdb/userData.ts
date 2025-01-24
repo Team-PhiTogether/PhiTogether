@@ -11,7 +11,7 @@ export function saveGameConfig(gameConfig: GameConfig | Object, id: string = "ga
         gameConfig = JSON.parse(JSON.stringify(gameConfig));
         openDB()
             .then(db => {
-                const objStore = db.transaction(['userData'], 'readwrite').objectStore('userData');
+                const objStore = db.transaction(["userData"], "readwrite").objectStore("userData");
                 const getReq = objStore.get(id);
                 getReq.onsuccess = e => {
                     if (getReq.result) objStore.put({ id, gameConfig });
@@ -21,21 +21,24 @@ export function saveGameConfig(gameConfig: GameConfig | Object, id: string = "ga
                 getReq.onerror = e => rej(e);
             })
             .catch(e => rej(e));
-        });
+    });
 }
 
 /**
  * 读取用户设置
  */
-export function getGameConfig(id: string = "gameConfig", defaultConfig?: Object): Promise<Object | null> {
+export function getGameConfig(
+    id: string = "gameConfig",
+    defaultConfig?: Object
+): Promise<Object | null> {
     return new Promise((res, rej) => {
         openDB()
             .then(db => {
-                const objStore = db.transaction(['userData']).objectStore('userData');
+                const objStore = db.transaction(["userData"]).objectStore("userData");
                 const getReq = objStore.get(id);
                 getReq.onsuccess = async e => {
                     const result = getReq.result;
-                    if (result) res(result.gameConfig)
+                    if (result) res(result.gameConfig);
                     else if (defaultConfig) {
                         await saveGameConfig(defaultConfig, id);
                         res(defaultConfig);
@@ -48,8 +51,8 @@ export function getGameConfig(id: string = "gameConfig", defaultConfig?: Object)
 }
 
 interface ParsedGameConfig {
-    gameConfig: GameConfig,
-    ptBestRecords: Object | null,
+    gameConfig: GameConfig;
+    ptBestRecords: Object | null;
 }
 /**
  * Parse gameConfig(废)

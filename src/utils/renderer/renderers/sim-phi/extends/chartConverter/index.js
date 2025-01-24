@@ -7,13 +7,13 @@ function info(text) {
     const result = [];
     let current = {};
     for (const i of lines) {
-        if (i.startsWith('#')) {
+        if (i.startsWith("#")) {
             if (Object.keys(current).length) result.push(current);
             current = {};
         } else {
             let [key, value] = i.split(/:(.+)/).map(i => i.trim());
-            if (key === 'Song') key = 'Music';
-            if (key === 'Picture') key = 'Image';
+            if (key === "Song") key = "Music";
+            if (key === "Picture") key = "Image";
             if (key) current[key] = value;
         }
     }

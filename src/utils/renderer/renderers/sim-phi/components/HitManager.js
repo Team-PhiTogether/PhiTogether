@@ -1,4 +1,4 @@
-import shared from '@utils/js/shared.js';
+import shared from "@utils/js/shared.js";
 
 class HitEvent {
     /**
@@ -71,7 +71,7 @@ export class HitManager {
      */
     activate(type, id, offsetX, offsetY) {
         const { list } = this;
-        const idx = list.findIndex((hit) => hit.type === type && hit.id === id);
+        const idx = list.findIndex(hit => hit.type === type && hit.id === id);
         if (idx !== -1) list.splice(idx, 1);
         list.push(new HitEvent(type, id, offsetX, offsetY));
     }
@@ -82,7 +82,7 @@ export class HitManager {
      * @param {number} offsetY
      */
     moving(type, id, offsetX, offsetY) {
-        const hitEl = this.list.find((hit) => hit.type === type && hit.id === id);
+        const hitEl = this.list.find(hit => hit.type === type && hit.id === id);
         if (hitEl) hitEl.move(offsetX, offsetY);
     }
     /**
@@ -90,7 +90,7 @@ export class HitManager {
      * @param {number|string} id
      */
     deactivate(type, id) {
-        const hitEl = this.list.find((hit) => hit.type === type && hit.id === id);
+        const hitEl = this.list.find(hit => hit.type === type && hit.id === id);
         if (hitEl) hitEl.isActive = false;
     }
     update() {

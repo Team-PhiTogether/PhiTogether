@@ -1,22 +1,22 @@
-import shared from '../js/shared';
-import { GameConfigAccount } from '../ptmain/types/GameConfig';
-import { PZUserBasicInfo, PZUserTokenInfo, PZPlayConfig } from './userInfo.type';
-import { SongMeta, SongMetav2, ChartMeta, ChartMetav2 } from '../ptmain/types/SongAndChartMeta';
-import { ChartAsset } from '../ptdb/charts';
+import shared from "../js/shared";
+import { GameConfigAccount } from "../ptmain/types/GameConfig";
+import { PZUserBasicInfo, PZUserTokenInfo, PZPlayConfig } from "./userInfo.type";
+import { SongMeta, SongMetav2, ChartMeta, ChartMetav2 } from "../ptmain/types/SongAndChartMeta";
+import { ChartAsset } from "../ptdb/charts";
 import * as apiErrProcessor from "./apiErrProcessor";
-import { TmodifiedMeta, TmodifiedWindow } from '../ptmain/types/modifiedWindow';
-import { ImportMeta, ImportMetaEnv } from '../../../vite-env.d';
+import { TmodifiedMeta, TmodifiedWindow } from "../ptmain/types/modifiedWindow";
+import { ImportMeta, ImportMetaEnv } from "../../../vite-env.d";
 
 enum API_PATH {
-    auth = '/auth/token',
-    userInfo = '/me/',
-    playChart = '/player/play/',
-    record = '/records/',
-    configurations = '/player/configurations/',
+    auth = "/auth/token",
+    userInfo = "/me/",
+    playChart = "/player/play/",
+    record = "/records/",
+    configurations = "/player/configurations/",
     songs = "/songs/",
     charts = "/charts/",
-    bindTapTap = "/me/bindings/tapTap"
-};
+    bindTapTap = "/me/bindings/tapTap",
+}
 // @ts-ignore
 const APPID = import.meta.env.VITE_PZ_APPID;
 
@@ -24,47 +24,55 @@ const getApi = (e?: string): string => "https://api.phizone.cn" + (e ? API_PATH[
 // const getApi = (e?: string): string => "https://dev.phi.zone" + (e ? API_PATH[e] : "");
 
 export interface PZApiResponse<result> {
-    total: number | null,
-    perPage: number | null,
-    hasPrevious: boolean | null,
-    hasNext: boolean | null,
-    results: result/*  | null */,
+    total: number | null;
+    perPage: number | null;
+    hasPrevious: boolean | null;
+    hasNext: boolean | null;
+    results: result /*  | null */;
     // items: {
     //     ".error": string,
     //     ".error_description": string,
     // } | null,
 }
 interface PZChartPlayStat {
-    chart: string,
-    max_combo: number,
-    perfect: number,
-    good_early: number,
-    good_late: number,
-    bad: number,
-    miss: number,
-    stdDeviation: number,
+    chart: string;
+    max_combo: number;
+    perfect: number;
+    good_early: number;
+    good_late: number;
+    bad: number;
+    miss: number;
+    stdDeviation: number;
 }
 
 export const PhiZoneAPI = {
-    refreshLogin(credential: string, type: string, userName: string, tap?: boolean): Promise<PZUserTokenInfo | null> {
+    refreshLogin(
+        credential: string,
+        type: string,
+        userName: string,
+        tap?: boolean
+    ): Promise<PZUserTokenInfo | null> {
         return new Promise(async (res, rej) => {
             try {
                 const myHeaders = new Headers();
 
                 const urlencoded = new URLSearchParams();
-                urlencoded.append('client_id','regular');
-                urlencoded.append('client_secret','c29b1587-80f9-475f-b97b-dca1884eb0e3');
-                urlencoded.append('grant_type', type);
+                urlencoded.append("client_id", "regular");
+                urlencoded.append("client_secret", "c29b1587-80f9-475f-b97b-dca1884eb0e3");
+                urlencoded.append("grant_type", type);
                 urlencoded.append(type, credential);
-                urlencoded.append('username', userName);
+                urlencoded.append("username", userName);
 
                 var requestOptions = {
-                    method: 'POST',
+                    method: "POST",
                     body: urlencoded,
                     headers: myHeaders,
                 };
 
-                const response = await fetch(getApi('auth')+(tap?`?tapApplicationId=${APPID}`:""), requestOptions);
+                const response = await fetch(
+                    getApi("auth") + (tap ? `?tapApplicationId=${APPID}` : ""),
+                    requestOptions
+                );
                 const result = await response.json();
 
                 if (result.access_token) {
@@ -81,16 +89,16 @@ export const PhiZoneAPI = {
         return new Promise(async (res, rej) => {
             try {
                 const myHeaders = new Headers();
-                myHeaders.append('Authorization', `Bearer ${access_token}`);
-                myHeaders.append('Content-Type', 'application/json');
+                myHeaders.append("Authorization", `Bearer ${access_token}`);
+                myHeaders.append("Content-Type", "application/json");
 
                 var requestOptions = {
-                    method: 'POST',
-                    body: JSON.stringify({applicationId: APPID, unionId: unionID}),
+                    method: "POST",
+                    body: JSON.stringify({ applicationId: APPID, unionId: unionID }),
                     headers: myHeaders,
                 };
 
-                const response = await fetch(getApi('bindTapTap'), requestOptions);
+                const response = await fetch(getApi("bindTapTap"), requestOptions);
 
                 if (response.status === 204) {
                     res(true);
@@ -107,19 +115,24 @@ export const PhiZoneAPI = {
             try {
                 const myHeaders = new Headers();
 
-                myHeaders.append('Authorization', `Bearer ${access_token}`);
+                myHeaders.append("Authorization", `Bearer ${access_token}`);
 
                 var requestOptions = {
-                    method: 'GET',
+                    method: "GET",
                     headers: myHeaders,
                 };
 
-                const response = await fetch(getApi('userInfo'), requestOptions);
+                const response = await fetch(getApi("userInfo"), requestOptions);
                 let result = await response.json();
 
                 if (result.data) {
-                    if (!result.data.avatar) result.data.avatar = "https://res.phizone.cn/akFOXszKg7n9DQXWDBFA4AEJ39MtdCWo/Transparent_Akkarin.webp";
-                    const additionInfo = await this.getUserAdditionInfo(access_token, result.data.id);
+                    if (!result.data.avatar)
+                        result.data.avatar =
+                            "https://res.phizone.cn/akFOXszKg7n9DQXWDBFA4AEJ39MtdCWo/Transparent_Akkarin.webp";
+                    const additionInfo = await this.getUserAdditionInfo(
+                        access_token,
+                        result.data.id
+                    );
                     for (const i in additionInfo) {
                         result.data[i] = additionInfo[i];
                     }
@@ -139,7 +152,7 @@ export const PhiZoneAPI = {
                 const myHeaders = new Headers();
 
                 var requestOptions = {
-                    method: 'GET',
+                    method: "GET",
                     headers: myHeaders,
                 };
 
@@ -162,14 +175,14 @@ export const PhiZoneAPI = {
             try {
                 const myHeaders = new Headers();
 
-                myHeaders.append('Authorization', `Bearer ${access_token}`);
+                myHeaders.append("Authorization", `Bearer ${access_token}`);
 
                 var requestOptions = {
-                    method: 'GET',
+                    method: "GET",
                     headers: myHeaders,
                 };
 
-                const response = await fetch(getApi('configurations'), requestOptions);
+                const response = await fetch(getApi("configurations"), requestOptions);
                 const result = await response.json();
 
                 if (result.data) {
@@ -187,14 +200,14 @@ export const PhiZoneAPI = {
             try {
                 const myHeaders = new Headers();
 
-                if (access_token) myHeaders.append('Authorization', `Bearer ${access_token}`);
+                if (access_token) myHeaders.append("Authorization", `Bearer ${access_token}`);
 
                 var requestOptions = {
-                    method: 'GET',
+                    method: "GET",
                     headers: myHeaders,
                 };
 
-                const response = await fetch(getApi('configurations') + `${id}/`, requestOptions);
+                const response = await fetch(getApi("configurations") + `${id}/`, requestOptions);
                 const result = await response.json();
 
                 if (result && result.data) {
@@ -207,13 +220,17 @@ export const PhiZoneAPI = {
             }
         });
     },
-    patchSpecConfiguration(access_token: string, id: string, data: Object): Promise<PZPlayConfig | null> {
+    patchSpecConfiguration(
+        access_token: string,
+        id: string,
+        data: Object
+    ): Promise<PZPlayConfig | null> {
         return new Promise(async (res, rej) => {
             try {
                 const myHeaders = new Headers();
 
-                myHeaders.append('Authorization', `Bearer ${access_token}`);
-                myHeaders.append('Content-Type', 'application/json');
+                myHeaders.append("Authorization", `Bearer ${access_token}`);
+                myHeaders.append("Content-Type", "application/json");
 
                 const d: Object[] = [];
 
@@ -222,22 +239,22 @@ export const PhiZoneAPI = {
                         op: "replace",
                         path: `/${t}`,
                         value: data[t],
-                    })
+                    });
                 }
 
                 var requestOptions = {
-                    method: 'PATCH',
+                    method: "PATCH",
                     body: JSON.stringify(d),
                     headers: myHeaders,
                 };
 
-                await fetch(getApi('configurations') + `${id}/`, requestOptions);
-
+                await fetch(getApi("configurations") + `${id}/`, requestOptions);
 
                 const result = await this.getUserConfigurations(access_token);
-                shared.game.ptmain.gameConfig.account.defaultConfigID = result[result.length - 1].id;
+                shared.game.ptmain.gameConfig.account.defaultConfigID =
+                    result[result.length - 1].id;
                 shared.game.ptmain.gameConfig.account.defaultConfig = result[result.length - 1];
-                
+
                 if (result) {
                     res(result);
                 } else {
@@ -253,14 +270,18 @@ export const PhiZoneAPI = {
             try {
                 const myHeaders = new Headers();
 
-                myHeaders.append('Authorization', `Bearer ${access_token}`);
+                myHeaders.append("Authorization", `Bearer ${access_token}`);
 
                 var requestOptions = {
-                    method: 'GET',
+                    method: "GET",
                     headers: myHeaders,
                 };
 
-                const result = await fetch(getApi("playChart") + `?chartId=${chart}&configurationId=${config}&applicationId=${APPID}`, requestOptions);
+                const result = await fetch(
+                    getApi("playChart") +
+                        `?chartId=${chart}&configurationId=${config}&applicationId=${APPID}`,
+                    requestOptions
+                );
 
                 if (result) {
                     res(result);
@@ -274,8 +295,8 @@ export const PhiZoneAPI = {
     },
     recordEncrypted(stat: PZChartPlayStat, accountInfo: GameConfigAccount) {
         return new Promise((res, rej) => {
-            const wi = (window as unknown as TmodifiedWindow);
-            const pzPlayInfo = JSON.parse(sessionStorage.getItem("pzPlayInfo") || '');
+            const wi = window as unknown as TmodifiedWindow;
+            const pzPlayInfo = JSON.parse(sessionStorage.getItem("pzPlayInfo") || "");
             const f = stat.max_combo;
             const d = accountInfo.defaultConfigID;
             const n = stat.miss;
@@ -288,12 +309,35 @@ export const PhiZoneAPI = {
             const e = stat.good_late;
             const a = (accountInfo.userBasicInfo as PZUserBasicInfo).id;
             const chartmd5 = wi.hook.chartsMD5.get(wi.hook.selectchart.value);
-            const aa = { "token": pzPlayInfo.token, "maxCombo": f, "perfect": c, "goodEarly": g, "goodLate": e, "bad": x, "miss": n, "stdDeviation": m, "checksum": chartmd5 };
+            const aa = {
+                token: pzPlayInfo.token,
+                maxCombo: f,
+                perfect: c,
+                goodEarly: g,
+                goodLate: e,
+                bad: x,
+                miss: n,
+                stdDeviation: m,
+                checksum: chartmd5,
+            };
             const record = (wi as unknown as TmodifiedWindow).GoPZRecord;
-            record(aa, (accountInfo.tokenInfo as PZUserTokenInfo).access_token, String(f), String(d), String(n), String(c), String(k), String(w), String(g), String(x), String(e), String(a))
+            record(
+                aa,
+                (accountInfo.tokenInfo as PZUserTokenInfo).access_token,
+                String(f),
+                String(d),
+                String(n),
+                String(c),
+                String(k),
+                String(w),
+                String(g),
+                String(x),
+                String(e),
+                String(a)
+            )
                 .then(e => e.json())
-                .then((e) => {
-                    sessionStorage.removeItem('pzPlayInfo');
+                .then(e => {
+                    sessionStorage.removeItem("pzPlayInfo");
                     res(e.data);
                 })
                 .catch(e => {
@@ -301,19 +345,24 @@ export const PhiZoneAPI = {
                 });
         });
     },
-    getLeaderboard(access_token: string, chart: string | null = null, neighborhoodRange: number | null = 10, topRange: number | null = 10) {
+    getLeaderboard(
+        access_token: string,
+        chart: string | null = null,
+        neighborhoodRange: number | null = 10,
+        topRange: number | null = 10
+    ) {
         return new Promise(async (res, rej) => {
             try {
                 const myHeaders = new Headers();
 
-                myHeaders.append('Authorization', `Bearer ${access_token}`);
+                myHeaders.append("Authorization", `Bearer ${access_token}`);
 
                 var requestOptions = {
-                    method: 'GET',
+                    method: "GET",
                     headers: myHeaders,
                 };
 
-                const link = `${getApi('charts')}${chart}/leaderboard?neighborhoodRange=${neighborhoodRange}&topRange=${topRange}`;
+                const link = `${getApi("charts")}${chart}/leaderboard?neighborhoodRange=${neighborhoodRange}&topRange=${topRange}`;
 
                 const response = await fetch(link, requestOptions);
                 const result = await response.json();
@@ -336,11 +385,14 @@ export const PhiZoneAPI = {
                 //myHeaders.append('Authorization', `Bearer ${access_token}`);
 
                 var requestOptions = {
-                    method: 'GET',
+                    method: "GET",
                     headers: myHeaders,
                 };
 
-                const response = await fetch(getApi() + `/users/${user}/personalBests`, requestOptions);
+                const response = await fetch(
+                    getApi() + `/users/${user}/personalBests`,
+                    requestOptions
+                );
                 const result = await response.json();
 
                 if (result) {
@@ -358,7 +410,8 @@ export const PhiZoneAPI = {
         const data = result.data;
 
         if (data.phi1) data.phi1["chart"] = await this.getChartAndItsSongAsv1(data.phi1.chartId);
-        for (const i in data.best19) data.best19[i]["chart"] = await this.getChartAndItsSongAsv1(data.best19[i].chartId);
+        for (const i in data.best19)
+            data.best19[i]["chart"] = await this.getChartAndItsSongAsv1(data.best19[i].chartId);
 
         return data;
     },
@@ -367,14 +420,17 @@ export const PhiZoneAPI = {
             // try {
             const myHeaders = new Headers();
 
-            myHeaders.append('Authorization', `Bearer ${access_token}`);
+            myHeaders.append("Authorization", `Bearer ${access_token}`);
 
             var requestOptions = {
-                method: 'GET',
+                method: "GET",
                 headers: myHeaders,
             };
 
-            const response = await fetch(`${getApi('record')}?MinOwnerId=${user}&MaxOwnerId=${user}&Order=score&Desc=true&PerPage=114514`, requestOptions);
+            const response = await fetch(
+                `${getApi("record")}?MinOwnerId=${user}&MaxOwnerId=${user}&Order=score&Desc=true&PerPage=114514`,
+                requestOptions
+            );
             const result = await response.json();
 
             if (result) {
@@ -399,12 +455,18 @@ export const PhiZoneAPI = {
         });
     },
     async getSongs(page = 1, searchQuery?: string): Promise<SongMetav2[] | null> {
-        const url = getApi("songs") + "?PerPage=32&Page=" + page + (searchQuery ? ("&Search=" + searchQuery) : "");
+        const url =
+            getApi("songs") +
+            "?PerPage=32&Page=" +
+            page +
+            (searchQuery ? "&Search=" + searchQuery : "");
 
         let myHeaders = new Headers();
-        myHeaders.append('User-Agent', 'PhiZoneRegularAccess');
+        myHeaders.append("User-Agent", "PhiZoneRegularAccess");
         const songList = await (
-            await fetch(url.replace(/https?:\/\/api.phi.zone/, "https://api.phi.zone"), { headers: myHeaders })
+            await fetch(url.replace(/https?:\/\/api.phi.zone/, "https://api.phi.zone"), {
+                headers: myHeaders,
+            })
         ).json();
 
         if (songList.data) return songList;
@@ -414,9 +476,11 @@ export const PhiZoneAPI = {
         const url = `${getApi("songs")}${id}/charts?Order=difficulty&PerPage=114514`;
 
         let myHeaders = new Headers();
-        myHeaders.append('User-Agent', 'PhiZoneRegularAccess');
+        myHeaders.append("User-Agent", "PhiZoneRegularAccess");
         const chartList = await (
-            await fetch(url.replace(/https?:\/\/api.phi.zone/, "https://api.phi.zone"), { headers: myHeaders })
+            await fetch(url.replace(/https?:\/\/api.phi.zone/, "https://api.phi.zone"), {
+                headers: myHeaders,
+            })
         ).json();
 
         if (chartList.data) return chartList.data;
@@ -426,9 +490,11 @@ export const PhiZoneAPI = {
         const url = `${getApi("charts")}${id}`;
 
         let myHeaders = new Headers();
-        myHeaders.append('User-Agent', 'PhiZoneRegularAccess');
+        myHeaders.append("User-Agent", "PhiZoneRegularAccess");
         const chartList = await (
-            await fetch(url.replace(/https?:\/\/api.phi.zone/, "https://api.phi.zone"), { headers: myHeaders })
+            await fetch(url.replace(/https?:\/\/api.phi.zone/, "https://api.phi.zone"), {
+                headers: myHeaders,
+            })
         ).json();
 
         if (chartList.data && chartList.data.id) return chartList.data;
@@ -438,9 +504,11 @@ export const PhiZoneAPI = {
         const url = `${getApi("songs")}${id}`;
 
         let myHeaders = new Headers();
-        myHeaders.append('User-Agent', 'PhiZoneRegularAccess');
+        myHeaders.append("User-Agent", "PhiZoneRegularAccess");
         const chartList = await (
-            await fetch(url.replace(/https?:\/\/api.phi.zone/, "https://api.phi.zone"), { headers: myHeaders })
+            await fetch(url.replace(/https?:\/\/api.phi.zone/, "https://api.phi.zone"), {
+                headers: myHeaders,
+            })
         ).json();
 
         if (chartList.data && chartList.data.id) return chartList.data;
@@ -484,7 +552,8 @@ export const PhiZoneAPI = {
         const chartList = await this.getCharts(songid);
         if (chartList)
             for (const chart of chartList) {
-                const { id, level, difficulty, file, authorName, noteCount, songId, likeCount } = chart;
+                const { id, level, difficulty, file, authorName, noteCount, songId, likeCount } =
+                    chart;
                 outputCharts.push({
                     id,
                     level,
@@ -506,7 +575,19 @@ export const PhiZoneAPI = {
         return outputSong;
     },
     convertSongTov1(song: SongMetav2): SongMeta {
-        const { id, title, edition, authorName, file, illustration, illustrator, bpm, duration, previewStart, previewEnd } = song;
+        const {
+            id,
+            title,
+            edition,
+            authorName,
+            file,
+            illustration,
+            illustrator,
+            bpm,
+            duration,
+            previewStart,
+            previewEnd,
+        } = song;
         const outputSong = {
             id,
             composer: authorName,
@@ -524,7 +605,11 @@ export const PhiZoneAPI = {
         };
         return outputSong;
     },
-    async getAllSongsAndChartsAsv1(page = 1, searchQuery?: string): Promise<PZApiResponse<SongMeta[]> | null> {   // get songs and charts. returns with phizone api v1 format
+    async getAllSongsAndChartsAsv1(
+        page = 1,
+        searchQuery?: string
+    ): Promise<PZApiResponse<SongMeta[]> | null> {
+        // get songs and charts. returns with phizone api v1 format
         const songList = await this.getSongs(page, searchQuery);
         if (!songList) return null;
         const { total, perPage, hasPrevious, hasNext } = songList;
@@ -540,7 +625,9 @@ export const PhiZoneAPI = {
         };
     },
     async getChartAssets(id: string): Promise<ChartAsset[]> {
-        const assetsList = JSON.parse(await (await fetch(`${getApi('charts')}${id}/assets`)).text())['data'];
+        const assetsList = JSON.parse(
+            await (await fetch(`${getApi("charts")}${id}/assets`)).text()
+        )["data"];
         if (!assetsList) return [];
         const assets: ChartAsset[] = [];
         for (const i of assetsList)
@@ -551,6 +638,6 @@ export const PhiZoneAPI = {
                 file: await (await fetch(i.file)).blob(),
             });
         return assets;
-    }
+    },
 };
 export default PhiZoneAPI;

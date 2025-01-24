@@ -13,12 +13,12 @@ function openDB(dbName: string = "PTv0", ver: number = 1): Promise<IDBDatabase> 
         if (!window.indexedDB) rej("IndexedDB Not Found");
         const req = window.indexedDB.open(dbName, ver);
         req.onerror = e => rej(e);
-        req.onsuccess = e => res(openedDB[dbName] = req.result);
+        req.onsuccess = e => res((openedDB[dbName] = req.result));
         req.onupgradeneeded = e => {
             const target = e.target as IDBRequest;
             upgradeDB(target.result);
             const transaction = target.transaction as IDBTransaction;
-            transaction.oncomplete = e => res(openedDB[dbName] = target.result);
+            transaction.oncomplete = e => res((openedDB[dbName] = target.result));
         };
     });
 }

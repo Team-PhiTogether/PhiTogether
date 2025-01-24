@@ -1,40 +1,42 @@
 {
-  "name": "phitogether",
-  "private": true,
-  "version": "2.2.7pj2",
-  "type": "module",
-  "scripts": {
-    "dev": "vite --port 1145",
-    "build": "vite build && node ./script/build.js",
-    "build4dev": "vite build && node ./script/build4dev.js",
-    "build4dev2pub": "node ./script/build4dev2pub.js && vite build",
-    "build4cap": "pnpm build && npx cap sync",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@capacitor/android": "^6.2.0",
-    "@capacitor/core": "^6.2.0",
-    "@capacitor/ios": "^6.2.0",
-    "@types/node": "^20.8.0",
-    "devtools-detector": "^2.0.14",
-    "eruda": "^3.0.1",
-    "file-saver": "^2.0.5",
-    "md5": "^2.3.0",
-    "notiflix": "^3.2.6",
-    "stackblur-canvas": "^2.6.0",
-    "vue": "^3.3.4",
-    "vue-i18n": "^9.5.0",
-    "vue-router": "^4.2.5"
-  },
-  "devDependencies": {
-    "@capacitor/cli": "^6.2.0",
-    "@vitejs/plugin-vue": "^4.2.3",
-    "vite": "^4.4.9"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "notiflix@3.2.6": "patches/notiflix@3.2.6.patch"
+    "name": "phitogether",
+    "private": true,
+    "version": "2.2.7pj2",
+    "type": "module",
+    "scripts": {
+        "dev": "vite --port 1145",
+        "build": "vite build && node ./script/build.js",
+        "build4dev": "vite build && node ./script/build4dev.js",
+        "build4dev2pub": "node ./script/build4dev2pub.js && vite build",
+        "build4cap": "pnpm build && npx cap sync",
+        "preview": "vite preview",
+        "pret": "prettier --check .",
+        "pret:fix": "prettier --write ."
+    },
+    "dependencies": {
+        "@capacitor/android": "^6.2.0",
+        "@capacitor/core": "^6.2.0",
+        "@capacitor/ios": "^6.2.0",
+        "@types/node": "^20.8.0",
+        "devtools-detector": "^2.0.14",
+        "eruda": "^3.0.1",
+        "file-saver": "^2.0.5",
+        "md5": "^2.3.0",
+        "notiflix": "^3.2.6",
+        "stackblur-canvas": "^2.6.0",
+        "vue": "^3.3.4",
+        "vue-i18n": "^9.5.0",
+        "vue-router": "^4.2.5"
+    },
+    "devDependencies": {
+        "@capacitor/cli": "^6.2.0",
+        "@vitejs/plugin-vue": "^4.2.3",
+        "prettier": "3.4.2",
+        "vite": "^4.4.9"
+    },
+    "pnpm": {
+        "patchedDependencies": {
+            "notiflix@3.2.6": "patches/notiflix@3.2.6.patch"
+        }
     }
-  },
-  "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0"
 }

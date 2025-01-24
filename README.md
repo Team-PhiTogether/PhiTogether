@@ -6,7 +6,7 @@
 
 [Status Page](https://status.phitogether.fun)
 
-Bringing multiplayer to Phigros gameplay! An open-source, non-commercial & community-based rhythm game with PhiZone intergrated. 
+Bringing multiplayer to Phigros gameplay! An open-source, non-commercial & community-based rhythm game with PhiZone intergrated.
 
 ## 👍 Support Our Continuous Operation
 
@@ -23,7 +23,6 @@ Preview the latest unreleased version of PhiTogether here: [PhiTogether-latest.r
 ## 📃 LICENSE
 
 The source code (excluding multimedia resources) is distributed under the [AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html) license.
-
 
 For multimedia resources, we reserve all rights.
 

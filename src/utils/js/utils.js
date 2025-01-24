@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 //utils
 const Utils = {
     /**@this {HTMLElement} */
@@ -7,7 +7,7 @@ const Utils = {
         const isHTMLElement = _this instanceof HTMLElement;
         const isHTMLInputElement = _this instanceof HTMLInputElement;
         const isHTMLTextAreaElement = _this instanceof HTMLTextAreaElement;
-        let data = '';
+        let data = "";
         if (isHTMLInputElement || isHTMLTextAreaElement) {
             _this.focus();
             _this.select();
@@ -21,10 +21,10 @@ const Utils = {
             data = _this.textContent;
         } else return Promise.reject();
         if (navigator.clipboard) return navigator.clipboard.writeText(data);
-        return Promise[document.execCommand('copy') ? 'resolve' : 'reject']();
+        return Promise[document.execCommand("copy") ? "resolve" : "reject"]();
     },
     /**@this {HTMLElement} */
-    setText(str = '') {
+    setText(str = "") {
         const _this = this;
         const isHTMLElement = _this instanceof HTMLElement;
         const isHTMLInputElement = _this instanceof HTMLInputElement;
@@ -38,73 +38,74 @@ const Utils = {
         const d = new Date(time * 1e3);
         return `${d.getFullYear()}${d.getMonth() + 1}${d.getDate()}`;
     },
-    loadJS: (str) =>
-        new Promise((resolve) => {
-            const script = document.createElement('script');
+    loadJS: str =>
+        new Promise(resolve => {
+            const script = document.createElement("script");
             script.onload = resolve;
             script.onerror = resolve;
             try {
                 const url = new URL(str);
                 script.src = url.href;
-                script.crossOrigin = 'anonymous';
+                script.crossOrigin = "anonymous";
             } catch (_) {
                 script.textContent = String(str);
             }
             document.head.appendChild(script);
         }),
     lazyload(func, ...args) {
-        if (document.readyState === 'complete') return func(...args);
-        return new Promise((resolve) => {
+        if (document.readyState === "complete") return func(...args);
+        return new Promise(resolve => {
             const listener = () => {
-                self.removeEventListener('load', listener);
+                self.removeEventListener("load", listener);
                 resolve(func(...args));
             };
-            self.addEventListener('load', listener);
+            self.addEventListener("load", listener);
         });
     },
     /**@param {string} str */
     escapeHTML(str) {
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+        return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;");
     },
     /**@type {(familyName:string,{...options}?:{})=>Promise<void>} */
-    addFont() { },
-    throttle(func, wait){
+    addFont() {},
+    throttle(func, wait) {
         let timer = null;
-        return function(){
-            let context = this, args = [...arguments];
-            if(timer) return;
-            timer = setTimeout(function(){
+        return function () {
+            let context = this,
+                args = [...arguments];
+            if (timer) return;
+            timer = setTimeout(function () {
                 func.apply(context, args);
-                timer = null;            
-            }, wait)    
-        }
-    }
+                timer = null;
+            }, wait);
+        };
+    },
 };
 //fuck safe
 {
     let percent = 0;
     const _ = localStorage;
-    if (_.setItem == 'function (a,b){}') {
+    if (_.setItem == "function (a,b){}") {
         delete _.setItem;
         // Object.defineProperty(_, 'setItem', { value: function(a, b) { _[a] = b } });
         percent += 20;
     }
-    if (_.getItem == 'function (a){return null}') {
+    if (_.getItem == "function (a){return null}") {
         delete _.getItem;
         // Object.defineProperty(_, 'getItem', { value: function(a) { return _[a] } });
         percent += 20;
     }
-    if (_.removeItem == 'function (a){}') {
+    if (_.removeItem == "function (a){}") {
         delete _.removeItem;
         // Object.defineProperty(_, 'removeItem', { value: function(a) { delete _[a] } });
         percent += 20;
     }
-    if (_.clear == 'function (){}') {
+    if (_.clear == "function (){}") {
         delete _.clear;
         // Object.defineProperty(_, 'removeItem', { value: function() { Object.keys(_).forEach(v => delete _[v]) } });
         percent += 20;
     }
-    if (_.key == 'function (a){return null}') {
+    if (_.key == "function (a){return null}") {
         delete _.key;
         // Object.defineProperty(_, 'key', { value: function(a) { return Object.keys(_)[a] } });
         percent += 20;
@@ -117,49 +118,41 @@ const Utils = {
 (function () {
     // Defining locale
     Date.shortMonths = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
     ];
     Date.longMonths = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December',
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
     ];
-    Date.shortDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    Date.longDays = [
-        'Sunday',
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-    ];
+    Date.shortDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    Date.longDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     // Defining patterns
     var replaceChars = {
         // Day
         d: function () {
             var d = this.getDate();
-            return (d < 10 ? '0' : '') + d;
+            return (d < 10 ? "0" : "") + d;
         },
         D: function () {
             return Date.shortDays[this.getDay()];
@@ -177,12 +170,12 @@ const Utils = {
         S: function () {
             var S = this.getDate();
             return S % 10 === 1 && S !== 11
-                ? 'st'
+                ? "st"
                 : S % 10 === 2 && S !== 12
-                    ? 'nd'
-                    : S % 10 === 3 && S !== 13
-                        ? 'rd'
-                        : 'th';
+                  ? "nd"
+                  : S % 10 === 3 && S !== 13
+                    ? "rd"
+                    : "th";
         },
         w: function () {
             return this.getDay();
@@ -203,7 +196,7 @@ const Utils = {
             }
             var retVal = 1 + Math.ceil((firstThursday - target) / 604800000);
 
-            return retVal < 10 ? '0' + retVal : retVal;
+            return retVal < 10 ? "0" + retVal : retVal;
         },
         // Month
         F: function () {
@@ -211,7 +204,7 @@ const Utils = {
         },
         m: function () {
             var m = this.getMonth();
-            return (m < 9 ? '0' : '') + (m + 1);
+            return (m < 9 ? "0" : "") + (m + 1);
         },
         M: function () {
             return Date.shortMonths[this.getMonth()];
@@ -242,14 +235,14 @@ const Utils = {
             return this.getFullYear();
         },
         y: function () {
-            return ('' + this.getFullYear()).substr(2);
+            return ("" + this.getFullYear()).substr(2);
         },
         // Time
         a: function () {
-            return this.getHours() < 12 ? 'am' : 'pm';
+            return this.getHours() < 12 ? "am" : "pm";
         },
         A: function () {
-            return this.getHours() < 12 ? 'AM' : 'PM';
+            return this.getHours() < 12 ? "AM" : "PM";
         },
         B: function () {
             return Math.floor(
@@ -257,7 +250,7 @@ const Utils = {
                     this.getUTCMinutes() / 60 +
                     this.getUTCSeconds() / 3600) *
                     1000) /
-                24
+                    24
             );
         },
         g: function () {
@@ -268,23 +261,23 @@ const Utils = {
         },
         h: function () {
             var h = this.getHours();
-            return ((h % 12 || 12) < 10 ? '0' : '') + (h % 12 || 12);
+            return ((h % 12 || 12) < 10 ? "0" : "") + (h % 12 || 12);
         },
         H: function () {
             var H = this.getHours();
-            return (H < 10 ? '0' : '') + H;
+            return (H < 10 ? "0" : "") + H;
         },
         i: function () {
             var i = this.getMinutes();
-            return (i < 10 ? '0' : '') + i;
+            return (i < 10 ? "0" : "") + i;
         },
         s: function () {
             var s = this.getSeconds();
-            return (s < 10 ? '0' : '') + s;
+            return (s < 10 ? "0" : "") + s;
         },
         v: function () {
             var v = this.getMilliseconds();
-            return (v < 10 ? '00' : v < 100 ? '0' : '') + v;
+            return (v < 10 ? "00" : v < 100 ? "0" : "") + v;
         },
         // Timezone
         e: function () {
@@ -307,30 +300,30 @@ const Utils = {
         O: function () {
             var O = this.getTimezoneOffset();
             return (
-                (-O < 0 ? '-' : '+') +
-                (Math.abs(O / 60) < 10 ? '0' : '') +
+                (-O < 0 ? "-" : "+") +
+                (Math.abs(O / 60) < 10 ? "0" : "") +
                 Math.floor(Math.abs(O / 60)) +
                 (Math.abs(O % 60) === 0
-                    ? '00'
-                    : (Math.abs(O % 60) < 10 ? '0' : '') + Math.abs(O % 60))
+                    ? "00"
+                    : (Math.abs(O % 60) < 10 ? "0" : "") + Math.abs(O % 60))
             );
         },
         P: function () {
             var P = this.getTimezoneOffset();
             return (
-                (-P < 0 ? '-' : '+') +
-                (Math.abs(P / 60) < 10 ? '0' : '') +
+                (-P < 0 ? "-" : "+") +
+                (Math.abs(P / 60) < 10 ? "0" : "") +
                 Math.floor(Math.abs(P / 60)) +
-                ':' +
+                ":" +
                 (Math.abs(P % 60) === 0
-                    ? '00'
-                    : (Math.abs(P % 60) < 10 ? '0' : '') + Math.abs(P % 60))
+                    ? "00"
+                    : (Math.abs(P % 60) < 10 ? "0" : "") + Math.abs(P % 60))
             );
         },
         T: function () {
             var tz = this.toLocaleTimeString(navigator.language, {
-                timeZoneName: 'short',
-            }).split(' ');
+                timeZoneName: "short",
+            }).split(" ");
             return tz[tz.length - 1];
         },
         Z: function () {
@@ -338,7 +331,7 @@ const Utils = {
         },
         // Full Date/Time
         c: function () {
-            return this.format('Y-m-d\\TH:i:sP');
+            return this.format("Y-m-d\\TH:i:sP");
         },
         r: function () {
             return this.toString();
@@ -352,18 +345,16 @@ const Utils = {
     window.Date.prototype.format = function (format) {
         var date = this;
         return format.replace(/(\\?)(.)/g, function (_, esc, chr) {
-            return esc === '' && replaceChars[chr]
-                ? replaceChars[chr].call(date)
-                : chr;
+            return esc === "" && replaceChars[chr] ? replaceChars[chr].call(date) : chr;
         });
     };
-}.call(this));
+}).call(this);
 
 function parseURL(url) {
-    let tmp = url.substr(url.indexOf('//') + 2);
-    let host = tmp.substr(0, tmp.indexOf('/'));
-    let tmp2 = tmp.substr(tmp.indexOf('/'));
-    let qm = tmp2.indexOf('?');
+    let tmp = url.substr(url.indexOf("//") + 2);
+    let host = tmp.substr(0, tmp.indexOf("/"));
+    let tmp2 = tmp.substr(tmp.indexOf("/"));
+    let qm = tmp2.indexOf("?");
     let path, queryParam;
     if (qm < 0) {
         path = tmp2;
@@ -382,23 +373,29 @@ function parseURL(url) {
 
 function getQueryObject(search) {
     let query = search.substring(1);
-    let vars = query.split('&');
+    let vars = query.split("&");
     let res = {};
     for (var i = 0; i < vars.length; i++) {
-        let pair = vars[i].split('=');
+        let pair = vars[i].split("=");
         res[pair[0]] = decodeURIComponent(pair[1]);
     }
     return res;
 }
 
-window.Math.standardDeviation = arr => Math.sqrt(arr.reduce((a, b) => a + (b - arr.reduce((a, b) => a + b) / arr.length) ** 2, 0) / arr.length);
+window.Math.standardDeviation = arr =>
+    Math.sqrt(
+        arr.reduce((a, b) => a + (b - arr.reduce((a, b) => a + b) / arr.length) ** 2, 0) /
+            arr.length
+    );
 
-const html = (e) => e[0];
+const html = e => e[0];
 
 window.dataLayer = window.dataLayer || [];
-function gtag() { dataLayer.push(arguments); }
-gtag('js', new Date());
-gtag('config', 'G-NVFVE35LMW');
+function gtag() {
+    dataLayer.push(arguments);
+}
+gtag("js", new Date());
+gtag("config", "G-NVFVE35LMW");
 window.gtagLoaded = true;
 
 window.Utils = Utils;
