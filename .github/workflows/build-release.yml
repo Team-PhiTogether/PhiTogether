@@ -27,7 +27,7 @@ jobs:
           
       - name: Update version in package.json
         run: |
-          sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" package.json
+          sed -i "s|\"version\": \".*\"|\"version\": \"$VERSION\"|" package.json
           
       - name: Commit version update
         run: |
