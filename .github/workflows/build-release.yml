@@ -42,19 +42,19 @@ jobs:
           pnpm install
           pnpm build
           
-      - name: Deploy to pages branch
-        run: |
-          TARGET_BRANCH=$([ "${{ github.event.release.prerelease }}" == "true" ] && echo "pages-preview" || echo "pages")
-          git fetch origin $TARGET_BRANCH || git branch $TARGET_BRANCH
-          git checkout $TARGET_BRANCH
-          rm -rf *
-          cp -r dist/* .
-          git add .
-          git config --local user.email "${{ github.event.sender.email || 'actions@github.com' }}"
-          git config --local user.name "${{ github.event.sender.name || 'GitHub Actions' }}"
-          git commit -m "[deploy${TARGET_BRANCH#pages}] $VERSION"
-          git push -f origin $TARGET_BRANCH
-          git checkout -
+    #   - name: Deploy to pages branch
+    #     run: |
+    #       TARGET_BRANCH=$([ "${{ github.event.release.prerelease }}" == "true" ] && echo "pages-preview" || echo "pages")
+    #       git fetch origin $TARGET_BRANCH || git branch $TARGET_BRANCH
+    #       git checkout $TARGET_BRANCH
+    #       rm -rf *
+    #       cp -r dist/* .
+    #       git add .
+    #       git config --local user.email "${{ github.event.sender.email || 'actions@github.com' }}"
+    #       git config --local user.name "${{ github.event.sender.name || 'GitHub Actions' }}"
+    #       git commit -m "[deploy${TARGET_BRANCH#pages}] $VERSION"
+    #       git push -f origin $TARGET_BRANCH
+    #       git checkout -
         
       - name: Create build artifact
         run: |
