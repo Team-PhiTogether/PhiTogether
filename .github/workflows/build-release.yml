@@ -35,7 +35,7 @@ jobs:
           git config --local user.name "GitHub Action"
           git add package.json
           git commit -m "[Release] Update to $VERSION"
-          git push
+          git push origin HEAD:main
           
       - name: Install dependencies and Build
         run: |
