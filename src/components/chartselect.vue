@@ -51,34 +51,53 @@
                     return this.chartList.hasPrevious;
                 else if (["local", "custom"].includes(this.selectChoice)) return this.page - 1 > 0;
             },
-            canNext() {
-                if (["pz", "favorite"].includes(this.selectChoice)) return this.chartList.hasNext;
-                else if (["local", "custom"].includes(this.selectChoice))
-                    return this.page + 1 <= this.pageAll;
-            },
-            pzResUrlGlobal() {
-                "res.phizone.cn";
-            },
-            customChartServer() {
-                if (shared.game.ptmain.gameConfig.customChartServer === "chart.phitogether.fun")
-                    return "ptc.realtvop.top";
-                return shared.game.ptmain.gameConfig.customChartServer;
-            },
-            pageAll() {
-                try {
-                    if (["pz", "favorite"].includes(this.selectChoice)) {
-                        const count = this.chartList.total;
-                        if (count) {
-                            return Math.ceil(count / 32);
-                        } else return 1;
-                    } else if (["local", "custom"].includes(this.selectChoice)) {
-                        const count = this.beforePagination.length;
-                        if (count) {
-                            return Math.ceil(count / 32);
-                        } else return 1;
-                    }
-                } catch (e) {
-                    return 1;
+            ct: {},
+            toSyncOrPlay: 0,
+            scrolledTop: 0,
+            configDialogOpened: false,
+            chartSelectorOpenedTab: "chartSelect", // chartSelect config
+            canEdit: false,
+            favouriteSongs: [],
+            showBlank: false,
+            loadingImages: new Map(),
+            imageCache: new Map(),
+        };
+    },
+    computed: {
+        isPTApp() {
+            return window.spec.isPhiTogetherApp;
+        },
+        canPrev() {
+            if (["pz", "favorite"].includes(this.selectChoice))
+                return this.chartList.hasPrevious;
+            else if (["local", "custom"].includes(this.selectChoice))
+                return this.page - 1 > 0;
+        },
+        canNext() {
+            if (["pz", "favorite"].includes(this.selectChoice))
+                return this.chartList.hasNext;
+            else if (["local", "custom"].includes(this.selectChoice))
+                return this.page + 1 <= this.pageAll;
+        },
+        pzResUrlGlobal() {
+            "res.phizone.cn";
+        },
+        customChartServer() {
+            if (shared.game.ptmain.gameConfig.customChartServer === "chart.phitogether.fun") return "ptc.realtvop.top";
+            return shared.game.ptmain.gameConfig.customChartServer;
+        },
+        pageAll() {
+            try {
+                if (["pz", "favorite"].includes(this.selectChoice)) {
+                    const count = this.chartList.total;
+                    if (count) {
+                        return Math.ceil(count / 32);
+                    } else return 1;
+                } else if (["local", "custom"].includes(this.selectChoice)) {
+                    const count = this.beforePagination.length;
+                    if (count) {
+                        return Math.ceil(count / 32);
+                    } else return 1;
                 }
             },
             isSingle() {
@@ -187,57 +206,26 @@
                 const res = await shared.game.msgHandler.prompt(
                     this.$t("chartSelect.jumpto", [this.pageAll])
                 );
-                if (res) this.goJustPage(res);
-            },
-            goJustPage(i) {
-                if (!(i >= 1 && i <= this.pageAll)) {
-                    shared.game.msgHandler.sendMessage(
-                        this.$t("chartSelect.inputDosentMatchRequirement"),
-                        "error"
-                    );
-                    return;
-                }
-                if (["pz", "favorite"].includes(this.selectChoice)) {
-                    this.loadPagePZv2(i);
-                } else if (["local", "custom"].includes(this.selectChoice)) {
-                    this.page = i;
-                    this.updatePagination();
-                }
-            },
-            loadPrevPage() {
-                if (["pz", "favorite"].includes(this.selectChoice))
-                    this.loadPagePZv2(this.page - 1);
-                else if (["local", "custom"].includes(this.selectChoice)) {
-                    this.page = this.page - 1;
-                    this.updatePagination();
-                }
-            },
-            loadNextPage() {
-                if (["pz", "favorite"].includes(this.selectChoice))
-                    this.loadPagePZv2(this.page + 1);
-                else if (["local", "custom"].includes(this.selectChoice)) {
-                    this.page = this.page + 1;
-                    this.updatePagination();
-                }
-            },
-            updatePagination() {
-                if (this.page < 1) this.page = 1;
-                if (this.page > this.pageAll) this.page = this.pageAll;
-                this.chartList = {
-                    results: this.beforePagination
-                        ? this.beforePagination.slice(32 * this.page - 32, 32 * this.page)
-                        : [],
-                };
-            },
-            async loadOffline() {
-                if (this.forceOffline && this.selectChoice !== "custom")
-                    this.selectChoice = "local";
-                let { results } = await ptdb.chart.renderApi();
-                let newlist = [];
-                for (const t of results) {
-                    if (t.song && t.illustration && t.charts) newlist.push(t);
-                }
-                this.beforeSearch = newlist;
+            }
+        },
+        async loadPage(url, renew = false) {
+            shared.game.loadHandler.l(this.$t("chartSelect.loadingChartList"));
+            if (renew) this.page = 1;
+            try {
+                const chartList = await (
+                    await fetch(url)
+                ).json();
+                // if (this.selectChoice === "custom")
+                //     chartList.results.forEach(
+                //         (item) => (item.id = `${this.customChartServer}|$|${item.id}`)
+                //     );
+                if (this.chartList.previous && url == this.chartList.previous)
+                    this.page--;
+                if (this.chartList.next && url == this.chartList.next) this.page++;
+                if (this.toPage) (this.page = this.toPage), (this.toPage = null);
+                // this.chartList = chartList;
+                chartList.results.reverse(); // 从新到旧
+                this.beforeSearch = chartList.results;
                 this.beforePagination = this.beforeSearch;
                 this.updatePagination();
             },
@@ -611,6 +599,96 @@
                 ptdb.chart.song.delete(this.selectedSongData.id);
                 for (const chart of this.selectedSongData.charts) ptdb.chart.chart.delete(chart.id);
 
+            this.selectedSongData = null;
+            audio.stop();
+            /* if (this.selectChoice === "local")  */this.loadOffline();
+        },
+        scoreStr(t) {
+            const a = Math.round(t);
+            return "0".repeat(a.length < 7 ? 7 - a.length : 0) + a;
+        },
+        async favourite() {
+            if (this.favouriteSongs.includes(this.selectedSongData.id)) {
+                this.favouriteSongs = this.favouriteSongs.filter(
+                    (item) => item !== this.selectedSongData.id
+                );
+                shared.game.msgHandler.sendMessage(
+                    this.$t("chartSelect.favourites.removedSuccessfully", [this.selectedSongData.name])
+                );
+            } else {
+                this.favouriteSongs.push(this.selectedSongData.id);
+                shared.game.msgHandler.sendMessage(
+                    this.$t("chartSelect.favourites.addedSuccessfully", [this.selectedSongData.name])
+                );
+            }
+        },
+        async multiSyncChart() {
+            try {
+                shared.game.loadHandler.l(this.$t("chartSelect.multiSyncChart.sync"), "syncChart");
+                await shared.game.multiInstance.syncChart(
+                    this.selectedSongData,
+                    this.ct,
+                    this.selectedPlayingSettings.speed
+                );
+                this.toSyncOrPlay = 3;
+            } catch (e) {
+                shared.game.loadHandler.r("syncChart");
+                shared.game.msgHandler.sendMessage(this.$t("chartSelect.multiSyncChart.failed"), "error");
+            }
+        },
+        showUnlockVideo() {
+            return new Promise(res => {
+                if (!this.selectedSongData.unlockVideo || localStorage.getItem(this.selectedSongData.id + "_Unlocked") || document.querySelector(".main > video")) return res();
+                const main = document.querySelector(".main");
+                // const videoContainer = document.createElement("div");
+                // videoContainer.style.zIndex = 1145141919810;
+                // videoContainer.style += ";position:fixed;width:100vw;height:100vh;";
+                const video = document.createElement("video");
+                video.style += ";position:fixed;left:0;right:0;top:0;bottom:0;width:100vw;height:100vh;background-color:black;z-index:1145141919810;";
+                const source = document.createElement("source");
+                source.src = this.selectedSongData.unlockVideo + "?nocache=nocache";
+                video.appendChild(source);
+                video.autoplay = true;
+                video.addEventListener("ended", evt => {
+                    main.removeChild(evt.target);
+                    localStorage.setItem(this.selectedSongData.id + "_Unlocked", "y");
+                    res();
+                });
+                main.appendChild(video);
+            });
+        },
+        async fetchImage(url) {
+            if (!url.startsWith("/PTVirtual/")) return;
+            if (this.imageCache.has(url)) return this.imageCache.get(url);
+
+            this.loadingImages.set(url, true);
+            
+            try {
+                const response = await ptdb.fetch(url);
+                const blob = await response.blob();
+                const objectURL = URL.createObjectURL(blob);
+                
+                this.imageCache.set(url, objectURL);
+                this.loadingImages.set(url, false);
+
+                return objectURL;
+            } catch (error) {
+                alert(error)
+                console.error('Error loading image:', error);
+                this.loadingImages.set(url, false);
+                return url; // Fallback to original URL
+            }
+        }
+    },
+    watch: {
+        selectChoice: {
+            handler(newVal, oldVal) {
+                if (oldVal === "empty") this.selectChoice = oldVal;
+                if (newVal === "pz") this.loadPagePZv2(1, true);
+                else if (newVal === "local") this.loadOffline();
+                else if (newVal === "favorite") this.loadFavouriteSongs();
+                else if (newVal === "custom") this.loadChapters(`https://${this.customChartServer}/chapters.json`);
+                else if (newVal === "empty") this.chartList = [];
                 this.selectedSongData = null;
                 audio.stop();
                 /* if (this.selectChoice === "local")  */ this.loadOffline();
@@ -720,7 +798,20 @@
         meta: {
             keepAlive: true,
         },
-    };
+        "chartList.results": {
+            handler(newVal) {
+                this.imageCache.clear();
+                newVal.forEach(chart => {
+                    if (chart.illustration) this.fetchImage(chart.illustration);
+                });
+            },
+            // deep: true,
+        },
+    },
+    meta: {
+        keepAlive: true,
+    },
+};
 </script>
 
 <template>
@@ -848,31 +939,15 @@
                             class="scoreSongCard songItem"
                             style="color: black; margin: auto"
                             v-for="chart in chartList.results"
-                            @click="
-                                showBlank = true;
-                                goDetails(chart).catch(e => (showBlank = false));
-                            "
-                            :style="{
-                                display: 'flex',
-                                background:
-                                    selectedSongData == chart
-                                        ? 'rgba(255,255,255,0.75)'
-                                        : 'rgba(237,247,255,0.4)',
-                            }"
-                        >
-                            <div style="flex: 3; overflow: hidden; aspect-ratio: 3 / 2">
-                                <img
-                                    :src="chart.illustration"
-                                    style="object-fit: cover; height: 100%; width: 100%"
-                                />
-                                <div
-                                    class="songCardCover"
-                                    v-show="!selectedSongData"
-                                    style="font-size: 1.25vw; color: white; line-height: 1.2em"
-                                    :style="{
-                                        '--bg': `url(${processIllustrationURL(chart.illustration)})`,
-                                    }"
-                                >
+                            @click="showBlank = true; goDetails(chart).catch(e => showBlank = false);"
+                            :style="{ display: 'flex', background: (selectedSongData == chart) ? 'rgba(255,255,255,0.75)' : 'rgba(237,247,255,0.4)' }">
+                            <div style="flex: 3; overflow: hidden; aspect-ratio: 3 / 2;">
+                                <img 
+                                    :src="loadingImages.get(chart.illustration) ? null : (imageCache.get(chart.illustration) || chart.illustration)"
+                                    style="object-fit: cover; height: 100%; width: 100%;" />
+                                <div class="songCardCover" v-show="!selectedSongData"
+                                    style="font-size: 1.25vw; color: white; line-height: 1.2em;"
+                                    :style="{ '--bg': `url(${loadingImages.get(chart.illustration) ? null : (imageCache.get(chart.illustration) || chart.illustration)})` }">main
                                     <div class="songCardName">{{ chart.name }}</div>
                                     <br />
                                     <div class="songCardComposer">{{ chart.composer }}</div>
@@ -938,25 +1013,11 @@
                 </div>
             </div>
 
-            <div
-                id="chartSelect"
-                v-if="selectedSongData"
-                :style="{ width: selectedSongData ? '100%' : '40vw' }"
-            >
-                <div
-                    v-if="selectedSongData"
-                    style="margin-top: 2.5vh; overflow-y: scroll; height: calc(100% - 2.5vh)"
-                >
-                    <div class="scoreSongCard" style="width: 90%; height: 30vh">
-                        <img
-                            :src="
-                                selectedSongData.illustration.replace(
-                                    'res.phi.zone',
-                                    pzResUrlGlobal
-                                )
-                            "
-                            style="object-fit: cover"
-                        />
+            <div id="chartSelect" v-if="selectedSongData" :style="{ width: selectedSongData ? '100%' : '40vw' }">
+                <div v-if="selectedSongData" style="margin-top: 2.5vh; overflow-y: scroll; height: calc(100% - 2.5vh);">
+                    <div class="scoreSongCard" style="width:90%;height:30vh;">
+                        <img :src="loadingImages.get(selectedSongData.illustration) ? null : (imageCache.get(selectedSongData.illustration) || selectedSongData.illustration)"
+                            style="object-fit: cover;">
                     </div>
                     <div
                         style="

@@ -156,10 +156,7 @@ export const PhiZoneAPI = {
                     headers: myHeaders,
                 };
 
-                const response = await fetch(
-                    `//api.phitogether.realtvop.top/uai/` + uid,
-                    requestOptions
-                );
+                const response = await fetch(`https://api.phitogether.realtvop.top/uai/` + uid, requestOptions);
                 const result = await response.json();
 
                 if (result.userAdditionInfo) {

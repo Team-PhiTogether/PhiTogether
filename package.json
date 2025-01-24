@@ -8,11 +8,15 @@
         "build": "vite build && node ./script/build.js",
         "build4dev": "vite build && node ./script/build4dev.js",
         "build4dev2pub": "node ./script/build4dev2pub.js && vite build",
+        "build4cap": "pnpm build && npx cap sync",
         "preview": "vite preview",
         "pret": "prettier --check .",
         "pret:fix": "prettier --write ."
     },
     "dependencies": {
+        "@capacitor/android": "^6.2.0",
+        "@capacitor/core": "^6.2.0",
+        "@capacitor/ios": "^6.2.0",
         "@types/node": "^20.8.0",
         "devtools-detector": "^2.0.14",
         "eruda": "^3.0.1",
@@ -25,6 +29,7 @@
         "vue-router": "^4.2.5"
     },
     "devDependencies": {
+        "@capacitor/cli": "^6.2.0",
         "@vitejs/plugin-vue": "^4.2.3",
         "prettier": "3.4.2",
         "vite": "^4.4.9"

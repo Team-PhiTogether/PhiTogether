@@ -531,5 +531,10 @@ body.noUIBlur #NotiflixConfirmWrap > div.notiflix-confirm-overlay {
     backdrop-filter: unset !important;
 }
 body.noUIBlur .blur {
-    backdrop-filter: unset !important;
+	backdrop-filter: unset !important;
+}
+
+canvas {
+	-webkit-transform: translateZ(0);
+    transform: translateZ(0);
 }
