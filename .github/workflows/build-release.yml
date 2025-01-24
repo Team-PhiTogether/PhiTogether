@@ -23,7 +23,7 @@ jobs:
           
       - name: Get version from tag
         id: get_version
-        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
           
       - name: Update version in package.json
         run: |
@@ -67,5 +67,5 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./build.tar.gz
-          asset_name: build.tar.gz
+          asset_name: PhiTogether-web-${{ github.event.release.name }}.tar.gz
           asset_content_type: application/gzip
