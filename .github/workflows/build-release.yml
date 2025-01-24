@@ -23,7 +23,7 @@ jobs:
           
       - name: Get version from tag
         id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
           
       - name: Update version in package.json
         run: |
@@ -31,8 +31,8 @@ jobs:
           
       - name: Commit version update
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "${{ github.event.sender.email || 'actions@github.com' }}"
+          git config --local user.name "${{ github.event.sender.name || 'GitHub Actions' }}"
           git add package.json
           git commit -m "[Release] Update to $VERSION"
           git push origin HEAD:main
@@ -50,8 +50,8 @@ jobs:
           rm -rf *
           cp -r dist/* .
           git add .
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "${{ github.event.sender.email || 'actions@github.com' }}"
+          git config --local user.name "${{ github.event.sender.name || 'GitHub Actions' }}"
           git commit -m "[deploy${TARGET_BRANCH#pages}] $VERSION"
           git push -f origin $TARGET_BRANCH
           git checkout -
