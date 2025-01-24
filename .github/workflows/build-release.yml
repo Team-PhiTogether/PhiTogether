@@ -5,31 +5,55 @@ on:
     types: [created]
 
 jobs:
-  build:
+  prepare-environment:
+    name: Prepare Environment
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           
-      - name: Setup Node.js
+      - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           
-      - uses: pnpm/action-setup@v2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
         with:
           version: 8
           
-      - name: Get version from tag
+      - name: Install project dependencies
+        run: pnpm install
+        
+      - name: Cache dependencies
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            node_modules
+            .pnpm-store
+          key: ${{ runner.os }}-build-${{ github.sha }}
+          
+  update-version:
+    name: Update Version Number
+    needs: prepare-environment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          
+      - name: Extract version from release tag
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
           
-      - name: Update version in package.json
+      - name: Update package.json version
         run: |
           sed -i "s|\"version\": \".*\"|\"version\": \"$VERSION\"|" package.json
           
-      - name: Commit version update
+      - name: Commit version changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -37,10 +61,75 @@ jobs:
           git commit -m "[Release] Update to $VERSION"
           git push
           
-      - name: Install dependencies and Build
-        run: |
-          pnpm install
-          pnpm build
+  build-project:
+    name: Build Project
+    needs: update-version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          
+      - name: Restore cached dependencies
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            node_modules
+            .pnpm-store
+          key: ${{ runner.os }}-build-${{ github.sha }}
+          
+      - name: Build application
+        run: pnpm build
+        
+      - name: Save build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/
+          
+  create-release:
+    name: Create Release Package
+    needs: build-project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Download build files
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist
+          
+      - name: Package build files
+        run: tar -czf build.tar.gz dist/
+          
+      - name: Upload release package
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./build.tar.gz
+          asset_name: build.tar.gz
+          asset_content_type: application/gzip
+          
+  deploy-pages:
+    name: Deploy to Pages
+    needs: build-project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          
+      - name: Download build files
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist
           
       - name: Deploy to pages branch
         run: |
@@ -52,20 +141,6 @@ jobs:
           git add .
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git commit -m "[deploy${TARGET_BRANCH#pages}] $VERSION"
+          git commit -m "[deploy${TARGET_BRANCH#pages}] ${GITHUB_REF#refs/tags/v}"
           git push -f origin $TARGET_BRANCH
-          git checkout -
-        
-      - name: Create build artifact
-        run: |
-          tar -czf build.tar.gz dist/
           
-      - name: Upload build artifact
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./build.tar.gz
-          asset_name: build.tar.gz
-          asset_content_type: application/gzip
