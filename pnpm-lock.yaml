@@ -45,6 +45,9 @@ devDependencies:
   '@vitejs/plugin-vue':
     specifier: ^4.2.3
     version: registry.npmjs.org/@vitejs/plugin-vue@4.6.2(vite@4.5.3)(vue@3.4.31)
+  prettier:
+    specifier: 3.4.2
+    version: registry.npmjs.org/prettier@3.4.2
   vite:
     specifier: ^4.4.9
     version: registry.npmjs.org/vite@4.5.3(@types/node@20.14.9)
@@ -615,6 +618,14 @@ packages:
       nanoid: registry.npmjs.org/nanoid@3.3.7
       picocolors: registry.npmjs.org/picocolors@1.0.1
       source-map-js: registry.npmjs.org/source-map-js@1.2.0
+
+  registry.npmjs.org/prettier@3.4.2:
+    resolution: {integrity: sha512-e9MewbtFo+Fevyuxn/4rrcDAaq0IYxPGLvObpQjiZBMAzB9IGmzlnG9RZy3FFas+eBMu2vA0CszMeduow5dIuQ==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/prettier/-/prettier-3.4.2.tgz}
+    name: prettier
+    version: 3.4.2
+    engines: {node: '>=14'}
+    hasBin: true
+    dev: true
 
   registry.npmjs.org/rollup@3.29.4:
     resolution: {integrity: sha512-oWzmBZwvYrU0iJHtDmhsm662rC15FRXmcjCk1xD771dFDx5jJ02ufAQQTn0etB2emNk4J9EZg/yWKpsn9BWGRw==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/rollup/-/rollup-3.29.4.tgz}

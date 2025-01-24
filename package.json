@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",
+    "prettier": "3.4.2",
     "vite": "^4.4.9"
   },
   "pnpm": {
