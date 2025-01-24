@@ -23,8 +23,8 @@ export default {
             return shared.game.ptmain.gameMode === "single";
         },
         isAprFl() {
-            return partyMgr.list.aprfool2024.activate
-        }
+            return partyMgr.list.aprfool2024.activate;
+        },
     },
     mounted() {
         this.loadPage();
@@ -38,20 +38,14 @@ export default {
                 this.loadPage();
                 return;
             }
-            if (
-                this.filterType === "id" &&
-                this.filterParam1.startsWith("【PhiTogether")
-            ) {
+            if (this.filterType === "id" && this.filterParam1.startsWith("【PhiTogether")) {
                 this.filterParam1 = this.filterParam1.match(/\$\$\$([^$]+)\$\$\$/)[1];
             }
             this.loadPage(this.filterType, this.filterParam1, this.filterParam2);
         },
         async loadPage(by = "none", param1 = "", param2 = "") {
             try {
-                shared.game.loadHandler.l(
-                    this.$t("multiIndex.loadRoomInfo"),
-                    "loadRoomInfo"
-                );
+                shared.game.loadHandler.l(this.$t("multiIndex.loadRoomInfo"), "loadRoomInfo");
                 const t = JSON.parse(
                     await (
                         await fetch(
@@ -80,9 +74,11 @@ export default {
         },
         joinRoom(roomid) {
             shared.game.loadHandler.l(this.$t("multiIndex.joining"), "joinRoom");
-            fetch(`${shared.game.ptmain.gameConfig.mpServerURL}/api/multi/requestRoom/${roomid}?v=${spec.thisVersion}`)
-                .then((response) => response.json())
-                .then((result) => {
+            fetch(
+                `${shared.game.ptmain.gameConfig.mpServerURL}/api/multi/requestRoom/${roomid}?v=${spec.thisVersion}`
+            )
+                .then(response => response.json())
+                .then(result => {
                     const server_addr = result.server_addr;
                     if (result.code !== 0) {
                         shared.game.msgHandler.failure(this.$t(`serverMsg.${result.msg}`));
@@ -109,12 +105,13 @@ export default {
                 );
                 return;
             }
-            if (!this.createConfig.description)
-                this.createConfig.description = "No description.";
+            if (!this.createConfig.description) this.createConfig.description = "No description.";
             shared.game.loadHandler.l(this.$t("multiIndex.joining"), "createRoom");
-            fetch(`${shared.game.ptmain.gameConfig.mpServerURL}/api/multi/requestRoom/${roomid}?v=${spec.thisVersion}`)
-                .then((response) => response.json())
-                .then((result) => {
+            fetch(
+                `${shared.game.ptmain.gameConfig.mpServerURL}/api/multi/requestRoom/${roomid}?v=${spec.thisVersion}`
+            )
+                .then(response => response.json())
+                .then(result => {
                     const server_addr = result.server_addr;
                     if (result.code !== -2) {
                         shared.game.msgHandler.failure(this.$t(`serverMsg.${result.msg}`));
@@ -141,42 +138,78 @@ export default {
 </script>
 
 <template>
-    <div id="songSelect" style="width: 95%; margin: 0 auto;">
+    <div id="songSelect" style="width: 95%; margin: 0 auto">
         <div class="songsSourceSelectContainer">
             <div class="songsSourceSelect">
                 <div>
-                    <input type="radio" id="sc1" name="selectChoice" v-model="selectChoice" value="join">
+                    <input
+                        type="radio"
+                        id="sc1"
+                        name="selectChoice"
+                        v-model="selectChoice"
+                        value="join"
+                    />
                     <label for="sc1">{{ isAprFl ? "上车" : $t("multiIndex.join") }}</label>
                 </div>
 
                 <div>
                     <br />
-                    <input type="radio" id="sc0" name="selectChoice" v-model="selectChoice" value="create">
+                    <input
+                        type="radio"
+                        id="sc0"
+                        name="selectChoice"
+                        v-model="selectChoice"
+                        value="create"
+                    />
                     <label for="sc0">{{ isAprFl ? "开车" : $t("multiIndex.create") }}</label>
                 </div>
             </div>
         </div>
 
-        <div id="songAndChartSelector" class="blur"
-            :style="{ width: '90vw', 'border-radius': '12px', overflow: 'hidden' }">
+        <div
+            id="songAndChartSelector"
+            class="blur"
+            :style="{ width: '90vw', 'border-radius': '12px', overflow: 'hidden' }"
+        >
             <Transition name="upslide-fade">
                 <div v-if="selectChoice === 'join'" class="multiServer">
-                    <div class="multiServerSearch" style="width: 83vw; margin: 0 auto;">
-                        <input class="input" v-model="filterParam1" style="padding-right: 5px;" />
-                        <span v-if="filterType != 'id'" style="font-weight: bold; font-size: 24px;">~</span>
+                    <div class="multiServerSearch" style="width: 83vw; margin: 0 auto">
+                        <input class="input" v-model="filterParam1" style="padding-right: 5px" />
+                        <span v-if="filterType != 'id'" style="font-weight: bold; font-size: 24px">
+                            ~
+                        </span>
                         <input class="input" v-model="filterParam2" v-if="filterType != 'id'" />
                         <select v-model="filterType">
                             <option value="id">{{ $t("multiIndex.byId") }}</option>
                             <option value="rks">{{ $t("multiIndex.byRks") }}</option>
-                            <option value="playerNumber">{{ $t("multiIndex.byPlayerNumber") }}</option>
+                            <option value="playerNumber">
+                                {{ $t("multiIndex.byPlayerNumber") }}
+                            </option>
                         </select>
-                        <input type="button"
-                            v-bind:value="(filterParam1 || filterParam2) ? $t('multiIndex.search') : $t('multiIndex.refresh')"
-                            @click="doSearch()">
+                        <input
+                            type="button"
+                            v-bind:value="
+                                filterParam1 || filterParam2
+                                    ? $t('multiIndex.search')
+                                    : $t('multiIndex.refresh')
+                            "
+                            @click="doSearch()"
+                        />
                     </div>
                     <div class="multiServerList">
-                        <div style="width:100%;height:100%;font-size:xx-large;display:flex;align-items:center;justify-content:center;color:dimgrey;margin-top:-2.5vh;"
-                            v-if="!roomList.length">
+                        <div
+                            style="
+                                width: 100%;
+                                height: 100%;
+                                font-size: xx-large;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                color: dimgrey;
+                                margin-top: -2.5vh;
+                            "
+                            v-if="!roomList.length"
+                        >
                             <span>{{ $t("multiIndex.roomListEmpty") }}</span>
                         </div>
                         <div class="multiServerDisp" v-for="item in roomList">
@@ -186,15 +219,23 @@ export default {
                                     <div class="present">{{ item.player_number }}</div>
                                     <div class="total">/20</div>
                                 </div>
-                                <div class="avgRks">{{ $t("multiIndex.avgRks") }}: {{ item.avg_rks.toFixed(2) }}</div>
+                                <div class="avgRks">
+                                    {{ $t("multiIndex.avgRks") }}: {{ item.avg_rks.toFixed(2) }}
+                                </div>
                             </div>
                             <div class="line">
                                 {{ item.description }}
                             </div>
                             <div class="line">
-                                <div class="ownerName">{{ $t("multiIndex.owner") }}: {{ item.owner_info }}</div>
-                                <input type="button" v-bind:value="item.joinText" @click="joinRoom(item.id)"
-                                    v-if="item.canJoin">
+                                <div class="ownerName">
+                                    {{ $t("multiIndex.owner") }}: {{ item.owner_info }}
+                                </div>
+                                <input
+                                    type="button"
+                                    v-bind:value="item.joinText"
+                                    @click="joinRoom(item.id)"
+                                    v-if="item.canJoin"
+                                />
                                 <span v-if="!item.canJoin">{{ item.joinText }}</span>
                             </div>
                         </div>
@@ -202,23 +243,44 @@ export default {
                 </div>
             </Transition>
             <Transition name="upslide-fade">
-                <div v-if="selectChoice === 'create'"
-                    style="display:flex;align-items:center;justify-content:center;width:100%;flex-direction:column;">
+                <div
+                    v-if="selectChoice === 'create'"
+                    style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                        flex-direction: column;
+                    "
+                >
                     <div class="loginPageRow">
-                        {{ $t("multiIndex.roomId") }}: <input class="input" style="width:calc(100%/2);"
-                            v-model="createConfig.id" />
+                        {{ $t("multiIndex.roomId") }}:
+                        <input
+                            class="input"
+                            style="width: calc(100% / 2)"
+                            v-model="createConfig.id"
+                        />
                     </div>
                     <div class="loginPageRow">
-                        {{ $t("multiIndex.description") }}: <input class="input" style="width:calc(100%/2);"
-                            v-model="createConfig.description" />
+                        {{ $t("multiIndex.description") }}:
+                        <input
+                            class="input"
+                            style="width: calc(100% / 2)"
+                            v-model="createConfig.description"
+                        />
                     </div>
                     <div class="loginPageRow">
-                        <input type="checkbox" id="public" v-model="createConfig.isPublic"><label for="public">{{
-                            $t("multiIndex.goPublic") }}</label>
+                        <input type="checkbox" id="public" v-model="createConfig.isPublic" />
+                        <label for="public">{{ $t("multiIndex.goPublic") }}</label>
                     </div>
                     <div class="loginPageRow">
-                        <input type="button" v-bind:value="$t('multiIndex.create')" @click="createRoom" id="createBtn"
-                            style="width: 6em;">
+                        <input
+                            type="button"
+                            v-bind:value="$t('multiIndex.create')"
+                            @click="createRoom"
+                            id="createBtn"
+                            style="width: 6em"
+                        />
                     </div>
                 </div>
             </Transition>
@@ -296,12 +358,12 @@ export default {
 
 .multiServerDisp .playernumber {
     display: flex;
-    margin-top: .4em;
+    margin-top: 0.4em;
 }
 
 .present {
     font-size: x-large;
-    margin-top: -.3em;
+    margin-top: -0.3em;
 }
 
 .multiServerDisp input#createBtn {
@@ -313,7 +375,7 @@ export default {
     max-width: 60%;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-top: .2em;
+    margin-top: 0.2em;
 }
 
 .multiServerDisp .line:nth-child(3) {
@@ -321,6 +383,6 @@ export default {
 }
 
 .multiServerDisp .avgRks {
-    margin-top: .3em;
+    margin-top: 0.3em;
 }
 </style>

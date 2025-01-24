@@ -1,35 +1,35 @@
 {
-  "name": "phitogether",
-  "private": true,
-  "version": "2.2.7pj2",
-  "type": "module",
-  "scripts": {
-    "dev": "vite --port 1145",
-    "build": "vite build && node ./script/build.js",
-    "build4dev": "vite build && node ./script/build4dev.js",
-    "build4dev2pub": "node ./script/build4dev2pub.js && vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@types/node": "^20.8.0",
-    "devtools-detector": "^2.0.14",
-    "eruda": "^3.0.1",
-    "file-saver": "^2.0.5",
-    "md5": "^2.3.0",
-    "notiflix": "^3.2.6",
-    "stackblur-canvas": "^2.6.0",
-    "vue": "^3.3.4",
-    "vue-i18n": "^9.5.0",
-    "vue-router": "^4.2.5"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^4.2.3",
-    "prettier": "3.4.2",
-    "vite": "^4.4.9"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "notiflix@3.2.6": "patches/notiflix@3.2.6.patch"
+    "name": "phitogether",
+    "private": true,
+    "version": "2.2.7pj2",
+    "type": "module",
+    "scripts": {
+        "dev": "vite --port 1145",
+        "build": "vite build && node ./script/build.js",
+        "build4dev": "vite build && node ./script/build4dev.js",
+        "build4dev2pub": "node ./script/build4dev2pub.js && vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@types/node": "^20.8.0",
+        "devtools-detector": "^2.0.14",
+        "eruda": "^3.0.1",
+        "file-saver": "^2.0.5",
+        "md5": "^2.3.0",
+        "notiflix": "^3.2.6",
+        "stackblur-canvas": "^2.6.0",
+        "vue": "^3.3.4",
+        "vue-i18n": "^9.5.0",
+        "vue-router": "^4.2.5"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^4.2.3",
+        "prettier": "3.4.2",
+        "vite": "^4.4.9"
+    },
+    "pnpm": {
+        "patchedDependencies": {
+            "notiflix@3.2.6": "patches/notiflix@3.2.6.patch"
+        }
     }
-  }
 }

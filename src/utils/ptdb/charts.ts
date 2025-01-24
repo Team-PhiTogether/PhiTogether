@@ -12,42 +12,42 @@ export enum ChartSource {
     PhiTogether = 3,
 }
 export interface CachedSong {
-    id: string | number,
-    name: string,
-    composer: string,
-    illustrator: string,
-    from: ChartSource,
-    edition?: string | null,
-    bpm?: number | null,
-    duration?: string | null,
-    preview_start?: string | null,
-    preview_end?: string | null,
-    previewStart?: string | null,
-    previewEnd?: string | null,
-    songFile: Blob,
-    illustrationFile: Blob,
-    charts?: ChartMeta<Blob>[],
-    origin: SongMeta,
+    id: string | number;
+    name: string;
+    composer: string;
+    illustrator: string;
+    from: ChartSource;
+    edition?: string | null;
+    bpm?: number | null;
+    duration?: string | null;
+    preview_start?: string | null;
+    preview_end?: string | null;
+    previewStart?: string | null;
+    previewEnd?: string | null;
+    songFile: Blob;
+    illustrationFile: Blob;
+    charts?: ChartMeta<Blob>[];
+    origin: SongMeta;
 }
 export interface CachedChart {
-    id: string | number,
-    level: string,
-    difficulty: number,
-    from: ChartSource,
-    charter: string,
-    notes?: number | null,
-    song: string | number,
-    chartFile: Blob,
-    assetsFile?: ChartAsset[],
-    parsedChart?: any, // I have to make it anyscript :(
-    md5: string,
-    origin: ChartMeta,
+    id: string | number;
+    level: string;
+    difficulty: number;
+    from: ChartSource;
+    charter: string;
+    notes?: number | null;
+    song: string | number;
+    chartFile: Blob;
+    assetsFile?: ChartAsset[];
+    parsedChart?: any; // I have to make it anyscript :(
+    md5: string;
+    origin: ChartMeta;
 }
 export interface ChartAsset {
-    id: string,
-    type: number,
-    name: string,
-    file: Blob,
+    id: string;
+    type: number;
+    name: string;
+    file: Blob;
 }
 
 function parseCustomServerChartId(id: string | number): string | number {
@@ -68,18 +68,19 @@ function toURLString(arg: string | Response | URL): string {
     else url = arg;
     return url;
 }
-async function getExistenceInCache(arg: string | Response | URL): Promise<[Cache, Response | undefined]> {
+async function getExistenceInCache(
+    arg: string | Response | URL
+): Promise<[Cache, Response | undefined]> {
     const url = toURLString(arg);
     const cache = await window.caches.open("PTv0-Charts");
     return [cache, await cache.match(url, { ignoreSearch: true, ignoreVary: true })];
 }
 async function deleteInCacheIfCached(arg: string | Response | URL) {
-    getExistenceInCache(arg)
-        .then(e => {
-            if (e[1]) {
-                e[0].delete(e[1].url);
-            }
-        })
+    getExistenceInCache(arg).then(e => {
+        if (e[1]) {
+            e[0].delete(e[1].url);
+        }
+    });
 }
 function deepClone(d: any): any {
     return JSON.parse(JSON.stringify(d));
@@ -90,34 +91,73 @@ async function haveSong(songId: string) {
     return !!allCharts.includes(songId);
 }
 
-async function downloadSong(songInfo: SongMeta, songFile?: Blob, illustrationFile?: Blob): Promise<CachedSong> {
+async function downloadSong(
+    songInfo: SongMeta,
+    songFile?: Blob,
+    illustrationFile?: Blob
+): Promise<CachedSong> {
     return {
         id: parseCustomServerChartId(songInfo.id),
         name: songInfo.name,
         composer: songInfo.composer,
         illustrator: songInfo.composer,
-        from: songInfo.isFromPhiZone ? ChartSource.PhiZone : songInfo.isFromURL ? ChartSource.Unknown : ChartSource.PhiTogether,
-        songFile: songFile || await fetch(getNoCacheURL(songInfo.song)).then(f => f.blob()),
-        illustrationFile: illustrationFile || await fetch(getNoCacheURL(songInfo.illustration)).then(f => f.blob()),
+        from: songInfo.isFromPhiZone
+            ? ChartSource.PhiZone
+            : songInfo.isFromURL
+              ? ChartSource.Unknown
+              : ChartSource.PhiTogether,
+        songFile: songFile || (await fetch(getNoCacheURL(songInfo.song)).then(f => f.blob())),
+        illustrationFile:
+            illustrationFile ||
+            (await fetch(getNoCacheURL(songInfo.illustration)).then(f => f.blob())),
         origin: deepClone(songInfo),
-    }
+    };
 }
-async function downloadChart(chartInfo: ChartMeta, chartFile?: Response | Blob, noSongCallback?: Function): Promise<CachedChart> {
-    const songId = parseCustomServerChartId(chartInfo.for || (typeof chartInfo.song === "object" ? chartInfo.song.id : chartInfo.song));
-    
+async function downloadChart(
+    chartInfo: ChartMeta,
+    chartFile?: Response | Blob,
+    noSongCallback?: Function
+): Promise<CachedChart> {
+    const songId = parseCustomServerChartId(
+        chartInfo.for || (typeof chartInfo.song === "object" ? chartInfo.song.id : chartInfo.song)
+    );
+
     if (await haveSong(songId as string))
         if (noSongCallback)
-            try { await noSongCallback(); }
-            catch (e) { console.error(e); }
+            try {
+                await noSongCallback();
+            } catch (e) {
+                console.error(e);
+            }
         else if (typeof chartInfo.song === "object")
             await downloadSong(chartInfo.song)
                 .then(s => saveCachedSong(s))
                 .catch(e => console.error(e));
         else console.log(GetChartFilesError.SongNotFound);
 
-    const source = chartInfo.isFromPhiZone ? ChartSource.PhiZone : chartInfo.isFromURL ? ChartSource.Unknown : ChartSource.PhiTogether;
-    const chartBlob: Blob = chartFile ? chartFile instanceof Blob ? chartFile : await chartFile.blob() : await fetch(getNoCacheURL(chartInfo.chart)).then(f => f.blob());
-    const assetsFile = source === ChartSource.PhiZone ? await PhiZoneAPI.getChartAssets(chartInfo.id as string) : source === ChartSource.PhiTogether && chartInfo.assets ? [{ id: "0", type: -1, name: "assets.zip", file: await (await fetch(chartInfo.assets)).blob() }] : undefined;
+    const source = chartInfo.isFromPhiZone
+        ? ChartSource.PhiZone
+        : chartInfo.isFromURL
+          ? ChartSource.Unknown
+          : ChartSource.PhiTogether;
+    const chartBlob: Blob = chartFile
+        ? chartFile instanceof Blob
+            ? chartFile
+            : await chartFile.blob()
+        : await fetch(getNoCacheURL(chartInfo.chart)).then(f => f.blob());
+    const assetsFile =
+        source === ChartSource.PhiZone
+            ? await PhiZoneAPI.getChartAssets(chartInfo.id as string)
+            : source === ChartSource.PhiTogether && chartInfo.assets
+              ? [
+                    {
+                        id: "0",
+                        type: -1,
+                        name: "assets.zip",
+                        file: await (await fetch(chartInfo.assets)).blob(),
+                    },
+                ]
+              : undefined;
 
     return {
         id: parseCustomServerChartId(chartInfo.id),
@@ -132,15 +172,18 @@ async function downloadChart(chartInfo: ChartMeta, chartFile?: Response | Blob, 
         // @ts-ignore
         md5: md5(await new Response(chartBlob).text()),
         origin: deepClone(chartInfo),
-    }
+    };
 }
 
-function deleteCachedSongOrChart(id: string | number | null, name: string): Promise<boolean> | null {
+function deleteCachedSongOrChart(
+    id: string | number | null,
+    name: string
+): Promise<boolean> | null {
     if (id === null) return null;
     return new Promise((res, rej) => {
         openDB()
             .then(db => {
-                const objStore = db.transaction([name], 'readwrite').objectStore(name);
+                const objStore = db.transaction([name], "readwrite").objectStore(name);
                 const getReq = objStore.delete(id);
                 getReq.onsuccess = e => res(true);
                 getReq.onerror = e => rej(e);
@@ -148,8 +191,12 @@ function deleteCachedSongOrChart(id: string | number | null, name: string): Prom
             .catch(e => rej(e));
     });
 }
-function deleteCachedSong(id: string | number | null): Promise<boolean> | null { return deleteCachedSongOrChart(id, ObjectStores.Song) }
-function deleteCachedChart(id: string | number | null): Promise<boolean> | null { return deleteCachedSongOrChart(id, ObjectStores.Chart) }
+function deleteCachedSong(id: string | number | null): Promise<boolean> | null {
+    return deleteCachedSongOrChart(id, ObjectStores.Song);
+}
+function deleteCachedChart(id: string | number | null): Promise<boolean> | null {
+    return deleteCachedSongOrChart(id, ObjectStores.Chart);
+}
 
 function getCachedChart(id: string | number | null): Promise<CachedChart> | null {
     return new Promise((res, rej) => {
@@ -157,11 +204,13 @@ function getCachedChart(id: string | number | null): Promise<CachedChart> | null
         id = parseCustomServerChartId(id);
         openDB()
             .then(db => {
-                const objStore = db.transaction([ObjectStores.Chart]).objectStore(ObjectStores.Chart);
+                const objStore = db
+                    .transaction([ObjectStores.Chart])
+                    .objectStore(ObjectStores.Chart);
                 const getReq = objStore.get(id as string | number);
                 getReq.onsuccess = e => {
                     const result = getReq.result;
-                    if (result) res(result)
+                    if (result) res(result);
                     else rej(e);
                 };
                 getReq.onerror = e => rej(e);
@@ -179,7 +228,7 @@ function getCachedSong(id: string | number | null): Promise<CachedSong> {
                 const getReq = objStore.get(id as string | number);
                 getReq.onsuccess = e => {
                     const result = getReq.result;
-                    if (result) res(result)
+                    if (result) res(result);
                     else rej(e);
                 };
                 getReq.onerror = e => rej(e);
@@ -192,7 +241,9 @@ function saveCachedSong(cachedSong: CachedSong): Promise<boolean | any> {
     return new Promise((res, rej) => {
         openDB()
             .then(db => {
-                const objStore = db.transaction([ObjectStores.Song], 'readwrite').objectStore(ObjectStores.Song);
+                const objStore = db
+                    .transaction([ObjectStores.Song], "readwrite")
+                    .objectStore(ObjectStores.Song);
                 const getReq = objStore.get(cachedSong.id);
                 getReq.onsuccess = e => {
                     if (getReq.result) objStore.put(cachedSong);
@@ -202,13 +253,15 @@ function saveCachedSong(cachedSong: CachedSong): Promise<boolean | any> {
                 getReq.onerror = e => rej(e);
             })
             .catch(e => rej(e));
-        });
+    });
 }
 function saveCachedChart(cachedChart: CachedChart): Promise<boolean | any> {
     return new Promise((res, rej) => {
         openDB()
             .then(db => {
-                const objStore = db.transaction([ObjectStores.Chart], 'readwrite').objectStore(ObjectStores.Chart);
+                const objStore = db
+                    .transaction([ObjectStores.Chart], "readwrite")
+                    .objectStore(ObjectStores.Chart);
                 const getReq = objStore.get(cachedChart.id);
                 getReq.onsuccess = e => {
                     if (getReq.result) objStore.put(cachedChart);
@@ -218,7 +271,7 @@ function saveCachedChart(cachedChart: CachedChart): Promise<boolean | any> {
                 getReq.onerror = e => rej(e);
             })
             .catch(e => rej(e));
-        });
+    });
 }
 
 function getSongsIllustrationAsB64(songid: string | number): Promise<string> {
@@ -242,19 +295,22 @@ enum GetChartFilesError {
     SongNotFound = "Song Not Found",
 }
 function checkLocalChart(chartid: string | number): Promise<Boolean> {
-    return new Promise((res) => {
+    return new Promise(res => {
         (getCachedChart(chartid) as Promise<CachedChart>)
-        .then(e => {
-            res(true);
-        })
-        .catch(e => res(false));
+            .then(e => {
+                res(true);
+            })
+            .catch(e => res(false));
     });
 }
-function getChartsFiles(chartid: string | number, songid?: string | number): Promise<[Blob, Blob, Blob, ChartAsset[] | null]> {
+function getChartsFiles(
+    chartid: string | number,
+    songid?: string | number
+): Promise<[Blob, Blob, Blob, ChartAsset[] | null]> {
     return new Promise((res, rej) => {
         (getCachedChart(chartid) as Promise<CachedChart>)
             .then(async chart => {
-                songid = parseCustomServerChartId(chart.song || songid as string | number);
+                songid = parseCustomServerChartId(chart.song || (songid as string | number));
                 if (!songid) return rej(GetChartFilesError.SongIDNotFound);
 
                 const songMeta = await getCachedSong(songid)
@@ -264,18 +320,17 @@ function getChartsFiles(chartid: string | number, songid?: string | number): Pro
 
                 const { songFile, illustrationFile } = songMeta;
                 const { chartFile } = chart;
-                if (!songFile || !illustrationFile || !chartFile) return rej(GetChartFilesError.Uncaught);
-                res([
-                    songFile,
-                    illustrationFile,
-                    chartFile,
-                    chart.assetsFile || null,
-                ]);
+                if (!songFile || !illustrationFile || !chartFile)
+                    return rej(GetChartFilesError.Uncaught);
+                res([songFile, illustrationFile, chartFile, chart.assetsFile || null]);
             })
             .catch(e => rej(GetChartFilesError.ChartNotFound));
     });
 }
-function getChartsFilesByMeta(chartMeta: ChartMeta, songMeta?: SongMeta): Promise<[Blob, Blob, Blob, ChartAsset[] | null] | null> {
+function getChartsFilesByMeta(
+    chartMeta: ChartMeta,
+    songMeta?: SongMeta
+): Promise<[Blob, Blob, Blob, ChartAsset[] | null] | null> {
     return new Promise((res, rej) => {
         if (!songMeta)
             if (chartMeta.song instanceof Object) songMeta = chartMeta.song;
@@ -304,7 +359,9 @@ function getChartsFilesByMeta(chartMeta: ChartMeta, songMeta?: SongMeta): Promis
                         });
                 }
                 function downloadThisChart() {
-                    downloadChart(chartMeta/* , undefined, async () => await downloadSong(songMeta as SongMeta).then(s => saveCachedSong(s)) */)
+                    downloadChart(
+                        chartMeta /* , undefined, async () => await downloadSong(songMeta as SongMeta).then(s => saveCachedSong(s)) */
+                    )
                         .then(c => saveCachedChart(c))
                         .then(() => getChartsFiles(parseCustomServerChartId(chartMeta.id)))
                         .then(f => {
@@ -313,9 +370,9 @@ function getChartsFilesByMeta(chartMeta: ChartMeta, songMeta?: SongMeta): Promis
                         })
                         .catch(e => {
                             if (e === GetChartFilesError.SongNotFound) downloadThisSong();
-                            else rej(GetChartFilesError.ChartNotFound) ;
+                            else rej(GetChartFilesError.ChartNotFound);
                         });
-                    }
+                }
             });
     });
 }
@@ -337,7 +394,7 @@ function cachedChart2Meta(cachedChart: CachedChart): ChartMeta<string | number> 
         isFromPhiZone: cachedChart.from === ChartSource.PhiZone,
         isFromURL: cachedChart.from === ChartSource.Unknown,
         origin: cachedChart.origin,
-    }
+    };
 }
 function cachedSong2Meta(cachedSong: CachedSong): SongMeta {
     return {
@@ -352,7 +409,7 @@ function cachedSong2Meta(cachedSong: CachedSong): SongMeta {
         isFromPhiZone: cachedSong.from === ChartSource.PhiZone,
         isFromURL: cachedSong.from === ChartSource.Unknown,
         origin: cachedSong.origin,
-    }
+    };
 }
 
 function getAllCharts(dbName: string = ObjectStores.Chart): Promise<CachedChart[]> {
@@ -365,7 +422,7 @@ function getAllCharts(dbName: string = ObjectStores.Chart): Promise<CachedChart[
                 };
             })
             .catch(e => rej(e));
-        });
+    });
 }
 function getAllSongs(dbName: string = ObjectStores.Song): Promise<CachedSong[]> {
     return new Promise((res, rej) => {
@@ -377,7 +434,7 @@ function getAllSongs(dbName: string = ObjectStores.Song): Promise<CachedSong[]> 
                 };
             })
             .catch(e => rej(e));
-        });
+    });
 }
 function getAllChartsKeys(dbName: string = ObjectStores.Chart): Promise<string[]> {
     return new Promise((res, rej) => {
@@ -389,7 +446,7 @@ function getAllChartsKeys(dbName: string = ObjectStores.Chart): Promise<string[]
                 };
             })
             .catch(e => rej(e));
-        });
+    });
 }
 async function renderPZApi(): Promise<PZApiResponse<SongMeta[]>> {
     const result: PZApiResponse<SongMeta[]> = {
@@ -398,14 +455,14 @@ async function renderPZApi(): Promise<PZApiResponse<SongMeta[]>> {
         hasPrevious: null,
         hasNext: null,
         results: [],
-    }
+    };
 
-    const songsInCache = await renderPZApiFromCache() as unknown as SongMeta[];
+    const songsInCache = (await renderPZApiFromCache()) as unknown as SongMeta[];
 
     if (!window.indexedDB) {
         result.results = songsInCache;
         return result;
-    };
+    }
 
     const allCharts: CachedChart[] = await getAllCharts();
 
@@ -449,7 +506,7 @@ async function renderCacheList(): Promise<SongMeta[]> {
     for (const song of allSongs) {
         if (!song) continue;
         if (!songs[song.id]) {
-            song.charts = []
+            song.charts = [];
             songs[song.id] = song;
         }
     }
@@ -460,8 +517,8 @@ async function renderCacheList(): Promise<SongMeta[]> {
 
 async function getSongFile(meta: SongMeta, init?: RequestInit): Promise<Response> {
     const cachedSongFile = await getCachedSong(meta.id)
-                            .then(s => new Response(s.songFile))
-                            .catch(e => null);
+        .then(s => new Response(s.songFile))
+        .catch(e => null);
     return cachedSongFile || fetch(meta.song, init);
 }
 

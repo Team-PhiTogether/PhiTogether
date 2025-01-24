@@ -36,11 +36,15 @@ export default {
             return JSON.parse(import.meta.env.VITE_MP_MAINTAINANCE);
         },
         lastLogin() {
-            return shared.game.ptmain.gameConfig.account.userBasicInfo ? (new Date(shared.game.ptmain.gameConfig.account.userBasicInfo.dateLastLoggedIn).format("Y-m-d H:i:s")) : "";
+            return shared.game.ptmain.gameConfig.account.userBasicInfo
+                ? new Date(
+                      shared.game.ptmain.gameConfig.account.userBasicInfo.dateLastLoggedIn
+                  ).format("Y-m-d H:i:s")
+                : "";
         },
         isAprFl() {
-            return partyMgr.list.aprfool2024.activate
-        }
+            return partyMgr.list.aprfool2024.activate;
+        },
     },
     methods: {
         forcedFullscreen() {
@@ -53,10 +57,7 @@ export default {
             });
         },
         async versionNumber() {
-            if (
-                !spec.isPhiTogetherApp &&
-                (!this.loginStatus || !this.loginInfo.isPTDeveloper)
-            )
+            if (!spec.isPhiTogetherApp && (!this.loginStatus || !this.loginInfo.isPTDeveloper))
                 this.to("/aboutpage");
             this.verClicked++;
             if (this.verClicked == 7) {
@@ -71,7 +72,7 @@ export default {
         },
         to(page) {
             if (page == "/replayPage") {
-                shared.game.msgHandler.warning(this.$t("replayPage.toBeOptimized"))
+                shared.game.msgHandler.warning(this.$t("replayPage.toBeOptimized"));
             }
             this.$router.push(page);
         },
@@ -79,12 +80,7 @@ export default {
             this.to("/login");
         },
         async logOut() {
-            if (
-                !(await shared.game.msgHandler.confirm(
-                    this.$t("startPage.logoutConfirm")
-                ))
-            )
-                return;
+            if (!(await shared.game.msgHandler.confirm(this.$t("startPage.logoutConfirm")))) return;
             shared.game.ptmain.gameConfig.account = {
                 tokenInfo: null,
                 userBasicInfo: null,
@@ -96,19 +92,18 @@ export default {
         },
         checkIfCantPlay() {
             const isCantPlay = !shared.game.ptmain.canplay;
-            if (isCantPlay) shared.game.msgHandler.sendMessage(
-                this.$t("startPage.antiAddictionIssue"),
-                "error"
-            );
+            if (isCantPlay)
+                shared.game.msgHandler.sendMessage(
+                    this.$t("startPage.antiAddictionIssue"),
+                    "error"
+                );
             return isCantPlay;
         },
         async singleGame() {
             if (this.checkIfCantPlay()) return;
             shared.game.ptmain.gameMode = "single";
             if (!navigator.onLine) {
-                await shared.game.msgHandler.warning(
-                    this.$t("startPage.offlineNotice")
-                );
+                await shared.game.msgHandler.warning(this.$t("startPage.offlineNotice"));
                 this.to({ path: "/chartSelect", query: { offline: 1 } });
                 return;
             }
@@ -119,28 +114,23 @@ export default {
                         else this.reLogin();
                         return;
                     }
-                } else shared.game.msgHandler.sendMessage(this.$t("startPage.askForLogin"), "error");
+                } else
+                    shared.game.msgHandler.sendMessage(this.$t("startPage.askForLogin"), "error");
             }
             this.to({ path: "/chartSelect" });
         },
         async multiGame() {
             if (this.checkIfCantPlay()) return;
             if (!shared.game.ptmain.gameConfig.mpServerURL) {
-                shared.game.msgHandler.failure(
-                    this.$t("startPage.mpMaintainanceNotice")
-                );
+                shared.game.msgHandler.failure(this.$t("startPage.mpMaintainanceNotice"));
                 return;
             }
             if (!navigator.onLine) {
-                shared.game.msgHandler.failure(
-                    this.$t("startPage.offlineMPNotice")
-                );
+                shared.game.msgHandler.failure(this.$t("startPage.offlineMPNotice"));
                 return;
             }
             if (shared.game.ptmain.noAccountMode) {
-                shared.game.msgHandler.failure(
-                    this.$t("startPage.noaccountmodeMPNotice")
-                );
+                shared.game.msgHandler.failure(this.$t("startPage.noaccountmodeMPNotice"));
                 if (!this.loginInfo) this.to({ path: "/login" });
                 else this.reLogin();
                 return;
@@ -153,9 +143,7 @@ export default {
                 );
                 shared.game.loadHandler.r("multiGetJudg");
                 if (current.goodJudgment != 160 || current.perfectJudgment != 80) {
-                    shared.game.msgHandler.failure(
-                        this.$t("startPage.judgeRangeMPNotice")
-                    );
+                    shared.game.msgHandler.failure(this.$t("startPage.judgeRangeMPNotice"));
                     return;
                 }
                 if (shared.game.ptmain.gameConfig.fullScreenJudge) {
@@ -164,15 +152,14 @@ export default {
                 }
             } catch {
                 shared.game.loadHandler.r("multiGetJudg");
-                shared.game.msgHandler.sendMessage(this.$t("startPage.errLoadingUserConfig"), "error");
+                shared.game.msgHandler.sendMessage(
+                    this.$t("startPage.errLoadingUserConfig"),
+                    "error"
+                );
                 return;
             }
             if (localStorage.lastMultiInfo) {
-                if (
-                    await shared.game.msgHandler.confirm(
-                        this.$t("startPage.restoreMP")
-                    )
-                ) {
+                if (await shared.game.msgHandler.confirm(this.$t("startPage.restoreMP"))) {
                     const lastMultiInfo = JSON.parse(localStorage.lastMultiInfo);
                     try {
                         shared.game.loadHandler.l(this.$t("startPage.recoverMP"), "recoverMulti");
@@ -192,9 +179,7 @@ export default {
                         }
                     } catch {
                         shared.game.loadHandler.r("recoverMulti");
-                        shared.game.msgHandler.warning(
-                            this.$t("startPage.recoverMPNetProblem")
-                        );
+                        shared.game.msgHandler.warning(this.$t("startPage.recoverMPNetProblem"));
                     }
                     return;
                 } else {
@@ -215,60 +200,89 @@ export default {
         <div id="flexCol">
             <div class="startPageRow">
                 <div id="playerCard" class="blur">
-                    <div v-if="loginInfo" style="margin-bottom: 20px;">
+                    <div v-if="loginInfo" style="margin-bottom: 20px">
                         <div id="playerCardActions">
-                            <span @click="toB20()" v-if="loginStatus">{{ $t("startPage.viewB20") }}</span>
+                            <span @click="toB20()" v-if="loginStatus">
+                                {{ $t("startPage.viewB20") }}
+                            </span>
                             <span @click="reLogin()" v-else>{{ $t("startPage.retryLogin") }}</span>
                             &nbsp;&nbsp;
-                            <span @click="logIn()">{{ $t("startPage.switch") }}</span>&nbsp;&nbsp;
+                            <span @click="logIn()">{{ $t("startPage.switch") }}</span>
+                            &nbsp;&nbsp;
                             <span @click="logOut()">{{ $t("startPage.logout") }}</span>
                         </div>
-                        <div id="playerCardUsrAvatarParent" style="padding-top: 10px;">
-                            <div v-if="loginInfo && loginInfo.avatar" id="playerCardUsrAvatar"
-                                :style='{ "border-color": userColor }'>
-                                <img :src="loginInfo.avatar.replace('res.phi.zone', pzResUrlGlobal)" />
+                        <div id="playerCardUsrAvatarParent" style="padding-top: 10px">
+                            <div
+                                v-if="loginInfo && loginInfo.avatar"
+                                id="playerCardUsrAvatar"
+                                :style="{ 'border-color': userColor }"
+                            >
+                                <img
+                                    :src="loginInfo.avatar.replace('res.phi.zone', pzResUrlGlobal)"
+                                />
                             </div>
                         </div>
-                        <div id="playerCardUsrName">
-                            {{ loginInfo.userName }}&nbsp;&nbsp;
-                        </div>
+                        <div id="playerCardUsrName">{{ loginInfo.userName }}&nbsp;&nbsp;</div>
                         <br />
                         <div id="playerCardUsrInfo">
                             PhiZone
-                            <b style="color:green;">{{ loginInfo.role.toUpperCase() }}</b>
+                            <b style="color: green">{{ loginInfo.role.toUpperCase() }}</b>
                             <div v-if="loginInfo.isPTDeveloper">
                                 PhiTogether
-                                <b style="color:DeepSkyBlue;">DEVELOPER</b>
+                                <b style="color: DeepSkyBlue">DEVELOPER</b>
                             </div>
                             <div v-if="!loginStatus">
-                                <b style="color:DarkOrange;">OFFLINE</b>
+                                <b style="color: DarkOrange">OFFLINE</b>
                             </div>
-                            <br v-else /><br v-if="!loginInfo.isPTDeveloper" /><br />
-                            ID <b>{{ loginInfo.id }}</b>&nbsp; EXP
-                            <b>{{ loginInfo.experience.toFixed(0) }}</b><br />
-                            RKS <b>{{ loginInfo.rks.toFixed(3) }}</b><br /><br />
-                            LAST LOGIN<br />
+                            <br v-else />
+                            <br v-if="!loginInfo.isPTDeveloper" />
+                            <br />
+                            ID
+                            <b>{{ loginInfo.id }}</b>
+                            &nbsp; EXP
+                            <b>{{ loginInfo.experience.toFixed(0) }}</b>
+                            <br />
+                            RKS
+                            <b>{{ loginInfo.rks.toFixed(3) }}</b>
+                            <br />
+                            <br />
+                            LAST LOGIN
+                            <br />
                             <b>{{ lastLogin }}</b>
                         </div>
                         <br />
                     </div>
-                    <div v-else @click="logIn()" style="margin-bottom: 20px;">
+                    <div v-else @click="logIn()" style="margin-bottom: 20px">
                         <div id="playerCardActions">
-                            <span @click="logIn()">{{ $t("startPage.login") }}</span>&nbsp;&nbsp;
+                            <span @click="logIn()">{{ $t("startPage.login") }}</span>
+                            &nbsp;&nbsp;
                         </div>
                         <div id="playerCardUsrAvatarParent">
-                            <div id="playerCardUsrAvatar" :style='{ "border-color": userColor }'>
+                            <div id="playerCardUsrAvatar" :style="{ 'border-color': userColor }">
                                 <img />
                             </div>
                         </div>
-                        <div id="playerCardUsrName">{{ $t("startPage.unLogined") }}&nbsp;&nbsp;</div>
+                        <div id="playerCardUsrName">
+                            {{ $t("startPage.unLogined") }}&nbsp;&nbsp;
+                        </div>
                         <br />
                         <div id="playerCardUsrInfo">
                             PhiZone
-                            <b style="color:green;">GUEST</b><br /><br /><br />
-                            ID <b>--</b>&nbsp; EXP <b>---</b><br />
-                            RKS <b>--.---</b><br /><br />
-                            LAST LOGIN<br />
+                            <b style="color: green">GUEST</b>
+                            <br />
+                            <br />
+                            <br />
+                            ID
+                            <b>--</b>
+                            &nbsp; EXP
+                            <b>---</b>
+                            <br />
+                            RKS
+                            <b>--.---</b>
+                            <br />
+                            <br />
+                            LAST LOGIN
+                            <br />
                             <b>----.--.-- --:--:--</b>
                         </div>
                         <br />
@@ -280,45 +294,76 @@ export default {
         <div id="flexCol2" style="margin-top: -14vh">
             <div class="startPageRow">
                 <br />
-                <input class="blur startBtn btn-smooth" type="button" :value='$t("startPage.singleGame")'
-                    @click="singleGame()" />
+                <input
+                    class="blur startBtn btn-smooth"
+                    type="button"
+                    :value="$t('startPage.singleGame')"
+                    @click="singleGame()"
+                />
             </div>
             <div class="startPageRow">
-                <input class="blur startBtn btn-smooth" :class="{ forbidden: mpMaintainanceStatus }" type="button"
-                    :value='isAprFl ? "上车" : $t("startPage.multiGame")' @click="multiGame()" />
+                <input
+                    class="blur startBtn btn-smooth"
+                    :class="{ forbidden: mpMaintainanceStatus }"
+                    type="button"
+                    :value="isAprFl ? '上车' : $t('startPage.multiGame')"
+                    @click="multiGame()"
+                />
             </div>
             <div class="startPageRow startPageRow2">
-                <input class="blur startBtn btn-smooth" type="button" :value='$t("startPage.caches")'
-                    @click="to('/cacheManage')" />
-                <input class="blur startBtn btn-smooth" type="button" :value='$t("startPage.replay")'
-                    @click="to('/replayPage')" />
+                <input
+                    class="blur startBtn btn-smooth"
+                    type="button"
+                    :value="$t('startPage.caches')"
+                    @click="to('/cacheManage')"
+                />
+                <input
+                    class="blur startBtn btn-smooth"
+                    type="button"
+                    :value="$t('startPage.replay')"
+                    @click="to('/replayPage')"
+                />
             </div>
             <br />
             <div class="startPageRow">
-                <input class="blur startBtn btn-smooth" type="button" :value='$t("startPage.gameSettings")'
-                    @click="to('/settings')" />
+                <input
+                    class="blur startBtn btn-smooth"
+                    type="button"
+                    :value="$t('startPage.gameSettings')"
+                    @click="to('/settings')"
+                />
             </div>
             <br />
         </div>
-        <footer style="z-index:1688;">
+        <footer style="z-index: 1688">
             <!-- <div style="padding-bottom: 5px;">语言 / Language: <select v-model="localeValue" @change="switchLocale">
                 <option value="zh_CN">简体中文</option>
                 <option value="zh_TW">正體中文</option>
                 <option value="en_US">English</option>
             </select></div> -->
-            <a @click="to('/aboutPage')"><b>{{ $t("startPage.about") }}</b></a>
+            <a @click="to('/aboutPage')">
+                <b>{{ $t("startPage.about") }}</b>
+            </a>
             &nbsp;|&nbsp;
             <a href="https://status.phitogether.fun" target="_blank">
                 <b>{{ $t("startPage.serviceStatus") }}</b>
             </a>
             &nbsp;|&nbsp;
-            <a @click="to('/changelogs')"><b>{{ $t("startPage.updateLogs") }}</b></a>
+            <a @click="to('/changelogs')">
+                <b>{{ $t("startPage.updateLogs") }}</b>
+            </a>
             &nbsp;|&nbsp;
             <a @click="to('/settings')"><b>语言 / Language</b></a>
-            <span v-if="!isPTApp">&nbsp;|&nbsp;
-                <a @click="forcedFullscreen"><b>{{ $t("startPage.forcedFullscreen") }}</b></a></span>
+            <span v-if="!isPTApp">
+                &nbsp;|&nbsp;
+                <a @click="forcedFullscreen">
+                    <b>{{ $t("startPage.forcedFullscreen") }}</b>
+                </a>
+            </span>
             <br />
-            <span @click="versionNumber()">PhiTogether {{ ver }} - &copy; 2023-2024 Team PhiTogether</span>
+            <span @click="versionNumber()">
+                PhiTogether {{ ver }} - &copy; 2023-2024 Team PhiTogether
+            </span>
         </footer>
     </div>
 </template>
@@ -326,9 +371,9 @@ export default {
 <style>
 div#playerCardActions {
     text-align: right;
-    padding-top: .5em;
+    padding-top: 0.5em;
     margin-bottom: -1.6em;
-    font-size: .9em;
+    font-size: 0.9em;
     margin-right: 1.1em;
     color: midnightblue;
 }
@@ -361,7 +406,7 @@ div#versionInfo {
     right: 5%;
 }
 
-.startPageRow input[type=button] {
+.startPageRow input[type="button"] {
     font-size: 1.6em;
     margin: 6px;
     width: 240px;
@@ -375,7 +420,7 @@ div#versionInfo {
     display: inline-flex;
 }
 
-.startPageRow2 input[type=button] {
+.startPageRow2 input[type="button"] {
     width: 50%;
 }
 
@@ -396,7 +441,8 @@ div#versionInfo {
     margin: auto;
     background-color: #ffffff3a;
     border-radius: 20px;
-    box-shadow: #002a8328 0px 0px 20px 5px,
+    box-shadow:
+        #002a8328 0px 0px 20px 5px,
         inset #002a8328 0px 0px 50px 8px;
 }
 
@@ -437,7 +483,7 @@ div#versionInfo {
 #playerCardUsrInfo {
     color: rgba(0, 0, 0, 0.35);
     font-size: 1em;
-    line-height: .85em;
+    line-height: 0.85em;
 }
 
 #flexCol {
@@ -445,7 +491,6 @@ div#versionInfo {
     margin-left: 1vw;
     margin-right: 5vw;
 }
-
 
 @media screen and (orientation: landscape) {
     #flexCol {
@@ -480,7 +525,6 @@ div#versionInfo {
         margin-top: 8vh;
     }
 }
-
 
 #startPage {
     margin-top: 10vh;

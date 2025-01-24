@@ -2,10 +2,9 @@
 import shared from "../utils/js/shared.js";
 import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
 
-const $ = (query) => document.getElementById(query);
-const $$ = (query) => document.body.querySelector(query);
-const $$$ = (query) => document.body.querySelectorAll(query);
-
+const $ = query => document.getElementById(query);
+const $$ = query => document.body.querySelector(query);
+const $$$ = query => document.body.querySelectorAll(query);
 
 export default {
     name: "playerB20",
@@ -21,13 +20,16 @@ export default {
         },
         loginInfo() {
             return shared.game.ptmain.gameConfig.account.userBasicInfo;
-        }
+        },
     },
     async mounted() {
         try {
             shared.game.loadHandler.l(this.$t("playerB20.loadB20"), "loadb20");
             const id = this.$route.query.id;
-            this.data = await phizoneApi.getPlayerB20Asv1(shared.game.ptmain.gameConfig.account.tokenInfo.access_token, id);
+            this.data = await phizoneApi.getPlayerB20Asv1(
+                shared.game.ptmain.gameConfig.account.tokenInfo.access_token,
+                id
+            );
             this.loaded = true;
         } catch (e) {
             shared.game.msgHandler.sendMessage(this.$t("playerB20.error"), "error");
@@ -44,9 +46,7 @@ export default {
             return "0".repeat(a.length < 7 ? 7 - a.length : 0) + a;
         },
     },
-    watch: {
-
-    }
+    watch: {},
 };
 </script>
 
@@ -62,51 +62,77 @@ export default {
                                     <div class="playerB20Card">
                                         <div id="playerCardUsrAvatarParent">
                                             <div id="playerCardUsrAvatar">
-                                                <img :src="loginInfo.avatar.replace('res.phi.zone', pzResUrlGlobal)">
+                                                <img
+                                                    :src="
+                                                        loginInfo.avatar.replace(
+                                                            'res.phi.zone',
+                                                            pzResUrlGlobal
+                                                        )
+                                                    "
+                                                />
                                             </div>
                                         </div>
                                         <div class="playerB20Info">
                                             <p class="name">{{ loginInfo.userName }}</p>
                                             <p class="id">ID: {{ loginInfo.id }}</p>
                                             <p class="rks">RKS: {{ loginInfo.rks.toFixed(3) }}</p>
-                                            <p class="exp">EXP: {{ loginInfo.experience.toFixed(0) }}</p>
+                                            <p class="exp">
+                                                EXP: {{ loginInfo.experience.toFixed(0) }}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="scoreRankingBody">
                                     <div class="scoreRankingBodyColum">
-                                        <div class="scoreRankingCardEle" v-if="data.phi1 && data.phi1.chart">
+                                        <div
+                                            class="scoreRankingCardEle"
+                                            v-if="data.phi1 && data.phi1.chart"
+                                        >
                                             <div class="scoreSongCard">
-                                                <img :src="data.phi1.chart.song.illustration">
+                                                <img :src="data.phi1.chart.song.illustration" />
                                                 <div class="songCardCoverAll">
                                                     <div class="songCardID Phi">Phi</div>
                                                     <div class="songCardName">
                                                         {{ data.phi1.chart.song.name }}
                                                     </div>
                                                     <div class="songCardLevel">
-                                                        {{ data.phi1.rks.toFixed(2) }}<br />{{ data.phi1.chart.level }}
+                                                        {{ data.phi1.rks.toFixed(2) }}
+                                                        <br />
+                                                        {{ data.phi1.chart.level }}
                                                         {{ data.phi1.chart.difficulty }}
                                                     </div>
-                                                    <div class="songCardScore">{{ scoreStr(data.phi1.score) }}</div>
-                                                    <div class="songCardAcc">{{ (data.phi1.accuracy * 100).toFixed(2) }}%
+                                                    <div class="songCardScore">
+                                                        {{ scoreStr(data.phi1.score) }}
+                                                    </div>
+                                                    <div class="songCardAcc">
+                                                        {{ (data.phi1.accuracy * 100).toFixed(2) }}%
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="scoreRankingCardEle" v-for="item, i in data.best19">
+                                        <div
+                                            class="scoreRankingCardEle"
+                                            v-for="(item, i) in data.best19"
+                                        >
                                             <div class="scoreSongCard">
-                                                <img :src="item.chart.song.illustration">
+                                                <img :src="item.chart.song.illustration" />
                                                 <div class="songCardCoverAll">
                                                     <div class="songCardID">#{{ i + 1 }}</div>
                                                     <div class="songCardName">
                                                         {{ item.chart.song.name }}
                                                     </div>
                                                     <div class="songCardLevel">
-                                                        {{ item.rks.toFixed(2) }}<br />{{ item.chart.level }}
+                                                        {{ item.rks.toFixed(2) }}
+                                                        <br />
+                                                        {{ item.chart.level }}
                                                         {{ item.chart.difficulty }}
                                                     </div>
-                                                    <div class="songCardScore">{{ scoreStr(item.score) }}</div>
-                                                    <div class="songCardAcc">{{ (item.accuracy * 100).toFixed(2) }}%</div>
+                                                    <div class="songCardScore">
+                                                        {{ scoreStr(item.score) }}
+                                                    </div>
+                                                    <div class="songCardAcc">
+                                                        {{ (item.accuracy * 100).toFixed(2) }}%
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -126,7 +152,6 @@ export default {
     background-color: goldenrod;
 }
 
-
 .playerB20Container .scoreRankingCardEle {
     width: 25% !important;
 }
@@ -139,14 +164,15 @@ export default {
     width: 300px;
     background-color: #c5effb;
     border-radius: 20px;
-    box-shadow: #002a8328 0px 0px 20px 5px,
+    box-shadow:
+        #002a8328 0px 0px 20px 5px,
         inset #002a8328 0px 0px 50px 8px;
     padding-top: 10px;
     padding-bottom: 10px;
 }
 
 .playerB20Card .playerB20Info {
-    font-size: .7em;
+    font-size: 0.7em;
     font-weight: normal;
 }
 
@@ -168,7 +194,6 @@ export default {
 .playerB20Card .name {
     font-size: 1.2em;
 }
-
 
 @media screen and (max-width: 700px) {
     .playerB20Container .scoreRankingCardEle {

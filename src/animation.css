@@ -52,21 +52,24 @@
     opacity: 0;
 }
 
-#settings.out,#select2.out {
+#settings.out,
+#select2.out {
     transition: all 0.3s ease-in;
 }
 
- 
-#settings.from,#select2.from {
+#settings.from,
+#select2.from {
     transform: translateX(20px);
     opacity: 0;
 }
 
-#settings.to,#select2.to {
+#settings.to,
+#select2.to {
     transform: translateX(-20px);
     opacity: 0;
 }
 
-#settings.in,#select2.in {
+#settings.in,
+#select2.in {
     transition: all 0.3s 0.3s ease-out;
 }

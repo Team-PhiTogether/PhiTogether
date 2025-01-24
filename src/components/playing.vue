@@ -33,11 +33,13 @@ export default {
             const [data, original] = recordMgr.export();
 
             downloadText(
-                `${original.chartInfo.songData.name}${original.chartInfo.chartData.level
-                    }${original.chartInfo.chartData.difficulty}-${original.playerInfo.username
-                    }-${new Date().format("YmdHis")}.ptr`,
+                `${original.chartInfo.songData.name}${
+                    original.chartInfo.chartData.level
+                }${original.chartInfo.chartData.difficulty}-${
+                    original.playerInfo.username
+                }-${new Date().format("YmdHis")}.ptr`,
                 data,
-                "application/json",
+                "application/json"
             );
         },
     },

@@ -21,7 +21,7 @@ export class Stat {
         this.combo = 0;
         this.numOfNotes = 0;
         this.data = {};
-        this.id = '';
+        this.id = "";
     }
     public get good(): number {
         return this.noteRank[7] + this.noteRank[3];
@@ -39,12 +39,14 @@ export class Stat {
         return this.perfect + this.good + this.bad;
     }
     public get scoreNum(): number {
-        const a = 1e6 * (this.perfect * 0.9 + this.good * 0.585 + this.maxcombo * 0.1) / this.numOfNotes;
+        const a =
+            (1e6 * (this.perfect * 0.9 + this.good * 0.585 + this.maxcombo * 0.1)) /
+            this.numOfNotes;
         return isFinite(a) ? a : 0;
     }
     public get scoreStr(): string {
         const a = this.scoreNum.toFixed(0);
-        return '0'.repeat(a.length < 7 ? 7 - a.length : 0) + a;
+        return "0".repeat(a.length < 7 ? 7 - a.length : 0) + a;
     }
     public get accNum(): number {
         const a = (this.perfect + this.good * 0.65) / this.all;
@@ -54,12 +56,12 @@ export class Stat {
         return `${(100 * this.accNum).toFixed(2)}\uff05`;
     }
     public get avgDispStr(): string {
-        const a = Math.trunc(this.cumDisp / this.numDisp * 1e3) || 0;
-        return `${a > 0 ? '+' : ''}${a.toFixed(0)}ms`;
+        const a = Math.trunc((this.cumDisp / this.numDisp) * 1e3) || 0;
+        return `${a > 0 ? "+" : ""}${a.toFixed(0)}ms`;
     }
     public get curDispStr(): string {
         const a = Math.trunc(this.curDisp * 1e3);
-        return `${a > 0 ? '+' : ''}${a.toFixed(0)}ms`;
+        return `${a > 0 ? "+" : ""}${a.toFixed(0)}ms`;
     }
     public get lineStatus(): 0 | 1 | 3 {
         if (this.bad) return 0;
@@ -80,7 +82,7 @@ export class Stat {
         const life = 1000 - this.good * 1 - this.bad * 10 - this.noteRank[2] * 40;
         return life > 0 ? life : 0;
     }
-    public getData(isAuto: boolean, speed = ''): StatData {
+    public getData(isAuto: boolean, speed = ""): StatData {
         let scoreBest = "0000000"; // 补0历史最高分
         if (!speed) {
             const d = JSON.parse(sessionStorage.getItem("loadedChart") || "{}");
@@ -121,7 +123,7 @@ export class Stat {
             });
         return Object.assign(pbj, { textBelowStr: "" });
     }
-    public reset(numOfNotes: number, id: string, speed = '', format: string): void {
+    public reset(numOfNotes: number, id: string, speed = "", format: string): void {
         this.numOfNotes = Number(numOfNotes) || 0;
         this.combo = 0;
         this.maxcombo = 0;

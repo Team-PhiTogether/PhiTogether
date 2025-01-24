@@ -24,18 +24,18 @@ export default {
     },
     methods: {
         async save() {
-            if (
-                !this.songData.composer ||
-                !this.songData.name ||
-                !this.songData.illustrator
-            ) if (await shared.game.msgHandler.confirm(this.$t("userChartEdit.askToFillWithUK"))) {
-                this.songData.composer = this.songData.composer || "unknown";
-                this.songData.name = this.songData.name || "unknown";
-                this.songData.illustrator = this.songData.illustrator || "unknown";
-            } else return;
+            if (!this.songData.composer || !this.songData.name || !this.songData.illustrator)
+                if (
+                    await shared.game.msgHandler.confirm(this.$t("userChartEdit.askToFillWithUK"))
+                ) {
+                    this.songData.composer = this.songData.composer || "unknown";
+                    this.songData.name = this.songData.name || "unknown";
+                    this.songData.illustrator = this.songData.illustrator || "unknown";
+                } else return;
             const md5 = this.songData.id;
 
-            await ptdb.chart.song.get(md5)
+            await ptdb.chart.song
+                .get(md5)
                 .then(s => {
                     s.composer = this.songData.composer;
                     s.name = this.songData.name;
@@ -45,7 +45,8 @@ export default {
                 .then(ptdb.chart.song.save)
                 .then(async () => {
                     for (const i in this.songData.charts) {
-                        await ptdb.chart.chart.get(this.songData.charts[i].id)
+                        await ptdb.chart.chart
+                            .get(this.songData.charts[i].id)
                             .then(c => {
                                 c.charter = this.songData.charts[i].charter || "unknown";
                                 c.level = this.songData.charts[i].level || "SP";
@@ -72,34 +73,59 @@ export default {
 
 <template>
     <div id="userChartEdit" class="routerRealPage">
-        <h1 class="userChartEditRow" style="font-size:2em;"> {{ $t("userChartEdit.title") }} </h1>
+        <h1 class="userChartEditRow" style="font-size: 2em">{{ $t("userChartEdit.title") }}</h1>
         <div class="userChartEditRow">
-            {{ $t("userChartEdit.songName") }}：<input class="input textInput" style="width:calc(100%/2);"
-                v-model="songData.name" />
+            {{ $t("userChartEdit.songName") }}：
+            <input class="input textInput" style="width: calc(100% / 2)" v-model="songData.name" />
         </div>
         <div class="userChartEditRow">
-            {{ $t("userChartEdit.composer") }}：<input class="input textInput" style="width:calc(100%/4.75);"
-                v-model="songData.composer" />
+            {{ $t("userChartEdit.composer") }}：
+            <input
+                class="input textInput"
+                style="width: calc(100% / 4.75)"
+                v-model="songData.composer"
+            />
 
-            {{ $t("userChartEdit.illustrator") }}：<input class="input textInput" style="width:calc(100%/4.75);"
-                v-model="songData.illustrator" />
+            {{ $t("userChartEdit.illustrator") }}：
+            <input
+                class="input textInput"
+                style="width: calc(100% / 4.75)"
+                v-model="songData.illustrator"
+            />
         </div>
         <br />
         <div v-for="chartData in songData.charts" class="userChartEditRow">
             <h3>ID: {{ chartData.id }}</h3>
             <div class="userChartEditRow">
-                {{ $t("userChartEdit.charter") }}：<input class="input textInput" style="width:calc(100%/2);"
-                    v-model="chartData.charter" />
+                {{ $t("userChartEdit.charter") }}：
+                <input
+                    class="input textInput"
+                    style="width: calc(100% / 2)"
+                    v-model="chartData.charter"
+                />
             </div>
             <div class="userChartEditRow">
-                {{ $t("userChartEdit.level") }}：<input class="input textInput" style="width:calc(100%/4.5);"
-                    v-model="chartData.level" />
-                {{ $t("userChartEdit.difficulty") }}：<input class="input textInput" style="width:calc(100%/4.5);"
-                    v-model="chartData.difficulty" />
+                {{ $t("userChartEdit.level") }}：
+                <input
+                    class="input textInput"
+                    style="width: calc(100% / 4.5)"
+                    v-model="chartData.level"
+                />
+                {{ $t("userChartEdit.difficulty") }}：
+                <input
+                    class="input textInput"
+                    style="width: calc(100% / 4.5)"
+                    v-model="chartData.difficulty"
+                />
             </div>
         </div>
         <div class="userChartEditRow">
-            <input type="button" style="width:auto;font-size:1.5em;" :value='$t("userChartEdit.save")' @click="save()" />
+            <input
+                type="button"
+                style="width: auto; font-size: 1.5em"
+                :value="$t('userChartEdit.save')"
+                @click="save()"
+            />
         </div>
     </div>
 </template>
@@ -119,13 +145,14 @@ export default {
     margin: 10px;
 }
 
-.userChartEditRow input:not([type=button]) {
+.userChartEditRow input:not([type="button"]) {
     width: 70%;
     height: 2em;
 }
 
-.userChartEditRow input[type=button] {
+.userChartEditRow input[type="button"] {
     font-size: 1.6em;
     width: 40%;
     margin: 6px;
-}</style>
+}
+</style>

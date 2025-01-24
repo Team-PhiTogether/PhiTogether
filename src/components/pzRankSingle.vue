@@ -2,10 +2,9 @@
 import shared from "../utils/js/shared.js";
 import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
 
-const $ = (query) => document.getElementById(query);
-const $$ = (query) => document.body.querySelector(query);
-const $$$ = (query) => document.body.querySelectorAll(query);
-
+const $ = query => document.getElementById(query);
+const $$ = query => document.body.querySelector(query);
+const $$$ = query => document.body.querySelectorAll(query);
 
 export default {
     name: "pzRankSingle",
@@ -24,14 +23,11 @@ export default {
         },
         userInfo() {
             return shared.game.ptmain.gameConfig.account.userBasicInfo;
-        }
+        },
     },
     async mounted() {
         this.songdata = JSON.parse(sessionStorage.getItem("chartDetailsData"));
         this.ct = JSON.parse(sessionStorage.getItem("loadedChart"));
-
-
-
 
         try {
             shared.game.loadHandler.l("正在加载数据...", "loadrecord");
@@ -53,7 +49,9 @@ export default {
     },
     methods: {
         async goJustPageAsk() {
-            const res = await shared.game.msgHandler.prompt(`请输入您要跳转的页码 (1 - ${this.pageAll})`);
+            const res = await shared.game.msgHandler.prompt(
+                `请输入您要跳转的页码 (1 - ${this.pageAll})`
+            );
             if (res) this.goJustPage(res);
         },
         async goJustPage(i) {
@@ -68,26 +66,22 @@ export default {
                 shared.game.loadHandler.l("正在加载数据...", "loadrecord");
                 this.data = await phizoneApi.getRecords(this.token, null, null, link);
                 this.page = i;
-            } catch { } finally {
+            } catch {
+            } finally {
                 shared.game.loadHandler.r("loadrecord");
             }
         },
 
         getDifficultyActual(chartInfo) {
             if (typeof chartInfo.difficulty === "string") return chartInfo.difficulty;
-            else return chartInfo.difficulty === 0
-                ? "?"
-                : chartInfo.difficulty.toFixed(1);
+            else return chartInfo.difficulty === 0 ? "?" : chartInfo.difficulty.toFixed(1);
         },
         cleanStr(i) {
             return i.replace(
                 new RegExp(
                     [
                         ...i.matchAll(
-                            new RegExp(
-                                "\\[PZ([A-Za-z]+):([0-9]+):((?:(?!:PZRT\]).)*):PZRT\\]",
-                                "g"
-                            )
+                            new RegExp("\\[PZ([A-Za-z]+):([0-9]+):((?:(?!:PZRT\]).)*):PZRT\\]", "g")
                         ),
                     ].length === 0
                         ? "\\[PZ([A-Za-z]+):([0-9]+):([^\\]]+)\\]" // legacy support
@@ -106,7 +100,8 @@ export default {
                 shared.game.loadHandler.l("正在加载数据...", "loadrecord");
                 this.data = await phizoneApi.getRecords(this.token, null, null, this.data.next);
                 this.page++;
-            } catch { } finally {
+            } catch {
+            } finally {
                 shared.game.loadHandler.r("loadrecord");
             }
         },
@@ -115,24 +110,25 @@ export default {
                 shared.game.loadHandler.l("正在加载数据...", "loadrecord");
                 this.data = await phizoneApi.getRecords(this.token, null, null, this.data.previous);
                 this.page--;
-            } catch { } finally {
+            } catch {
+            } finally {
                 shared.game.loadHandler.r("loadrecord");
             }
-        }
+        },
     },
-    watch: {
-
-    }
+    watch: {},
 };
 </script>
 
 <template>
     <div v-if="loaded">
         <div id="chartDetailsHeader">
-            <div class="scoreSongCard" style="margin-left:5%;margin-right:5%;">
-                <img :src="songdata.illustration">
-                <div class="songCardCover"
-                    :style="{ '--bg': 'url(' + songdata.illustration + ')' }">
+            <div class="scoreSongCard" style="margin-left: 5%; margin-right: 5%">
+                <img :src="songdata.illustration" />
+                <div
+                    class="songCardCover"
+                    :style="{ '--bg': 'url(' + songdata.illustration + ')' }"
+                >
                     <div class="songCardName">
                         {{ songdata.name }}
                     </div>
@@ -141,38 +137,55 @@ export default {
             <div id="chartSongDetails">
                 <div id="songBPM">BPM：{{ songdata.bpm }}</div>
                 <div id="songDuration">时长：{{ songdata.duration }}</div>
-                <div>谱面：{{ ct.level }} {{ getDifficultyActual(ct) }} {{ ct.ranked ? 'Ranked' : '' }}</div>
+                <div>
+                    谱面：{{ ct.level }} {{ getDifficultyActual(ct) }}
+                    {{ ct.ranked ? "Ranked" : "" }}
+                </div>
                 <div>谱师：{{ cleanStr(ct.charter) }}</div>
-
             </div>
         </div>
 
-
         <div id="scoreContent">
             <div class="scoreRanking scoreRankingNoPic">
-                <div class="scoreRankingTitle color-primary">
-                    游玩记录
-                </div>
+                <div class="scoreRankingTitle color-primary">游玩记录</div>
                 <div class="scoreRankingBody">
                     <div class="scoreRankingBodyColum">
-                        <div class="scoreRankingEle" v-for="item, i in data.results">
+                        <div class="scoreRankingEle" v-for="(item, i) in data.results">
                             <div class="scoreRankingNum">{{ page * 30 + i - 29 }}</div>
-                            <div class="scoreRankingUserName color-primary"
-                                :style="{ color: item.player.id === userInfo.id ? 'red' : 'var(--color-text-primary)' }">
-                                {{ item.player.username }}</div>
-                            <div class="scoreRankingExtra">{{ (item.acc * 100).toFixed(2) }}% {{ scoreStr(item.score) }}</div>
+                            <div
+                                class="scoreRankingUserName color-primary"
+                                :style="{
+                                    color:
+                                        item.player.id === userInfo.id
+                                            ? 'red'
+                                            : 'var(--color-text-primary)',
+                                }"
+                            >
+                                {{ item.player.username }}
+                            </div>
+                            <div class="scoreRankingExtra">
+                                {{ (item.acc * 100).toFixed(2) }}% {{ scoreStr(item.score) }}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div style="text-align:center;font-size:1.25em;color:midnightblue;line-height:1.2em;top:8px;">
-            <a v-if="canPrev" @click="loadPrevPage()" style="color:black;">◀</a>
+        <div
+            style="
+                text-align: center;
+                font-size: 1.25em;
+                color: midnightblue;
+                line-height: 1.2em;
+                top: 8px;
+            "
+        >
+            <a v-if="canPrev" @click="loadPrevPage()" style="color: black">◀</a>
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <a v-if="canNext" @click="loadNextPage()" style="color:black;">▶</a><br>
+            <a v-if="canNext" @click="loadNextPage()" style="color: black">▶</a>
+            <br />
             <span @click="goJustPageAsk()">第{{ page }}页 共{{ pageAll }}页</span>
         </div>
-
     </div>
 </template>

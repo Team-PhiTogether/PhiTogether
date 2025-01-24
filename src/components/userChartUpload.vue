@@ -36,7 +36,7 @@ export default {
             const i = extra.files[0];
             const reader = new FileReader();
             reader.readAsArrayBuffer(i);
-            reader.onload = (evt) => {
+            reader.onload = evt => {
                 _this.extraResource = evt.target.result;
             };
         };
@@ -103,10 +103,8 @@ export default {
             inputName.value = this.$route.query.name || inputName.value;
             inputArtist.value = this.$route.query.composer || inputArtist.value;
             inputCharter.value = this.$route.query.charter || inputCharter.value;
-            inputIllustrator.value =
-                this.$route.query.illustrator || inputIllustrator.value;
-            selectDifficulty.value =
-                this.$route.query.level || selectDifficulty.value;
+            inputIllustrator.value = this.$route.query.illustrator || inputIllustrator.value;
+            selectDifficulty.value = this.$route.query.level || selectDifficulty.value;
             selectLevel.value = this.$route.query.difficulty || selectLevel.value;
 
             if (
@@ -118,9 +116,7 @@ export default {
                 !selectLevel.value
             )
                 if (
-                    await shared.game.msgHandler.confirm(
-                        this.$t("userChartEdit.askToFillWithUK")
-                    )
+                    await shared.game.msgHandler.confirm(this.$t("userChartEdit.askToFillWithUK"))
                 ) {
                     inputName.value = inputName.value || "unknown";
                     inputArtist.value = inputArtist.value || "unknown";
@@ -131,7 +127,7 @@ export default {
                 } else return;
 
             if (this.$route.query.then === "playing") {
-                sessionStorage.removeItem("loadedChart")
+                sessionStorage.removeItem("loadedChart");
                 return this.$router.replace({ path: "/playing", query: { auto: 1 } });
             }
 
@@ -174,30 +170,38 @@ export default {
                 mimeIll = "image/png";
             let extSong = selectbgm.value.split("."),
                 extIll = selectbg.value.split(".");
-            (extSong = extSong[extSong.length - 1]),
-                (extIll = extIll[extIll.length - 1]);
+            (extSong = extSong[extSong.length - 1]), (extIll = extIll[extIll.length - 1]);
             if (extSong in mimeTable) mimeSong = mimeTable[extSong];
             if (extIll in mimeTable) mimeIll = mimeTable[extIll];
 
             shared.game.loadHandler.l(this.$t("userChartUpload.saving"), "saveChart");
-            ptdb.chart.song.download({
-                id: md5,
-                composer: inputArtist.value,
-                illustrator: inputIllustrator.value,
-                name: inputName.value,
-            }, new Blob([selectedBgm], { type: mimeSong }), new Blob([selectedBg], { type: mimeIll }))
+            ptdb.chart.song
+                .download(
+                    {
+                        id: md5,
+                        composer: inputArtist.value,
+                        illustrator: inputIllustrator.value,
+                        name: inputName.value,
+                    },
+                    new Blob([selectedBgm], { type: mimeSong }),
+                    new Blob([selectedBg], { type: mimeIll })
+                )
                 .then(ptdb.chart.song.save)
-                .then(() => ptdb.chart.chart.download({
-                    id: md5,
-                    level: selectDifficulty.value,
-                    difficulty: selectLevel.value,
-                    charter: inputCharter.value,
-                    song: md5,
-                }, new Blob([selectedChart], { type: "application/json" }))
+                .then(() =>
+                    ptdb.chart.chart.download(
+                        {
+                            id: md5,
+                            level: selectDifficulty.value,
+                            difficulty: selectLevel.value,
+                            charter: inputCharter.value,
+                            song: md5,
+                        },
+                        new Blob([selectedChart], { type: "application/json" })
+                    )
                 )
                 .then(ptdb.chart.chart.save)
                 .then(() => {
-                    if(!this.target) shared.game.loadHandler.r("saveChart");
+                    if (!this.target) shared.game.loadHandler.r("saveChart");
                     shared.game.msgHandler.sendMessage(this.$t("userChartUpload.success"));
 
                     if (!this.target) {
@@ -205,9 +209,7 @@ export default {
                     } else {
                         const goNext = () => {
                             const chartData = JSON.parse(sessionStorage.getItem("loadedChart"));
-                            const songData = JSON.parse(
-                                sessionStorage.getItem("chartDetailsData")
-                            );
+                            const songData = JSON.parse(sessionStorage.getItem("chartDetailsData"));
                             shared.game.multiInstance.loadChartSecond(songData, chartData);
                             shared.game.ptmain.$router.replace({
                                 path: "/chartSelect",
@@ -234,28 +236,46 @@ export default {
     },
 };
 
-const $id = (e) => document.getElementById(e);
+const $id = e => document.getElementById(e);
 </script>
 
 <template>
     <div id="cacheManage" class="routerRealPage">
-        <div class="blur" :class="{ cacheUnit: true }" style="padding: 10px;">
-            <h3> {{ $t("userChartUpload.title") }} </h3>
+        <div class="blur" :class="{ cacheUnit: true }" style="padding: 10px">
+            <h3>{{ $t("userChartUpload.title") }}</h3>
             <p>
-                {{ $t("userChartUpload.description.line0") }} <br />
-                {{ $t("userChartUpload.description.line1") }} <br />
-                {{ $t("userChartUpload.description.line2") }} <br />
+                {{ $t("userChartUpload.description.line0") }}
+                <br />
+                {{ $t("userChartUpload.description.line1") }}
+                <br />
+                {{ $t("userChartUpload.description.line2") }}
+                <br />
                 {{ $t("userChartUpload.description.line3") }}
             </p>
             <br />
-            <p style="color:red;" v-if="this.target">
-                {{ $t("userChartUpload.target", [targetInfo.name, targetInfo.level, targetInfo.difficulty,
-                targetInfo.charter, target]) }}
+            <p style="color: red" v-if="this.target">
+                {{
+                    $t("userChartUpload.target", [
+                        targetInfo.name,
+                        targetInfo.level,
+                        targetInfo.difficulty,
+                        targetInfo.charter,
+                        target,
+                    ])
+                }}
             </p>
-            {{ $t("userChartUpload.extraRes") }}：<input name="extraResource" type="file" id="extraResource" /><br /><br />
-            <input type="button" id="add_library" class="disabled" :value='$t("userChartUpload.add")'
-                @click="userChartUploaded()" />
-            <input type="button" :value='$t("userChartUpload.clear")' @click="clearStatAll()" />
+            {{ $t("userChartUpload.extraRes") }}：
+            <input name="extraResource" type="file" id="extraResource" />
+            <br />
+            <br />
+            <input
+                type="button"
+                id="add_library"
+                class="disabled"
+                :value="$t('userChartUpload.add')"
+                @click="userChartUploaded()"
+            />
+            <input type="button" :value="$t('userChartUpload.clear')" @click="clearStatAll()" />
         </div>
     </div>
 </template>

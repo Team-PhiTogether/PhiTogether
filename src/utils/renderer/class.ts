@@ -5,7 +5,7 @@ export class ChartRenderer {
 
     init: Function;
     load: {
-        chart: Function;   // url
+        chart: Function; // url
         respack: Function; // url
     };
     startGameplay: Function; // settings

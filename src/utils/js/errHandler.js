@@ -1,8 +1,6 @@
 import shared from "./shared";
 import { msgHandler } from "./msgHandler.js";
-import {
-    getConstructorName,
-} from "../js/common.js";
+import { getConstructorName } from "../js/common.js";
 
 const errsToReport = [];
 
@@ -28,39 +26,42 @@ const sysError = (e, error, message) => {
 
     try {
         const formData = new FormData();
-    
+
         formData.append("page", shared.game.ptmain.$route.fullPath);
         formData.append("file", e.filename);
         formData.append("msg", error.message);
         formData.append("stack", error.stack);
         formData.append("ver", window.spec.thisVersion);
-        formData.append("uid", shared.game.ptmain.gameConfig.account.userBasicInfo ? shared.game.ptmain.gameConfig.account.userBasicInfo.id.toString() : "0");
-    
+        formData.append(
+            "uid",
+            shared.game.ptmain.gameConfig.account.userBasicInfo
+                ? shared.game.ptmain.gameConfig.account.userBasicInfo.id.toString()
+                : "0"
+        );
+
         if (navigator.onLine)
             fetch(`https://api.phitogether.realtvop.top/errReport`, {
-                method: 'POST',
+                method: "POST",
                 body: formData,
-            })
-                .catch(e => e);
-        else
-            errsToReport.push(formData);
+            }).catch(e => e);
+        else errsToReport.push(formData);
     } catch (err) {
         // shit
         console.log(err);
     }
 };
-self.addEventListener("error", (e) => sysError(e, e.error, e.message));
-self.addEventListener("unhandledrejection", (e) => sysError(e, e.reason));
+self.addEventListener("error", e => sysError(e, e.error, e.message));
+self.addEventListener("unhandledrejection", e => sysError(e, e.reason));
 
 window.addEventListener("online", () => {
     for (const formData of errsToReport) {
         try {
             if (formData) {
                 fetch(`https://api.phitogether.realtvop.top/errReport`, {
-                    method: 'POST',
+                    method: "POST",
                     body: formData,
                 })
-                    .then(() => errsToReport[errsToReport.indexOf(formData)] = null)
+                    .then(() => (errsToReport[errsToReport.indexOf(formData)] = null))
                     .catch(e => e);
             }
         } catch (err) {
@@ -69,7 +70,6 @@ window.addEventListener("online", () => {
     }
 });
 
-window.addEventListener("load", (event) => {
-    fetch(`https://api.phitogether.realtvop.top/t/o`)
-        .catch(e => e);
+window.addEventListener("load", event => {
+    fetch(`https://api.phitogether.realtvop.top/t/o`).catch(e => e);
 });

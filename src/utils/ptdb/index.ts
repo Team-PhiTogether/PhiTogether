@@ -2,7 +2,7 @@ import { saveGameConfig, getGameConfig } from "./userData";
 export const gameConfig = {
     get: getGameConfig,
     save: saveGameConfig,
-}
+};
 
 import { fetch as dbfetch } from "./fetch";
 export const fetch = dbfetch;
@@ -46,4 +46,4 @@ const skin = {
 
 // import { openDB } from './openDB';
 
-export default { gameConfig, fetch, chart, skin/* , openDB */ };
+export default { gameConfig, fetch, chart, skin /* , openDB */ };

@@ -18,15 +18,15 @@ import en_US from "./en_US.json";
 // }
 
 const messages = {
-  zh_CN,
-  zh_TW,
-  en_US, //undone
+    zh_CN,
+    zh_TW,
+    en_US, //undone
 };
 
 const i18n = VueI18n.createI18n({
-  locale: "zh_CN",
-  fallbackLocale: "zh_CN",
-  messages,
+    locale: "zh_CN",
+    fallbackLocale: "zh_CN",
+    messages,
 });
 
 export default i18n;

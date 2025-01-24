@@ -32,7 +32,7 @@ class LinePec {
     }
     format() {
         const sortFn = (a, b) => a.time - b.time;
-        const sortFn2 = (a, b) => (a.startTime - b.startTime) + (a.endTime - b.endTime); //不单独判断以避免误差
+        const sortFn2 = (a, b) => a.startTime - b.startTime + (a.endTime - b.endTime); //不单独判断以避免误差
         const result = {
             bpm: this.bpm,
             speedEvents: [],
@@ -43,16 +43,30 @@ class LinePec {
             notesBelow: [],
             judgeLineDisappearEvents: [],
             judgeLineMoveEvents: [],
-            judgeLineRotateEvents: []
+            judgeLineRotateEvents: [],
         };
         const pushDisappearEvent = (startTime, endTime, start, end) => {
-            result.judgeLineDisappearEvents.push({ startTime, endTime, start, end, start2: 0, end2: 0 });
+            result.judgeLineDisappearEvents.push({
+                startTime,
+                endTime,
+                start,
+                end,
+                start2: 0,
+                end2: 0,
+            });
         };
         const pushMoveEvent = (startTime, endTime, start, end, start2, end2) => {
             result.judgeLineMoveEvents.push({ startTime, endTime, start, end, start2, end2 });
         };
         const pushRotateEvent = (startTime, endTime, start, end) => {
-            result.judgeLineRotateEvents.push({ startTime, endTime, start, end, start2: 0, end2: 0 });
+            result.judgeLineRotateEvents.push({
+                startTime,
+                endTime,
+                start,
+                end,
+                start2: 0,
+                end2: 0,
+            });
         };
         //cv和floorPosition一并处理
         const cvp = this.speedEvents.sort(sortFn);
@@ -62,7 +76,7 @@ class LinePec {
             const endTime = i < cvp.length - 1 ? cvp[i + 1].time : 1e9;
             const value = cvp[i].value;
             const floorPosition = s1;
-            s1 += (endTime - startTime) * value / this.bpm * 1.875;
+            s1 += (((endTime - startTime) * value) / this.bpm) * 1.875;
             s1 = Math.fround(s1);
             result.speedEvents.push({ startTime, endTime, value, floorPosition });
         }
@@ -85,7 +99,7 @@ class LinePec {
                 positionX: i.positionX,
                 holdTime: i.holdTime,
                 speed: i.speed * (i.type === 3 ? v2 : 1),
-                floorPosition: Math.fround(v1 + v2 * v3 / this.bpm * 1.875),
+                floorPosition: Math.fround(v1 + ((v2 * v3) / this.bpm) * 1.875),
             };
             if (i.isAbove) {
                 result.notesAbove.push(note);

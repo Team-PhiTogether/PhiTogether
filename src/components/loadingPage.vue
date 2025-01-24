@@ -11,8 +11,7 @@ export default {
             currentImageIndex: 0,
         };
     },
-    computed: {
-    },
+    computed: {},
     methods: {
         showNextImage() {
             const images = document.querySelectorAll(".loading-image");
@@ -40,10 +39,11 @@ export default {
         shared.game.loaded = () => {
             this.loaded = true;
             if (window.spec.antiAdditionEnabled)
-                if (document.visibilityState !== "hidden")
-                    window.nativeApi.antiAddiction_start();
+                if (document.visibilityState !== "hidden") window.nativeApi.antiAddiction_start();
                 else
-                    shared.game.afterShow.push(() => window.nativeApi && window.nativeApi.antiAddiction_start());
+                    shared.game.afterShow.push(
+                        () => window.nativeApi && window.nativeApi.antiAddiction_start()
+                    );
             if (this.animated) {
                 shared.game.loadHandler.r("loadRes");
                 if (this.$route.path === "/loading") this.$router.replace("/startPage");
@@ -57,20 +57,19 @@ export default {
                     else setTimeout(checkOnce, 100);
                 };
                 setTimeout(checkOnce, 100);
-            })
-        }
+            });
+        };
 
         await untilFullscreen();
 
         this.showNextImage();
     },
 };
-
 </script>
 
 <template>
     <div id="loadingPage">
-        <img src="/src/core/ptwithtitle.png" class="loading-image">
+        <img src="/src/core/ptwithtitle.png" class="loading-image" />
     </div>
 </template>
 
@@ -93,7 +92,6 @@ export default {
 }
 
 @keyframes loadingFadeInOutAnimation {
-
     0%,
     100% {
         opacity: 0;

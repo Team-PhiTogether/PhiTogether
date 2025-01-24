@@ -18,8 +18,8 @@ export default {
         document.querySelector("#result4").innerText = "-";
         shared.game.msgHandler.sendMessage(this.$t("calibrate.loadFile"), "info", false);
         fetch("/src/core/calibrate.mp3")
-            .then((t) => t.arrayBuffer())
-            .then((t) => {
+            .then(t => t.arrayBuffer())
+            .then(t => {
                 shared.game.msgHandler.sendMessage(this.$t("calibrate.loadSuccess"));
                 this.audiobuffer = t;
             })
@@ -34,7 +34,7 @@ export default {
     },
     methods: {
         caliOnce(evt) {
-            if(evt) evt.preventDefault();
+            if (evt) evt.preventDefault();
             const e = this.calibrateActx.currentTime - this.actxStartTime;
             var r = 1;
             e > 0 && e <= 2 && (r = 1),
@@ -51,14 +51,14 @@ export default {
                 (this.calibrateActx = new (
                     window.oggCompatible
                         ? window.AudioContext ||
-                        window.webkitAudioContext ||
-                        window.mozAudioContext ||
-                        window.msAudioContext
+                          window.webkitAudioContext ||
+                          window.mozAudioContext ||
+                          window.msAudioContext
                         : oggmented.OggmentedAudioContext
                 )()),
                 this.calibrateActx.decodeAudioData(
                     this.audiobuffer,
-                    (t) => {
+                    t => {
                         (this.bfs = this.calibrateActx.createBufferSource()),
                             (this.bfs.buffer = t),
                             this.bfs.connect(this.calibrateActx.destination),
@@ -70,13 +70,12 @@ export default {
                                 null == this.calibrateActx || this.calibrateActx.close(),
                                     (this.calibrateActx = void 0),
                                     (this.calibrateActx = null);
-                                const d=[];
-                                for(let i=1;i<=4;i++) {
-                                    const ele=document.querySelector(`#result${i}`);
-                                    if(ele.innerText!="-") d.push(parseInt(ele.innerText));
+                                const d = [];
+                                for (let i = 1; i <= 4; i++) {
+                                    const ele = document.querySelector(`#result${i}`);
+                                    if (ele.innerText != "-") d.push(parseInt(ele.innerText));
                                 }
-                                const 
-                                    c = Math.round(d.reduce((a,b)=>(a+b))/d.length);
+                                const c = Math.round(d.reduce((a, b) => a + b) / d.length);
                                 if (
                                     await shared.game.msgHandler.confirm(
                                         this.$t("calibrate.confirm", { c })
@@ -101,13 +100,20 @@ export default {
 <template>
     <div id="caliContainer">
         <div id="calibrate">
-            <div class="calititle"> {{ $t("calibrate.title") }} </div>
+            <div class="calititle">{{ $t("calibrate.title") }}</div>
             <div class="content">
                 <div class="description">
-                    {{ $t("calibrate.description1") }}<br>
+                    {{ $t("calibrate.description1") }}
+                    <br />
                     {{ $t("calibrate.description2") }}
                 </div>
-                <button id="clickBtn" @click="caliOnce()" :class="{ disabled: actxStartTime === null }"> {{ $t("calibrate.click") }} </button>
+                <button
+                    id="clickBtn"
+                    @click="caliOnce()"
+                    :class="{ disabled: actxStartTime === null }"
+                >
+                    {{ $t("calibrate.click") }}
+                </button>
                 <div class="results">
                     <div id="result1">-</div>
                     <div id="result2">-</div>
@@ -116,8 +122,13 @@ export default {
                 </div>
             </div>
             <div class="footer">
-                <button id="startBtn" @click="caliStart()"
-                    :class="{ disabled: (!audiobuffer) || (actxStartTime !== null) }"> {{ $t("calibrate.start") }} </button>
+                <button
+                    id="startBtn"
+                    @click="caliStart()"
+                    :class="{ disabled: !audiobuffer || actxStartTime !== null }"
+                >
+                    {{ $t("calibrate.start") }}
+                </button>
             </div>
         </div>
     </div>

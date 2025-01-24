@@ -14,7 +14,7 @@ export default {
             const i = extra.files[0];
             const reader = new FileReader();
             reader.readAsText(i);
-            reader.onload = (evt) => {
+            reader.onload = evt => {
                 _this.recordFile = evt.target.result;
             };
         };
@@ -27,19 +27,28 @@ export default {
     },
 };
 
-const $id = (e) => document.getElementById(e);
+const $id = e => document.getElementById(e);
 </script>
 
 <template>
     <div id="cacheManage" class="routerRealPage">
-        <div class="blur" :class="{ cacheUnit: true }" style="padding: 10px;">
-            <h3> {{ $t("replayPage.title") }} </h3>
+        <div class="blur" :class="{ cacheUnit: true }" style="padding: 10px">
+            <h3>{{ $t("replayPage.title") }}</h3>
             <p>
                 {{ $t("replayPage.description") }}
             </p>
             <br />
-            {{ $t("replayPage.recordFile") }}：<input name="recordFile" type="file" id="recordFile" /><br /><br />
-            <input type="button" id="add_library" :class="{ disabled: !recordFile }" :value="$t('replayPage.play')" @click="playRecord()" />
+            {{ $t("replayPage.recordFile") }}：
+            <input name="recordFile" type="file" id="recordFile" />
+            <br />
+            <br />
+            <input
+                type="button"
+                id="add_library"
+                :class="{ disabled: !recordFile }"
+                :value="$t('replayPage.play')"
+                @click="playRecord()"
+            />
         </div>
     </div>
 </template>

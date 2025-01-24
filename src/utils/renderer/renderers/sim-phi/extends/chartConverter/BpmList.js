@@ -10,7 +10,8 @@ export class BpmList {
         this.list.push({ start, end, bpm, value });
         this.accTime += (end - start) / bpm;
     }
-    calc(beat) { //将pec时间转换为pgr时间
+    calc(beat) {
+        //将pec时间转换为pgr时间
         let time = 0;
         for (const i of this.list) {
             if (beat > i.end) continue;

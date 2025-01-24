@@ -1,658 +1,658 @@
 {
-  "info": {
-    "info": "Info",
-    "cancel": "Cancel",
-    "confirm": "OK",
-    "mod": "Modify",
-    "error": "Error",
-    "colon": ": ",
-    "yes": "Yes",
-    "no": "No",
-    "ok": "Ok",
-    "failure": "Failure",
-    "warning": "Warning"
-  },
-  "pages": {
-    "/startpage": "Start Page",
-    "/chartselect": "Select a Chart",
-    "/playing": "Gameplay",
-    "/login": "Log in via PhiZone",
-    "/calibrate": "Calibration",
-    "/cachemanage": "Cache Manager",
-    "/aboutpage": "About",
-    "/chartupload": "Upload Local Chart",
-    "/chartedit": "Edit Info",
-    "/playerb20": "Player B20",
-    "/pzranksingle": "???",
-    "/replaypage": "Replays",
-    "/changelogs": "Changelogs",
-    "/multipanel": "MP Panel",
-    "/settings": "Settings",
-    "/loading": "Loading",
-    "/multiindex": "MP Lobby"
-  },
-  "startPage": {
-    "viewB20": "View B20",
-    "retryLogin": "Retry Logging in",
-    "switch": "Switch",
-    "logout": "Log out",
-    "login": "Log in",
-    "unLogined": "GUEST",
-    "singleGame": "Singleplayer",
-    "multiGame": "Multiplayer",
-    "caches": "Caches",
-    "replay": "Replay",
-    "gameSettings": "Game Settings",
-    "forcedFullscreen": "Force Fullscreen",
-    "about": "About",
-    "serviceStatus": "Status",
-    "updateLogs": "Changelogs",
-    "redirectToCustomURL": "Insert custom sim-phi URL",
-    "logoutConfirm": "Are you sure you want to log out? ",
-    "logoutSuccessfully": "You are logged out and entering offline mode. ",
-    "offlineNotice": "Only local charts are availbale due to a lack of Internet connection. ",
-    "askForLogin": "All gameplay data WILL NOT be saved in offline mode. Would you like to log in? ",
-    "askForRelogin": "All gameplay data WILL NOT be saved in offline mode. Would you like to log in? ",
-    "offlineMPNotice": "An Internet connection is required for multiplayer sessions.",
-    "noaccountmodeMPNotice": "You are not (properly) logged in. Please try again after a relogin. ",
-    "loadingUserConfig": "Loading user preferences...",
-    "judgeRangeMPNotice": "Please set your custom judgement to Perfect±80ms Good±160ms. ",
-    "fullscreenjudgeMPNotice": "Please disable full-screen judgement before a multiplayer session. ",
-    "errLoadingUserConfig": "Error fetching user preferences. ",
-    "restoreMP": "We've detected that you've disconnected from an ongoing multiplayer session. Would you like to reconnect? ",
-    "recoverMP": "Reconnecting",
-    "recoverMPFailed": "Failed to reconnect. Please tap the multiplayer button to start a new session. ",
-    "recoverMPNetProblem": "Failed to reconnect due to network issue. Retry by tapping the multiplayer button. ",
-    "mpMaintainanceNotice": "You can't use multiplayer function unless you fill in a custom MPCenter URL in the settings. ",
-    "antiAddictionIssue": "Antiaddiction Error"
-  },
-  "multiIndex": {
-    "join": "Join",
-    "create": "Create",
-    "roomId": "Room ID",
-    "goPublic": "Public Room",
-    "description": "Room Description",
-    "roomId_cannot_be_empty": "Room ID must not be empty",
-    "loadRoomInfo": "Loading room info",
-    "owner": "Room Owner",
-    "roomListEmpty": "Room Not Found",
-    "roomFull": "Room is Full",
-    "roomLocked": "Room is Locked",
-    "byId": "by ID",
-    "byRks": "by rks",
-    "byPlayerNumber": "by Players",
-    "search": "Search",
-    "refresh": "Refresh",
-    "avgRks": "Avg. rks",
-    "err": "Failed to execute",
-    "joining": "Connecting to server",
-    "roomIdCantContainsDollar": "\"$\" is forbidden in Room IDs."
-  },
-  "aboutPage": {
-    "life": "Been running for {0} days since launch",
-    "QQGuild": "QQ Guild: PhiTogether233  Discord Server: https://discord.gg/9mMBYFe9",
-    "bio": "PhiTogether is an <b> uncommercial</b> rhythm game based on Phigros with PhiZone integrated",
-    "supportUs": "Support us if you enjoy the game! ",
-    "relationshipWithPG": "The game has NO relation to Pigeon Games (Xiamen) Co. Ltd",
-    "roles": {
-      "projectCreator": "Creator",
-      "developers": "Developers",
-      "soundDesigner": "Sound FX Artists",
-      "visualEffects": "VFX Artist",
-      "communityManager": "Community Moderators",
-      "gameArtist": "Texture Artists"
+    "info": {
+        "info": "Info",
+        "cancel": "Cancel",
+        "confirm": "OK",
+        "mod": "Modify",
+        "error": "Error",
+        "colon": ": ",
+        "yes": "Yes",
+        "no": "No",
+        "ok": "Ok",
+        "failure": "Failure",
+        "warning": "Warning"
     },
-    "thanksToOther": "We express thanks to all players and co-creators who had helped us develop the game! ",
-    "externalLinks": "Friendly Links",
-    "sponsors": "Sponsors",
-    "supportus": "Support us at Afdian"
-  },
-  "cacheManage": {
-    "manageAll": "Manage All Caches",
-    "deleteAllCharts": "Delete all local charts",
-    "forceVersionUpdate": "Force update",
-    "clearAllData": "Clear ALL DATA of PhiTogether",
-    "deletedSuccessfully": "Deleted successfully",
-    "confirmBeforeDeleteData": "Are you sure you want to delete it? ",
-    "confirmBeforeDelete": "Are you sure you want to delete it? ",
-    "delete": "Delete",
-    "allDataDeleted": "PhiTogether has removed all game data stored on your device. Please quit PhiTogether and restart the game. ",
-    "separate": "Miscellaneous",
-    "cachedFileTitle": "Caches for {0}",
-    "deleteThisGroupOfFiles": "Delete All",
-    "file": "File",
-    "type": "Type",
-    "operation": "Operations",
-    "music_illustration": "Music and Illustration",
-    "chart": "Chart",
-    "additionRes": "Extras"
-  },
-  "calibrate": {
-    "title": "Offset Settings",
-    "description1": "Hit the button on every downbeat. ",
-    "description2": "The result is only for reference. Different input methods may result in different offsets. ",
-    "click": "Hit",
-    "start": "Start",
-    "loadFile": "Loading calibration audio...",
-    "loadSuccess": "Successfully loaded calibration audio. ",
-    "loadError": "Failed to load calibration audio. ",
-    "decodeError": "Failed to decode calibration audio. ",
-    "confirm": "Would you like to set the offset to {c}?"
-  },
-  "changelogs": {
-    "title": "Changelogs"
-  },
-  "chartSelect": {
-    "jumpto": "Insert your destination page (1 - {0})",
-    "inputDosentMatchRequirement": "Invalid input",
-    "favourites": {
-      "add": "Favourite",
-      "addedSuccessfully": "Added {0} to favourites",
-      "remove": "Unfavourite",
-      "removedSuccessfully": "Removed {0} from favourites"
+    "pages": {
+        "/startpage": "Start Page",
+        "/chartselect": "Select a Chart",
+        "/playing": "Gameplay",
+        "/login": "Log in via PhiZone",
+        "/calibrate": "Calibration",
+        "/cachemanage": "Cache Manager",
+        "/aboutpage": "About",
+        "/chartupload": "Upload Local Chart",
+        "/chartedit": "Edit Info",
+        "/playerb20": "Player B20",
+        "/pzranksingle": "???",
+        "/replaypage": "Replays",
+        "/changelogs": "Changelogs",
+        "/multipanel": "MP Panel",
+        "/settings": "Settings",
+        "/loading": "Loading",
+        "/multiindex": "MP Lobby"
     },
-    "multiSyncChart": {
-      "sync": "Syncing chart",
-      "failed": "Failed to sync chart"
+    "startPage": {
+        "viewB20": "View B20",
+        "retryLogin": "Retry Logging in",
+        "switch": "Switch",
+        "logout": "Log out",
+        "login": "Log in",
+        "unLogined": "GUEST",
+        "singleGame": "Singleplayer",
+        "multiGame": "Multiplayer",
+        "caches": "Caches",
+        "replay": "Replay",
+        "gameSettings": "Game Settings",
+        "forcedFullscreen": "Force Fullscreen",
+        "about": "About",
+        "serviceStatus": "Status",
+        "updateLogs": "Changelogs",
+        "redirectToCustomURL": "Insert custom sim-phi URL",
+        "logoutConfirm": "Are you sure you want to log out? ",
+        "logoutSuccessfully": "You are logged out and entering offline mode. ",
+        "offlineNotice": "Only local charts are availbale due to a lack of Internet connection. ",
+        "askForLogin": "All gameplay data WILL NOT be saved in offline mode. Would you like to log in? ",
+        "askForRelogin": "All gameplay data WILL NOT be saved in offline mode. Would you like to log in? ",
+        "offlineMPNotice": "An Internet connection is required for multiplayer sessions.",
+        "noaccountmodeMPNotice": "You are not (properly) logged in. Please try again after a relogin. ",
+        "loadingUserConfig": "Loading user preferences...",
+        "judgeRangeMPNotice": "Please set your custom judgement to Perfect±80ms Good±160ms. ",
+        "fullscreenjudgeMPNotice": "Please disable full-screen judgement before a multiplayer session. ",
+        "errLoadingUserConfig": "Error fetching user preferences. ",
+        "restoreMP": "We've detected that you've disconnected from an ongoing multiplayer session. Would you like to reconnect? ",
+        "recoverMP": "Reconnecting",
+        "recoverMPFailed": "Failed to reconnect. Please tap the multiplayer button to start a new session. ",
+        "recoverMPNetProblem": "Failed to reconnect due to network issue. Retry by tapping the multiplayer button. ",
+        "mpMaintainanceNotice": "You can't use multiplayer function unless you fill in a custom MPCenter URL in the settings. ",
+        "antiAddictionIssue": "Antiaddiction Error"
     },
-    "songSource": {
-      "local": "Local",
-      "favourites": "Fav-ed",
-      "pz": "&nbsp;PhiZone&nbsp;",
-      "pt": "PT Com."
+    "multiIndex": {
+        "join": "Join",
+        "create": "Create",
+        "roomId": "Room ID",
+        "goPublic": "Public Room",
+        "description": "Room Description",
+        "roomId_cannot_be_empty": "Room ID must not be empty",
+        "loadRoomInfo": "Loading room info",
+        "owner": "Room Owner",
+        "roomListEmpty": "Room Not Found",
+        "roomFull": "Room is Full",
+        "roomLocked": "Room is Locked",
+        "byId": "by ID",
+        "byRks": "by rks",
+        "byPlayerNumber": "by Players",
+        "search": "Search",
+        "refresh": "Refresh",
+        "avgRks": "Avg. rks",
+        "err": "Failed to execute",
+        "joining": "Connecting to server",
+        "roomIdCantContainsDollar": "\"$\" is forbidden in Room IDs."
     },
-    "search": "Search by name",
-    "import": "Import",
-    "chartListIsEmpty": "No charts available",
-    "pageCount": "Page {page} / {pageAll} in all",
-    "playConfig": {
-      "mirror": "Mirror",
-      "adjustOffset": "Adjust Offset",
-      "previewMode": "Preview Mode",
-      "practiseMode": "Practice Mode",
-      "videoRecorder": "Record Video",
-      "speed": "Speed",
-      "speeds": {
-        "slowest": "Slowest",
-        "slower": "Slower",
-        "normal": "Normal",
-        "faster": "Faster",
-        "fastest": "Fastest"
-      }
+    "aboutPage": {
+        "life": "Been running for {0} days since launch",
+        "QQGuild": "QQ Guild: PhiTogether233  Discord Server: https://discord.gg/9mMBYFe9",
+        "bio": "PhiTogether is an <b> uncommercial</b> rhythm game based on Phigros with PhiZone integrated",
+        "supportUs": "Support us if you enjoy the game! ",
+        "relationshipWithPG": "The game has NO relation to Pigeon Games (Xiamen) Co. Ltd",
+        "roles": {
+            "projectCreator": "Creator",
+            "developers": "Developers",
+            "soundDesigner": "Sound FX Artists",
+            "visualEffects": "VFX Artist",
+            "communityManager": "Community Moderators",
+            "gameArtist": "Texture Artists"
+        },
+        "thanksToOther": "We express thanks to all players and co-creators who had helped us develop the game! ",
+        "externalLinks": "Friendly Links",
+        "sponsors": "Sponsors",
+        "supportus": "Support us at Afdian"
     },
-    "previewLoadFailed": "Failed to load preview audio. ",
-    "loadingChartList": "Loading Chart List",
-    "loadingChapterList": "Loading Chapter List",
-    "loadFailed": "Failed to Load",
-    "pgmChartNote": "This chart is a Phigrim Original. Please refer to Phigrim for more info. ",
-    "unableToSelectDueToCopyrightReasons": "Sorry, the chart is unavailable for copyright issues. ",
-    "loadingChart": "Downloading Chart",
-    "edit": "Edit",
-    "delete": "Delete",
-    "select": "Play",
-    "rankings": "Ranking",
-    "thisSongHasNoPlayableCharts": "No chart is available for this song. ",
-    "chartSelect": "Chart Selection",
-    "config": "Gameplay Config"
-  },
-  "loadingPage": {
-    "loadingRes": "Loading Resources"
-  },
-  "login": {
-    "usernameAndPasswordCantBeEmpty": "Empty value detected",
-    "loggingin": "Logging In",
-    "email": "Email",
-    "passwd": "Password",
-    "signin": "Login",
-    "signup": "Sign Up",
-    "noTapTapBinding": "Cannot find a PhiZone account using given TapTap account. Please login with PhiZone account first.",
-    "askTapTapBinding": "Would you like to bind this PhiZone account with TapTap account ({username}) ?",
-    "bindingTapTap": "Binding TapTap account",
-    "bindTapTapSuccess": "Successfully bound TapTap account with PhiZone account",
-    "bindTapTapFailure": "Binding TapTap failed, please ensure that the PhiZone account is one-on-one bound to the TapTap account"
-  },
-  "multiplayer": {
-    "liveRanking": "Ranking",
-    "connection": {
-      "error": "Failed to connect. Retrying",
-      "wsRec": "Disconnected from the server. Reconnecting...",
-      "reconnected": "Reconnected to the server. ",
-      "forcedBroken": "The server closed your connection due to a maintainence. Your multiplayer session has been aborted. ",
-      "sendDataFailed": "The attempt to send {action} has failed"
+    "cacheManage": {
+        "manageAll": "Manage All Caches",
+        "deleteAllCharts": "Delete all local charts",
+        "forceVersionUpdate": "Force update",
+        "clearAllData": "Clear ALL DATA of PhiTogether",
+        "deletedSuccessfully": "Deleted successfully",
+        "confirmBeforeDeleteData": "Are you sure you want to delete it? ",
+        "confirmBeforeDelete": "Are you sure you want to delete it? ",
+        "delete": "Delete",
+        "allDataDeleted": "PhiTogether has removed all game data stored on your device. Please quit PhiTogether and restart the game. ",
+        "separate": "Miscellaneous",
+        "cachedFileTitle": "Caches for {0}",
+        "deleteThisGroupOfFiles": "Delete All",
+        "file": "File",
+        "type": "Type",
+        "operation": "Operations",
+        "music_illustration": "Music and Illustration",
+        "chart": "Chart",
+        "additionRes": "Extras"
     },
-    "downloadPlayBack": {
-      "roomClosed": "Replays from a closed room can't be downloaded",
-      "noAccess": "You are not authorized to download the replay",
-      "iOSUnavailable": "The PhiTogether iOS App is currently no capable for batch replay export."
+    "calibrate": {
+        "title": "Offset Settings",
+        "description1": "Hit the button on every downbeat. ",
+        "description2": "The result is only for reference. Different input methods may result in different offsets. ",
+        "click": "Hit",
+        "start": "Start",
+        "loadFile": "Loading calibration audio...",
+        "loadSuccess": "Successfully loaded calibration audio. ",
+        "loadError": "Failed to load calibration audio. ",
+        "decodeError": "Failed to decode calibration audio. ",
+        "confirm": "Would you like to set the offset to {c}?"
     },
-    "downloadAllPlayBack": {
-      "confirm": "Are you sure you want to download ALL replays? ",
-      "done": "Download completed"
+    "changelogs": {
+        "title": "Changelogs"
     },
-    "wrappedSinglePlayBack": {
-      "confirm": "Are you sure you want to download this replay? "
+    "chartSelect": {
+        "jumpto": "Insert your destination page (1 - {0})",
+        "inputDosentMatchRequirement": "Invalid input",
+        "favourites": {
+            "add": "Favourite",
+            "addedSuccessfully": "Added {0} to favourites",
+            "remove": "Unfavourite",
+            "removedSuccessfully": "Removed {0} from favourites"
+        },
+        "multiSyncChart": {
+            "sync": "Syncing chart",
+            "failed": "Failed to sync chart"
+        },
+        "songSource": {
+            "local": "Local",
+            "favourites": "Fav-ed",
+            "pz": "&nbsp;PhiZone&nbsp;",
+            "pt": "PT Com."
+        },
+        "search": "Search by name",
+        "import": "Import",
+        "chartListIsEmpty": "No charts available",
+        "pageCount": "Page {page} / {pageAll} in all",
+        "playConfig": {
+            "mirror": "Mirror",
+            "adjustOffset": "Adjust Offset",
+            "previewMode": "Preview Mode",
+            "practiseMode": "Practice Mode",
+            "videoRecorder": "Record Video",
+            "speed": "Speed",
+            "speeds": {
+                "slowest": "Slowest",
+                "slower": "Slower",
+                "normal": "Normal",
+                "faster": "Faster",
+                "fastest": "Fastest"
+            }
+        },
+        "previewLoadFailed": "Failed to load preview audio. ",
+        "loadingChartList": "Loading Chart List",
+        "loadingChapterList": "Loading Chapter List",
+        "loadFailed": "Failed to Load",
+        "pgmChartNote": "This chart is a Phigrim Original. Please refer to Phigrim for more info. ",
+        "unableToSelectDueToCopyrightReasons": "Sorry, the chart is unavailable for copyright issues. ",
+        "loadingChart": "Downloading Chart",
+        "edit": "Edit",
+        "delete": "Delete",
+        "select": "Play",
+        "rankings": "Ranking",
+        "thisSongHasNoPlayableCharts": "No chart is available for this song. ",
+        "chartSelect": "Chart Selection",
+        "config": "Gameplay Config"
     },
-    "downloadSinglePlayBack": {
-      "cheating": "Failed to download：Player {player} may have cheated in Round {round}. This replay has been invalidated. "
-    },
-    "tips": {
-      "afterCreated": {
-        "roomOwner": "Player info is provided in the multiplayer panel. Once you are ready, you may lock the room and start the game. ",
-        "player": "Waiting for {0} to start the game..."
-      },
-      "selectChart": {
-        "roomOwner": "Please choose a chart so it gets synced among all players. ",
-        "player": "The room owner is now choosing a chart. Please wait patiently"
-      },
-      "loadingChart": "Loading the chart. The game is about to start! ",
-      "waitingForOthers": "Awaiting stats upload for all players...",
-      "chartLoaded": "Chart loaded. Starting game...",
-      "thisRoundIsOver": "Round over. You may check the statistics. ",
-      "becameRoomOwner": "You've become the new room owner. ",
-      "locked": "The room is locked. You may click on the green text on your title bar to open up multiplayer panel. ",
-      "waitingToStart": "Waiting for game to start...",
-      "scoreAllUploaded": "All players have uploaded their scores. Statistics will be automatically shown 10 seconds later. ",
-      "nextRoundStarted": {
-        "roomOwner": "New round has started. Please choose your next chart. ",
-        "player": "Next round has started. Please wait for the room owner to choose the chart. "
-      },
-      "exitRankFull": "You may exit this fullscreen page by clicking on the PhiTogether Logo. "
-    },
-    "recoverMultiFailed": "Failed to recover accidentally halted multiplayer session. ",
-    "doCreateRoom": {
-      "shareInfo": "[PhiTogether] I've created a multiplayer game session at {0}//{1}, press the multiplayer button to play with me! $$${2}$$$",
-      "copyShareInfoConfirm": "Share message has been shown below. Press [Copy] to copy the message. <br>{shareInfo}",
-      "copyShareInfo": "Copy",
-      "autoCopyFailed": "Failed to copy the message automatically. Please retry manualy by long pressing the text below. <br>{shareInfo}",
-      "failed": "Failed to create a room. Please retry. "
-    },
-    "joinRoom": {
-      "failed": "Failed to join the room. Please retry. "
-    },
-    "actionPlayer": {
-      "confirm": "Would you like to execute operation on {name}? ",
-      "askForAction": "What would you like to do with {name}? ",
-      "actions": {
-        "kickPlayer": "Kick Player",
-        "transferOwnerShip": "Transfer Ownership"
-      },
-      "error_competeMode": "You are not able to transfer room ownership in competition mode. "
-    },
-    "exitRoom": {
-      "error_competeMode": "You are not able to quit in competition mode. ",
-      "exited": "You've quitted! "
-    },
-    "lockRoom": {
-      "locking": "Locking the room",
-      "locked": "The room has been locked. Please choose a chart! ",
-      "err": "We ran into a error. Please retry"
-    },
-    "sendMsg": {
-      "cantBeEmpty": "Message can't be empty",
-      "success": "Message sent successfully",
-      "failed": "Failed to send the message"
-    },
-    "roomClosed": "Room closed. ",
-    "cantFindChartLocally": "Chart {0} {1} can't be found in your chart gallery. You may proceed after uploading this chart. ",
-    "multiWaitLoadChart": "Waiting for all players to...",
-    "failed_tryAfter3Sec": "We've run into an error. Retry in 3 seconds. ",
-    "uploadFailed_tryAfter3Sec": "We've run into an error. Retry in 3 seconds. ",
-    "gameStartedWarning": {
-      "body": "The game has started. Please be ready! ",
-      "title": "Game Started",
-      "chartStillLoading": "Sorry, the chart is still loading."
-    },
-    "waitToStartGame": "Chart synced. Waiting for other players...",
-    "gameStartUI": {
-      "title": "Game Ready!",
-      "body": "All players are ready to go. Press [Start] to set off! ",
-      "start": "Start"
-    },
-    "panels": {
-      "messages": {
-        "title": "Messages",
-        "messagesList": "Message list",
-        "msgInputPlaceholder": "Say something...",
-        "send": "Send"
-      },
-      "playerList": {
-        "title": "Player List"
-      },
-      "roundRank": {
-        "title": "Ranking (per song)"
-      },
-      "playerRank": {
-        "title": "Ranking (per player)",
-        "my": "My ({0}) game records",
-        "others": "{0}'s game records"
-      },
-      "rank": {
-        "genVer": "v{verStr} generated at",
-        "totalRanking": "General Ranking"
-      }
-    },
-    "operations": "Operations",
-    "multiActions": {
-      "switchToRankByAcc": "Rank by Acc",
-      "switchToRankByScore": "Rank by Score",
-      "rankedByAcc": "Ranked by Acuuracy",
-      "rankedByScore": "Ranked by Score",
-      "nextTrack": "Next Round",
-      "lockRoom": "Lock Room and Start",
-      "closeRoom": "Close",
-      "exitRoom": "Exit",
-      "rankFull": "Show Fullscreen Statistics",
-      "downloadAllPlayBack": "Download Replays for All",
-      "backToSingle": "Return to Singleplayer"
-    }
-  },
-  "playerB20": {
-    "loadB20": "Loading Data...",
-    "error": "We ran into an error when loading your data. "
-  },
-  "replayPage": {
-    "toBeOptimized": "Sorry, this function is UNSTABLE. You are likely to encounter some errors when using.",
-    "title": "Replay",
-    "description": "Please upload your replay file. Be advised, the chart must be imported in advance if it was played via local imports. ",
-    "recordFile": "Replay File",
-    "play": "Play",
-    "invalidPtr": "Error: Invalid replay file.",
-    "chartNotFound": "Cannot find chart {1} for {0}. Replay file cannot be played."
-  },
-  "userChartEdit": {
-    "title": "Modify Chart Data",
-    "askToFillWithUK": "Some info has not been given. Would you like to replace them with \"unknown\"?",
-    "success": "Modification Success",
-    "error": "We ran into an error when trying to modify the info. ",
-    "songName": "Title",
-    "composer": "Composer",
-    "illustrator": "Illustrator",
-    "charter": "Charter",
-    "level": "Level",
-    "difficulty": "Difficulty",
-    "save": "Save"
-  },
-  "userChartUpload": {
-    "title": "Upload Local Chart",
-    "description": {
-      "line0": "Please click on [Load from Local File] button to import your chart to PhiTogether (One zip file must contain ONLY ONE chart file / Extra resources should be uploaded before you upload the chart. )",
-      "line1": "In common circumstances, PhiTogether will automatically complete the process of the import. ",
-      "line2": "You may have to insert chart info manually in case of incomplete info file. ",
-      "line3": "Please click on the [RESET] button if you accidentally chose the wrong file. "
-    },
-    "target": "The chart you are about to upload is {0} {1} {2} by {3} (Chart md5: {4}) Please make sure you've got the correct chart. ",
-    "extraRes": "Extra Resources",
-    "add": "Add to Gallery",
-    "clear": "Reset",
-    "saving": "Saving charts",
-    "success": "Chart successfully imported",
-    "fileDoesntMatch": "The chart you've uploaded {0} is not identical to {1}. Please try another file or contact the room owner. ",
-    "chartAdded": "This chart has already been imported",
-    "err": {
-      "haveMultipleCharts": "Error: Multiple charts in one file is not supported",
-      "noChartSelected": "Error: Chart file not found",
-      "noSongSelected": "Error: Audio file not found",
-      "noImageSelected": "Error: Illustration file not found"
-    }
-  },
-  "loadChart": {
-    "info": "Downloading File: {loaded}/{resNum}",
-    "failed": "Failed to load",
-    "loading": "Loading Chart",
-    "failedFromPZRedirect": "Failed to load the chart. Please log in via PhiZone to retry. ",
-    "simphiLoading": "Loading Resources"
-  },
-  "requestFullscreen": {
-    "requestDownloadiOSApp": "We've detected that you are using an Apple Device. Would you like to install PhiTogether App for a better experience? ",
-    "unsupported": "Your browser does not support fullscreen mode, which may affect your gameplay experience. ",
-    "requestFullscreen": "PhiTogether is best with fullscreen mode. Click the button below to enter fullscreen mode in case you run into any issues. ",
-    "clickToFullscreen": "Go Fullscreen"
-  },
-  "update": {
-    "newVersionNotify": "The game is about to be updated from v{0} to v{1}, which may take no more than a minute. Would you like to update now? ",
-    "autoUpdateCheckFailed": "Failed to check for updates"
-  },
-  "askPermission": {
-    "notification": {
-      "msg": "Request for notification feed has failed. PhiTogether won't be able to inform you of the latest info from multiplayer sessions. ",
-      "err": "Would you like to receive notifications about multiplayer session info when you are AFK? "
-    }
-  },
-  "phizone": {
-    "scoreUpload": {
-      "getToken": "Uploading PhiZone Gameplay Config",
-      "getTokenErr": "Error: Unable to establish connection with the server",
-      "uploading": "Uploading Your Scores",
-      "failed": "Score upload has failed. Would you like to retry? "
-    },
-    "modJudgment": {
-      "offline": "Judgement configs can't be modified in offline mode. ",
-      "current": "Your current settings are Perfect±{0}/Good±{1}. Would you like to modify it? ",
-      "enterPJ": "Please insert new Perfect judgement (±25~±100) Unit: ms",
-      "enterGJ": "Please insert new Good judgement (±60~±180) Unit: ms",
-      "inputDosentMatchRequirement": "Your input does not match the requirements. ",
-      "error": "Failed to modify the configuration. ",
-      "success": "Successfully modified the configuration",
-      "modifying": "Modifing the coniguration..."
+    "loadingPage": {
+        "loadingRes": "Loading Resources"
     },
     "login": {
-      "autologinFailed": "Failed to log in automatically Now entering offline mode. All gameplay data will not be saved until you retry logging in. ",
-      "updatingUserInfo": "Updating User Data",
-      "success": "Welcome to PhiTogether, {userName}!",
-      "autologgingin": "Automatically loggin in via PhiZone",
-      "withPhiZone": "Login with PhiZone",
-      "withTapTap": "Login with TapTap"
+        "usernameAndPasswordCantBeEmpty": "Empty value detected",
+        "loggingin": "Logging In",
+        "email": "Email",
+        "passwd": "Password",
+        "signin": "Login",
+        "signup": "Sign Up",
+        "noTapTapBinding": "Cannot find a PhiZone account using given TapTap account. Please login with PhiZone account first.",
+        "askTapTapBinding": "Would you like to bind this PhiZone account with TapTap account ({username}) ?",
+        "bindingTapTap": "Binding TapTap account",
+        "bindTapTapSuccess": "Successfully bound TapTap account with PhiZone account",
+        "bindTapTapFailure": "Binding TapTap failed, please ensure that the PhiZone account is one-on-one bound to the TapTap account"
     },
-    "err": {
-      "retriveToken": {
-        "invalidPswd": "Incorrect password",
-        "unableToFindUser": "Incorrect username"
-      },
-      "unknown": "Unknown error",
-      "network": "Network error"
-    }
-  },
-  "respack": {
-    "customResApplied": "Successfully applied custom texture. ",
-    "requestReload": "Switching between PhiTogether texture presets requires a reload. Would you like to reload now? ",
-    "err": "Custom texture not set properly",
-    "unavailableNow": "Prpr custom respack is temporarily unavailable.",
-    "customResRemoved": "Removed successfully.",
-    "customResRemoveFailed": "Removing failed."
-  },
-  "simphi": {
-    "askActionForSound": "Please click the button below to allow the sound to play.",
-    "compatibilityWarning": {
-      "miBrowser": "Mi Browser on version 17.4 or earlier has been detected. You may encounter issues on audio playback. "
+    "multiplayer": {
+        "liveRanking": "Ranking",
+        "connection": {
+            "error": "Failed to connect. Retrying",
+            "wsRec": "Disconnected from the server. Reconnecting...",
+            "reconnected": "Reconnected to the server. ",
+            "forcedBroken": "The server closed your connection due to a maintainence. Your multiplayer session has been aborted. ",
+            "sendDataFailed": "The attempt to send {action} has failed"
+        },
+        "downloadPlayBack": {
+            "roomClosed": "Replays from a closed room can't be downloaded",
+            "noAccess": "You are not authorized to download the replay",
+            "iOSUnavailable": "The PhiTogether iOS App is currently no capable for batch replay export."
+        },
+        "downloadAllPlayBack": {
+            "confirm": "Are you sure you want to download ALL replays? ",
+            "done": "Download completed"
+        },
+        "wrappedSinglePlayBack": {
+            "confirm": "Are you sure you want to download this replay? "
+        },
+        "downloadSinglePlayBack": {
+            "cheating": "Failed to download：Player {player} may have cheated in Round {round}. This replay has been invalidated. "
+        },
+        "tips": {
+            "afterCreated": {
+                "roomOwner": "Player info is provided in the multiplayer panel. Once you are ready, you may lock the room and start the game. ",
+                "player": "Waiting for {0} to start the game..."
+            },
+            "selectChart": {
+                "roomOwner": "Please choose a chart so it gets synced among all players. ",
+                "player": "The room owner is now choosing a chart. Please wait patiently"
+            },
+            "loadingChart": "Loading the chart. The game is about to start! ",
+            "waitingForOthers": "Awaiting stats upload for all players...",
+            "chartLoaded": "Chart loaded. Starting game...",
+            "thisRoundIsOver": "Round over. You may check the statistics. ",
+            "becameRoomOwner": "You've become the new room owner. ",
+            "locked": "The room is locked. You may click on the green text on your title bar to open up multiplayer panel. ",
+            "waitingToStart": "Waiting for game to start...",
+            "scoreAllUploaded": "All players have uploaded their scores. Statistics will be automatically shown 10 seconds later. ",
+            "nextRoundStarted": {
+                "roomOwner": "New round has started. Please choose your next chart. ",
+                "player": "Next round has started. Please wait for the room owner to choose the chart. "
+            },
+            "exitRankFull": "You may exit this fullscreen page by clicking on the PhiTogether Logo. "
+        },
+        "recoverMultiFailed": "Failed to recover accidentally halted multiplayer session. ",
+        "doCreateRoom": {
+            "shareInfo": "[PhiTogether] I've created a multiplayer game session at {0}//{1}, press the multiplayer button to play with me! $$${2}$$$",
+            "copyShareInfoConfirm": "Share message has been shown below. Press [Copy] to copy the message. <br>{shareInfo}",
+            "copyShareInfo": "Copy",
+            "autoCopyFailed": "Failed to copy the message automatically. Please retry manualy by long pressing the text below. <br>{shareInfo}",
+            "failed": "Failed to create a room. Please retry. "
+        },
+        "joinRoom": {
+            "failed": "Failed to join the room. Please retry. "
+        },
+        "actionPlayer": {
+            "confirm": "Would you like to execute operation on {name}? ",
+            "askForAction": "What would you like to do with {name}? ",
+            "actions": {
+                "kickPlayer": "Kick Player",
+                "transferOwnerShip": "Transfer Ownership"
+            },
+            "error_competeMode": "You are not able to transfer room ownership in competition mode. "
+        },
+        "exitRoom": {
+            "error_competeMode": "You are not able to quit in competition mode. ",
+            "exited": "You've quitted! "
+        },
+        "lockRoom": {
+            "locking": "Locking the room",
+            "locked": "The room has been locked. Please choose a chart! ",
+            "err": "We ran into a error. Please retry"
+        },
+        "sendMsg": {
+            "cantBeEmpty": "Message can't be empty",
+            "success": "Message sent successfully",
+            "failed": "Failed to send the message"
+        },
+        "roomClosed": "Room closed. ",
+        "cantFindChartLocally": "Chart {0} {1} can't be found in your chart gallery. You may proceed after uploading this chart. ",
+        "multiWaitLoadChart": "Waiting for all players to...",
+        "failed_tryAfter3Sec": "We've run into an error. Retry in 3 seconds. ",
+        "uploadFailed_tryAfter3Sec": "We've run into an error. Retry in 3 seconds. ",
+        "gameStartedWarning": {
+            "body": "The game has started. Please be ready! ",
+            "title": "Game Started",
+            "chartStillLoading": "Sorry, the chart is still loading."
+        },
+        "waitToStartGame": "Chart synced. Waiting for other players...",
+        "gameStartUI": {
+            "title": "Game Ready!",
+            "body": "All players are ready to go. Press [Start] to set off! ",
+            "start": "Start"
+        },
+        "panels": {
+            "messages": {
+                "title": "Messages",
+                "messagesList": "Message list",
+                "msgInputPlaceholder": "Say something...",
+                "send": "Send"
+            },
+            "playerList": {
+                "title": "Player List"
+            },
+            "roundRank": {
+                "title": "Ranking (per song)"
+            },
+            "playerRank": {
+                "title": "Ranking (per player)",
+                "my": "My ({0}) game records",
+                "others": "{0}'s game records"
+            },
+            "rank": {
+                "genVer": "v{verStr} generated at",
+                "totalRanking": "General Ranking"
+            }
+        },
+        "operations": "Operations",
+        "multiActions": {
+            "switchToRankByAcc": "Rank by Acc",
+            "switchToRankByScore": "Rank by Score",
+            "rankedByAcc": "Ranked by Acuuracy",
+            "rankedByScore": "Ranked by Score",
+            "nextTrack": "Next Round",
+            "lockRoom": "Lock Room and Start",
+            "closeRoom": "Close",
+            "exitRoom": "Exit",
+            "rankFull": "Show Fullscreen Statistics",
+            "downloadAllPlayBack": "Download Replays for All",
+            "backToSingle": "Return to Singleplayer"
+        }
     },
-    "loadLib": {
-      "err": {
-        "msg1": "Error: Failed to load component {name}",
-        "msg2": "Failed to load component {name}. Please check your network connection and restart the game. ",
-        "msg3": "Failed to load component {name}. Please check your browser compatibility. Updating your browser may help. "
-      },
-      "libNames": {
-        "createImageBitmap": "ImageBitmap Compatibility",
-        "oggmentedBundle": "ogg Format Compatibiliby",
-        "webp": "webp Format Compatibiliby"
-      }
+    "playerB20": {
+        "loadB20": "Loading Data...",
+        "error": "We ran into an error when loading your data. "
     },
-    "handleFile": {
-      "unsupportedFile": "Unsupported file: {0}",
-      "loadingFile": "Loading file: {uploader_done}/{uploader_total}"
+    "replayPage": {
+        "toBeOptimized": "Sorry, this function is UNSTABLE. You are likely to encounter some errors when using.",
+        "title": "Replay",
+        "description": "Please upload your replay file. Be advised, the chart must be imported in advance if it was played via local imports. ",
+        "recordFile": "Replay File",
+        "play": "Play",
+        "invalidPtr": "Error: Invalid replay file.",
+        "chartNotFound": "Cannot find chart {1} for {0}. Replay file cannot be played."
     },
-    "loading": {
-      "imgLoadingError": "We've detected that images may have not loaded properly. Please terminate all your background tasks and retry. ",
-      "resLoadFailed1": "Error: Failed to load {0} resources",
-      "resLoadFailed2": "Failed to load resource: \n{0}\nPlease check your Internet connection and retry. "
-    },
-    "prprCustomRes": {
-      "applied": "Successfully applied custom resource pack. ",
-      "err": "Error: Unable to apply custom resouce pack. Please check your settings. "
-    },
-    "adjustOffset": {
-      "title": "Adjust Offset",
-      "reset": "Reset",
-      "save": "Save",
-      "confirmSave": "Would you like to save adjusted offset?",
-      "offsetSaved": "Adjusted offset saved.",
-      "errorWhenSavingOffset": "Error occurred when saving adjusted offset.",
-      "adjustedChartSaved": "Adjusted chart saved.",
-      "onlyRPESupport": "Only chart made with RPE is supported to export."
-    },
-    "playErr": {
-      "noChartSelected": "Error: Chart file not found",
-      "noMusicSelected": "Error: Audio file not found",
-      "judgeLineDoesentExist": "Error: Judgement line #{0} does not exist",
-      "imageDoesentExist": "Error: Image {0} does not exist"
-    }
-  },
-  "skin": {
-    "haveCommon": "You may have already imported this resource pack. Would you like to procees? ",
-    "saved": "Successfully imported the resouce pack. "
-  },
-  "playing": {
-    "iOSCannotExport": "Replay export is not supported on an Apple mobile device. "
-  },
-  "settings": {
-    "mpServerURL": "MPCenter URL",
-    "uploader": {
-      "loadFile": "Load from Local File",
-      "loadFileType": {
-        "file": "Load File",
-        "folder": "Load Folder"
-      },
-      "chart": "Chart",
-      "music": "Music",
-      "illustration": "Illustration",
-      "info": {
-        "name": "Title",
-        "artist": "Composer",
+    "userChartEdit": {
+        "title": "Modify Chart Data",
+        "askToFillWithUK": "Some info has not been given. Would you like to replace them with \"unknown\"?",
+        "success": "Modification Success",
+        "error": "We ran into an error when trying to modify the info. ",
+        "songName": "Title",
+        "composer": "Composer",
         "illustrator": "Illustrator",
         "charter": "Charter",
+        "level": "Level",
         "difficulty": "Difficulty",
-        "level": "Level"
-      }
+        "save": "Save"
+    },
+    "userChartUpload": {
+        "title": "Upload Local Chart",
+        "description": {
+            "line0": "Please click on [Load from Local File] button to import your chart to PhiTogether (One zip file must contain ONLY ONE chart file / Extra resources should be uploaded before you upload the chart. )",
+            "line1": "In common circumstances, PhiTogether will automatically complete the process of the import. ",
+            "line2": "You may have to insert chart info manually in case of incomplete info file. ",
+            "line3": "Please click on the [RESET] button if you accidentally chose the wrong file. "
+        },
+        "target": "The chart you are about to upload is {0} {1} {2} by {3} (Chart md5: {4}) Please make sure you've got the correct chart. ",
+        "extraRes": "Extra Resources",
+        "add": "Add to Gallery",
+        "clear": "Reset",
+        "saving": "Saving charts",
+        "success": "Chart successfully imported",
+        "fileDoesntMatch": "The chart you've uploaded {0} is not identical to {1}. Please try another file or contact the room owner. ",
+        "chartAdded": "This chart has already been imported",
+        "err": {
+            "haveMultipleCharts": "Error: Multiple charts in one file is not supported",
+            "noChartSelected": "Error: Chart file not found",
+            "noSongSelected": "Error: Audio file not found",
+            "noImageSelected": "Error: Illustration file not found"
+        }
+    },
+    "loadChart": {
+        "info": "Downloading File: {loaded}/{resNum}",
+        "failed": "Failed to load",
+        "loading": "Loading Chart",
+        "failedFromPZRedirect": "Failed to load the chart. Please log in via PhiZone to retry. ",
+        "simphiLoading": "Loading Resources"
+    },
+    "requestFullscreen": {
+        "requestDownloadiOSApp": "We've detected that you are using an Apple Device. Would you like to install PhiTogether App for a better experience? ",
+        "unsupported": "Your browser does not support fullscreen mode, which may affect your gameplay experience. ",
+        "requestFullscreen": "PhiTogether is best with fullscreen mode. Click the button below to enter fullscreen mode in case you run into any issues. ",
+        "clickToFullscreen": "Go Fullscreen"
+    },
+    "update": {
+        "newVersionNotify": "The game is about to be updated from v{0} to v{1}, which may take no more than a minute. Would you like to update now? ",
+        "autoUpdateCheckFailed": "Failed to check for updates"
+    },
+    "askPermission": {
+        "notification": {
+            "msg": "Request for notification feed has failed. PhiTogether won't be able to inform you of the latest info from multiplayer sessions. ",
+            "err": "Would you like to receive notifications about multiplayer session info when you are AFK? "
+        }
+    },
+    "phizone": {
+        "scoreUpload": {
+            "getToken": "Uploading PhiZone Gameplay Config",
+            "getTokenErr": "Error: Unable to establish connection with the server",
+            "uploading": "Uploading Your Scores",
+            "failed": "Score upload has failed. Would you like to retry? "
+        },
+        "modJudgment": {
+            "offline": "Judgement configs can't be modified in offline mode. ",
+            "current": "Your current settings are Perfect±{0}/Good±{1}. Would you like to modify it? ",
+            "enterPJ": "Please insert new Perfect judgement (±25~±100) Unit: ms",
+            "enterGJ": "Please insert new Good judgement (±60~±180) Unit: ms",
+            "inputDosentMatchRequirement": "Your input does not match the requirements. ",
+            "error": "Failed to modify the configuration. ",
+            "success": "Successfully modified the configuration",
+            "modifying": "Modifing the coniguration..."
+        },
+        "login": {
+            "autologinFailed": "Failed to log in automatically Now entering offline mode. All gameplay data will not be saved until you retry logging in. ",
+            "updatingUserInfo": "Updating User Data",
+            "success": "Welcome to PhiTogether, {userName}!",
+            "autologgingin": "Automatically loggin in via PhiZone",
+            "withPhiZone": "Login with PhiZone",
+            "withTapTap": "Login with TapTap"
+        },
+        "err": {
+            "retriveToken": {
+                "invalidPswd": "Incorrect password",
+                "unableToFindUser": "Incorrect username"
+            },
+            "unknown": "Unknown error",
+            "network": "Network error"
+        }
+    },
+    "respack": {
+        "customResApplied": "Successfully applied custom texture. ",
+        "requestReload": "Switching between PhiTogether texture presets requires a reload. Would you like to reload now? ",
+        "err": "Custom texture not set properly",
+        "unavailableNow": "Prpr custom respack is temporarily unavailable.",
+        "customResRemoved": "Removed successfully.",
+        "customResRemoveFailed": "Removing failed."
+    },
+    "simphi": {
+        "askActionForSound": "Please click the button below to allow the sound to play.",
+        "compatibilityWarning": {
+            "miBrowser": "Mi Browser on version 17.4 or earlier has been detected. You may encounter issues on audio playback. "
+        },
+        "loadLib": {
+            "err": {
+                "msg1": "Error: Failed to load component {name}",
+                "msg2": "Failed to load component {name}. Please check your network connection and restart the game. ",
+                "msg3": "Failed to load component {name}. Please check your browser compatibility. Updating your browser may help. "
+            },
+            "libNames": {
+                "createImageBitmap": "ImageBitmap Compatibility",
+                "oggmentedBundle": "ogg Format Compatibiliby",
+                "webp": "webp Format Compatibiliby"
+            }
+        },
+        "handleFile": {
+            "unsupportedFile": "Unsupported file: {0}",
+            "loadingFile": "Loading file: {uploader_done}/{uploader_total}"
+        },
+        "loading": {
+            "imgLoadingError": "We've detected that images may have not loaded properly. Please terminate all your background tasks and retry. ",
+            "resLoadFailed1": "Error: Failed to load {0} resources",
+            "resLoadFailed2": "Failed to load resource: \n{0}\nPlease check your Internet connection and retry. "
+        },
+        "prprCustomRes": {
+            "applied": "Successfully applied custom resource pack. ",
+            "err": "Error: Unable to apply custom resouce pack. Please check your settings. "
+        },
+        "adjustOffset": {
+            "title": "Adjust Offset",
+            "reset": "Reset",
+            "save": "Save",
+            "confirmSave": "Would you like to save adjusted offset?",
+            "offsetSaved": "Adjusted offset saved.",
+            "errorWhenSavingOffset": "Error occurred when saving adjusted offset.",
+            "adjustedChartSaved": "Adjusted chart saved.",
+            "onlyRPESupport": "Only chart made with RPE is supported to export."
+        },
+        "playErr": {
+            "noChartSelected": "Error: Chart file not found",
+            "noMusicSelected": "Error: Audio file not found",
+            "judgeLineDoesentExist": "Error: Judgement line #{0} does not exist",
+            "imageDoesentExist": "Error: Image {0} does not exist"
+        }
+    },
+    "skin": {
+        "haveCommon": "You may have already imported this resource pack. Would you like to procees? ",
+        "saved": "Successfully imported the resouce pack. "
+    },
+    "playing": {
+        "iOSCannotExport": "Replay export is not supported on an Apple mobile device. "
     },
     "settings": {
-      "display": {
-        "title": "Display",
-        "showAcc": "Show Accuracy",
-        "highLight": "Highlight Simul. Notes",
-        "lineColor": "FC/AP Indicator",
-        "feedback": "Touch Feedback",
-        "imageBlur": "Blur Background",
-        "showCE2": "Early/Late VFX",
-        "enableVP": "Hide Inactive Notes",
-        "enableFR": "Render with 32-bit Float Values",
-        "JITSOpen": "Real-time Ranking (Multiplayer)",
-        "enhanceRankVis": "Enhance Ranking Visibility",
-        "enableFilter": "Use Filters",
-        "filterInputPlaceholder": "Insert Shader Code Here",
-        "aspectRatio": "Aspect Ratio",
-        "followAspectRatio": "Follow Aspect Ratio",
-        "noteScale": "Note Size",
-        "noteScaleOptions": {
-          "smaller": "Smallest",
-          "small": "Smaller",
-          "default": "Default",
-          "large": "Larger",
-          "larger": "Largest"
+        "mpServerURL": "MPCenter URL",
+        "uploader": {
+            "loadFile": "Load from Local File",
+            "loadFileType": {
+                "file": "Load File",
+                "folder": "Load Folder"
+            },
+            "chart": "Chart",
+            "music": "Music",
+            "illustration": "Illustration",
+            "info": {
+                "name": "Title",
+                "artist": "Composer",
+                "illustrator": "Illustrator",
+                "charter": "Charter",
+                "difficulty": "Difficulty",
+                "level": "Level"
+            }
         },
-        "backgroundDim": "Background Dim",
-        "backgroundDimOptions": {
-          "dark": "Darkest",
-          "dim": "Darker",
-          "default": "Default",
-          "bright": "Brighter",
-          "light": "Brightest"
-        },
-        "defaultRankMethod": "Ranking Method Preference",
-        "defaultRankMethodOptions": {
-          "score": "by Score",
-          "acc": "by Accuracy"
-        },
-        "enableLife": "Display LIFE Bar"
-      },
-      "performance": {
-        "title": "Performance",
-        "noUIBlur": "Disable UI Blur Effect",
-        "lowRes": "Low Resolution Mode",
-        "autoDelay": "Real-time Audio Offset (Untick this if you run into any audio playback issues)",
-        "isMaxFrame": "Lock Framerate",
-        "useRecommendConfigurationsForLowPerformanceDevices": "Use recommended configurations for low-performance devices"
-      },
-      "resources": {
-        "title": "Resources",
-        "usekwlevelOverbgm": "Use Legacy LevelOver Music",
-        "resourcesType": "Resouce Pack Type",
-        "resourceTypes": {
-          "preset1": "Preset 1",
-          "preset2": "Preset 2",
-          "prprCustom": "Custom Resource Pack",
-          "PTCustom": "PhiTogether Online RP"
-        },
-        "respack": "Resource Pack",
-        "uploadCustomRespack": "Upload Custom Resource Pack",
-        "ptTutorialMessage": "Please refer to this bilibili video: av998035635",
-        "ptTutorialTitle": "Watch Configuration Tutorial",
-        "ptTutorial": "Usage referrence",
-        "customResourceLinkPlaceholder": "Insert Pack JSON URL",
-        "loadResButton": "Load",
-        "inputOffset": "Input Offset(ms): ",
-        "doCalibrate": "Calibrate",
-        "volume": "SoundFX Volume",
-        "volumeOptions": {
-          "off": "Off",
-          "low": "Equivalent Sound of a Mosquito",
-          "veryLow": "Super Low",
-          "mediumLow": "Low",
-          "regular": "Normal",
-          "high": "Loud",
-          "veryHigh": "Very Loud"
-        },
-        "removeThisRespack": "Remove"
-      },
-      "experimental": {
-        "title": "Experimental",
-        "adjustJudgmentRangeButton": "Adjust Judgement",
-        "enableDebugToolsButton": "Initiate Debug Tools",
-        "disableDebugToolsButton": "Disable Debug Tools",
-        "fullScreenJudge": "Fullscreen Judgement",
-        "stopWhenNoLife": "Stop Game When LIFE Goes Below Zero",
-        "reviewWhenResume": "View Previous Notes Before Resume",
-        "isForcedMaxFrame": "Forced Framerate Lock"
-      }
+        "settings": {
+            "display": {
+                "title": "Display",
+                "showAcc": "Show Accuracy",
+                "highLight": "Highlight Simul. Notes",
+                "lineColor": "FC/AP Indicator",
+                "feedback": "Touch Feedback",
+                "imageBlur": "Blur Background",
+                "showCE2": "Early/Late VFX",
+                "enableVP": "Hide Inactive Notes",
+                "enableFR": "Render with 32-bit Float Values",
+                "JITSOpen": "Real-time Ranking (Multiplayer)",
+                "enhanceRankVis": "Enhance Ranking Visibility",
+                "enableFilter": "Use Filters",
+                "filterInputPlaceholder": "Insert Shader Code Here",
+                "aspectRatio": "Aspect Ratio",
+                "followAspectRatio": "Follow Aspect Ratio",
+                "noteScale": "Note Size",
+                "noteScaleOptions": {
+                    "smaller": "Smallest",
+                    "small": "Smaller",
+                    "default": "Default",
+                    "large": "Larger",
+                    "larger": "Largest"
+                },
+                "backgroundDim": "Background Dim",
+                "backgroundDimOptions": {
+                    "dark": "Darkest",
+                    "dim": "Darker",
+                    "default": "Default",
+                    "bright": "Brighter",
+                    "light": "Brightest"
+                },
+                "defaultRankMethod": "Ranking Method Preference",
+                "defaultRankMethodOptions": {
+                    "score": "by Score",
+                    "acc": "by Accuracy"
+                },
+                "enableLife": "Display LIFE Bar"
+            },
+            "performance": {
+                "title": "Performance",
+                "noUIBlur": "Disable UI Blur Effect",
+                "lowRes": "Low Resolution Mode",
+                "autoDelay": "Real-time Audio Offset (Untick this if you run into any audio playback issues)",
+                "isMaxFrame": "Lock Framerate",
+                "useRecommendConfigurationsForLowPerformanceDevices": "Use recommended configurations for low-performance devices"
+            },
+            "resources": {
+                "title": "Resources",
+                "usekwlevelOverbgm": "Use Legacy LevelOver Music",
+                "resourcesType": "Resouce Pack Type",
+                "resourceTypes": {
+                    "preset1": "Preset 1",
+                    "preset2": "Preset 2",
+                    "prprCustom": "Custom Resource Pack",
+                    "PTCustom": "PhiTogether Online RP"
+                },
+                "respack": "Resource Pack",
+                "uploadCustomRespack": "Upload Custom Resource Pack",
+                "ptTutorialMessage": "Please refer to this bilibili video: av998035635",
+                "ptTutorialTitle": "Watch Configuration Tutorial",
+                "ptTutorial": "Usage referrence",
+                "customResourceLinkPlaceholder": "Insert Pack JSON URL",
+                "loadResButton": "Load",
+                "inputOffset": "Input Offset(ms): ",
+                "doCalibrate": "Calibrate",
+                "volume": "SoundFX Volume",
+                "volumeOptions": {
+                    "off": "Off",
+                    "low": "Equivalent Sound of a Mosquito",
+                    "veryLow": "Super Low",
+                    "mediumLow": "Low",
+                    "regular": "Normal",
+                    "high": "Loud",
+                    "veryHigh": "Very Loud"
+                },
+                "removeThisRespack": "Remove"
+            },
+            "experimental": {
+                "title": "Experimental",
+                "adjustJudgmentRangeButton": "Adjust Judgement",
+                "enableDebugToolsButton": "Initiate Debug Tools",
+                "disableDebugToolsButton": "Disable Debug Tools",
+                "fullScreenJudge": "Fullscreen Judgement",
+                "stopWhenNoLife": "Stop Game When LIFE Goes Below Zero",
+                "reviewWhenResume": "View Previous Notes Before Resume",
+                "isForcedMaxFrame": "Forced Framerate Lock"
+            }
+        }
+    },
+    "serverMsg": {
+        "error": "Unknown error occurred.",
+        "updatePTApp": "To play with others, you have to update your PhiTogether client.",
+        "roomAvailable": "The room is available.",
+        "competetionStarted": "The competetion in the room has started.",
+        "noServersAvailable": "Cannot find available multiplayer server.",
+        "canCreateRoom": "The room doesn't exists. You can create if you want.",
+        "roomIDOccupied": "The Room ID is occupied.",
+        "centerServerNA": "Error occurred when connecting to multiplayer center.",
+        "alreadyJoin": "The account has been already in the room, so you cannot join it again.",
+        "alreadyKicked": "The account has been already blocked by the owner in the room, so you cannot join the room again.",
+        "roomFull": "The number of players in the room has already exceeded the limit.",
+        "roomDoesntExist": "The room doesn't exist.",
+        "roomCreatedMsg": "The room with ID {1} is created by {0}.",
+        "roomJoinMsg": "Player {0} joinned the room.",
+        "reOnlineMsg": "Player {0} reconnected.",
+        "userMsg": "{0} says: {1}",
+        "ownerChangedMsg": "{0} became the new owner of the room.",
+        "roomLockMsg": "The player list is locked. Game would be started soon.",
+        "exitMsg": "{0} exited the room.",
+        "chartSelectedMsg": "Chart {0} {1} Lv.{2} {3} is selected.",
+        "sbChartLoadedMsg": "Player {0} loaded the chart. ({1}/{2})",
+        "gameStartMsg": "Game start!!!",
+        "nextTrackMsg": "The next round started.",
+        "sbScoreUploadedMsg": "Player {0} uploaded score info. ({1}/{2})",
+        "offlineMsg": "Player {0} disconnected.",
+        "roomClosedMsg": "The room is closed.",
+        "allScoreUploadedMsg": "All the players have successfully uploaded score info.",
+        "allLoadFinishMsg": "All the players have successfully loaded the chart. We can start now."
     }
-  },
-  "serverMsg": {
-    "error": "Unknown error occurred.",
-    "updatePTApp": "To play with others, you have to update your PhiTogether client.",
-    "roomAvailable": "The room is available.",
-    "competetionStarted": "The competetion in the room has started.",
-    "noServersAvailable": "Cannot find available multiplayer server.",
-    "canCreateRoom": "The room doesn't exists. You can create if you want.",
-    "roomIDOccupied": "The Room ID is occupied.",
-    "centerServerNA": "Error occurred when connecting to multiplayer center.",
-    "alreadyJoin": "The account has been already in the room, so you cannot join it again.",
-    "alreadyKicked": "The account has been already blocked by the owner in the room, so you cannot join the room again.",
-    "roomFull": "The number of players in the room has already exceeded the limit.",
-    "roomDoesntExist": "The room doesn't exist.",
-    "roomCreatedMsg": "The room with ID {1} is created by {0}.",
-    "roomJoinMsg": "Player {0} joinned the room.",
-    "reOnlineMsg": "Player {0} reconnected.",
-    "userMsg": "{0} says: {1}",
-    "ownerChangedMsg": "{0} became the new owner of the room.",
-    "roomLockMsg": "The player list is locked. Game would be started soon.",
-    "exitMsg": "{0} exited the room.",
-    "chartSelectedMsg": "Chart {0} {1} Lv.{2} {3} is selected.",
-    "sbChartLoadedMsg": "Player {0} loaded the chart. ({1}/{2})",
-    "gameStartMsg": "Game start!!!",
-    "nextTrackMsg": "The next round started.",
-    "sbScoreUploadedMsg": "Player {0} uploaded score info. ({1}/{2})",
-    "offlineMsg": "Player {0} disconnected.",
-    "roomClosedMsg": "The room is closed.",
-    "allScoreUploadedMsg": "All the players have successfully uploaded score info.",
-    "allLoadFinishMsg": "All the players have successfully loaded the chart. We can start now."
-  }
 }

@@ -16,18 +16,15 @@ export default {
     methods: {
         getDifficultyActual(chartInfo) {
             if (typeof chartInfo.difficulty === "string") return chartInfo.difficulty;
-            else
-                return chartInfo.difficulty === 0
-                    ? "?"
-                    : chartInfo.difficulty.toFixed(1);
+            else return chartInfo.difficulty === 0 ? "?" : chartInfo.difficulty.toFixed(1);
         },
         getFileNameGeneral(i) {
             const t = i.split("/");
             return decodeURIComponent(t[t.length - 1]);
         },
         async deleteCache(i, type, hid = false) {
-            if(type==="song") await ptdb.chart.song.delete(i);
-            else if(type==="chart") await ptdb.chart.chart.delete(i);
+            if (type === "song") await ptdb.chart.song.delete(i);
+            else if (type === "chart") await ptdb.chart.chart.delete(i);
             else return;
             hid || shared.game.msgHandler.sendMessage(this.$t("cacheManage.deletedSuccessfully"));
             this.cacheList = await ptdb.chart.renderCacheList();
@@ -70,7 +67,7 @@ export default {
                 case "all":
                     caches.delete("PTv0-Main").then(() => {
                         caches.delete("PTv0-Charts").then(() => {
-                            caches.delete("PTv0-User").then(async() => {
+                            caches.delete("PTv0-User").then(async () => {
                                 await indexedDB.deleteDatabase("PTv0");
                                 shared.game.msgHandler.success(
                                     this.$t("cacheManage.allDataDeleted")
@@ -140,38 +137,66 @@ export default {
 
 <template>
     <div id="cacheManage" class="routerRealPage">
-        <div class="blur cacheUnit" style="padding: 10px;">
+        <div class="blur cacheUnit" style="padding: 10px">
             <h3>{{ $t("cacheManage.manageAll") }}</h3>
-            <input type="button" :value="$t('cacheManage.deleteAllCharts')" @click="clearAll('charts')" />
-            <input type="button" :value="$t('cacheManage.forceVersionUpdate')" @click="clearAll('self')" /><br />
+            <input
+                type="button"
+                :value="$t('cacheManage.deleteAllCharts')"
+                @click="clearAll('charts')"
+            />
+            <input
+                type="button"
+                :value="$t('cacheManage.forceVersionUpdate')"
+                @click="clearAll('self')"
+            />
+            <br />
             <input type="button" :value="$t('cacheManage.clearAllData')" @click="clearAll('all')" />
             <!-- <input type="button" value="导入用户配置" @click="importUserData()" v-if="false" />
             <input type="button" value="导出用户配置" @click="exportUserData()" v-if="false" /> -->
         </div>
         <div class="blur cacheUnit" v-for="cache in cacheList">
-            <h3>{{ $t("cacheManage.cachedFileTitle", [ cache.name ? cache.name : $t("cacheManage.separate") ]) }}</h3>
-            <input type="button" @click="deleteCacheAll(cache)" :value="$t('cacheManage.deleteThisGroupOfFiles')" />
+            <h3>
+                {{
+                    $t("cacheManage.cachedFileTitle", [
+                        cache.name ? cache.name : $t("cacheManage.separate"),
+                    ])
+                }}
+            </h3>
+            <input
+                type="button"
+                @click="deleteCacheAll(cache)"
+                :value="$t('cacheManage.deleteThisGroupOfFiles')"
+            />
             <div class="cacheTable">
                 <div class="chartListChartItem">
-                    <div class="file"> {{ $t("cacheManage.file") }} </div>
-                    <div class="type"> {{ $t("cacheManage.type") }} </div>
-                    <div class="play"> {{ $t("cacheManage.operation") }} </div>
+                    <div class="file">{{ $t("cacheManage.file") }}</div>
+                    <div class="type">{{ $t("cacheManage.type") }}</div>
+                    <div class="play">{{ $t("cacheManage.operation") }}</div>
                 </div>
                 <div class="chartListChartItem" v-if="cache.id && cache.song">
                     <div class="file">{{ getFileNameGeneral(cache.song) }}</div>
-                    <div class="type"> {{ $t("cacheManage.music_illustration") }} </div>
+                    <div class="type">{{ $t("cacheManage.music_illustration") }}</div>
                     <div class="play">
-                        <input type="button" @click="deleteCache(cache.id, 'song')" :value="$t('cacheManage.delete')" />
+                        <input
+                            type="button"
+                            @click="deleteCache(cache.id, 'song')"
+                            :value="$t('cacheManage.delete')"
+                        />
                     </div>
                 </div>
                 <div v-for="chart in cache.charts">
                     <div class="chartListChartItem">
                         <div class="file">{{ getFileNameGeneral(chart.chart) }}</div>
                         <div class="type">
-                            {{ $t("cacheManage.chart") }} {{ chart.level }} {{ getDifficultyActual(chart) }}
+                            {{ $t("cacheManage.chart") }} {{ chart.level }}
+                            {{ getDifficultyActual(chart) }}
                         </div>
                         <div class="play">
-                            <input type="button" @click="deleteCache(chart.id, 'chart')" :value="$t('cacheManage.delete')" />
+                            <input
+                                type="button"
+                                @click="deleteCache(chart.id, 'chart')"
+                                :value="$t('cacheManage.delete')"
+                            />
                         </div>
                     </div>
                     <!-- <div class="chartListChartItem" v-if="chart.assets">
@@ -194,7 +219,9 @@ export default {
     margin: 25px;
     padding: 5px;
     border-radius: 20px;
-    box-shadow: #002a8328 0px 0px 20px 5px, inset #002a8328 0px 0px 50px 8px;
+    box-shadow:
+        #002a8328 0px 0px 20px 5px,
+        inset #002a8328 0px 0px 50px 8px;
 }
 
 .chartListChartItem div {
@@ -207,7 +234,7 @@ export default {
     margin: 10px;
 }
 
-.chartListChartItem>div {
+.chartListChartItem > div {
     flex: 2;
     word-break: break-word;
     display: flex;
