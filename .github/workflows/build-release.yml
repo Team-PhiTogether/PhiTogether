@@ -1,0 +1,71 @@
+name: Build Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          
+      - name: Update version in package.json
+        run: |
+          sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" package.json
+          
+      - name: Commit version update
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add package.json
+          git commit -m "[Release] Update to $VERSION"
+          git push
+          
+      - name: Install dependencies and Build
+        run: |
+          pnpm install
+          pnpm build
+          
+      - name: Deploy to pages branch
+        run: |
+          TARGET_BRANCH=$([ "${{ github.event.release.prerelease }}" == "true" ] && echo "pages-preview" || echo "pages")
+          git fetch origin $TARGET_BRANCH || git branch $TARGET_BRANCH
+          git checkout $TARGET_BRANCH
+          rm -rf *
+          cp -r dist/* .
+          git add .
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "[deploy${TARGET_BRANCH#pages}] $VERSION"
+          git push -f origin $TARGET_BRANCH
+          git checkout -
+        
+      - name: Create build artifact
+        run: |
+          tar -czf build.tar.gz dist/
+          
+      - name: Upload build artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./build.tar.gz
+          asset_name: build.tar.gz
+          asset_content_type: application/gzip
