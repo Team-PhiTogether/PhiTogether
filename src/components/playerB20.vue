@@ -1,53 +1,53 @@
 <script>
-    import shared from "../utils/js/shared.js";
-    import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
+import shared from "../utils/js/shared.js";
+import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
 
-    const $ = query => document.getElementById(query);
-    const $$ = query => document.body.querySelector(query);
-    const $$$ = query => document.body.querySelectorAll(query);
+const $ = query => document.getElementById(query);
+const $$ = query => document.body.querySelector(query);
+const $$$ = query => document.body.querySelectorAll(query);
 
-    export default {
-        name: "playerB20",
-        data() {
-            return {
-                loaded: false,
-                data: null,
-            };
+export default {
+    name: "playerB20",
+    data() {
+        return {
+            loaded: false,
+            data: null,
+        };
+    },
+    computed: {
+        pzResUrlGlobal() {
+            "res.phizone.cn";
         },
-        computed: {
-            pzResUrlGlobal() {
-                "res.phizone.cn";
-            },
-            loginInfo() {
-                return shared.game.ptmain.gameConfig.account.userBasicInfo;
-            },
+        loginInfo() {
+            return shared.game.ptmain.gameConfig.account.userBasicInfo;
         },
-        async mounted() {
-            try {
-                shared.game.loadHandler.l(this.$t("playerB20.loadB20"), "loadb20");
-                const id = this.$route.query.id;
-                this.data = await phizoneApi.getPlayerB20Asv1(
-                    shared.game.ptmain.gameConfig.account.tokenInfo.access_token,
-                    id
-                );
-                this.loaded = true;
-            } catch (e) {
-                shared.game.msgHandler.sendMessage(this.$t("playerB20.error"), "error");
-            } finally {
-                shared.game.loadHandler.r("loadb20");
-            }
-        },
-        deactivated() {
+    },
+    async mounted() {
+        try {
+            shared.game.loadHandler.l(this.$t("playerB20.loadB20"), "loadb20");
+            const id = this.$route.query.id;
+            this.data = await phizoneApi.getPlayerB20Asv1(
+                shared.game.ptmain.gameConfig.account.tokenInfo.access_token,
+                id
+            );
+            this.loaded = true;
+        } catch (e) {
+            shared.game.msgHandler.sendMessage(this.$t("playerB20.error"), "error");
+        } finally {
             shared.game.loadHandler.r("loadb20");
+        }
+    },
+    deactivated() {
+        shared.game.loadHandler.r("loadb20");
+    },
+    methods: {
+        scoreStr(t) {
+            const a = t.toFixed(0);
+            return "0".repeat(a.length < 7 ? 7 - a.length : 0) + a;
         },
-        methods: {
-            scoreStr(t) {
-                const a = t.toFixed(0);
-                return "0".repeat(a.length < 7 ? 7 - a.length : 0) + a;
-            },
-        },
-        watch: {},
-    };
+    },
+    watch: {},
+};
 </script>
 
 <template>
@@ -148,62 +148,62 @@
 </template>
 
 <style>
-    .songCardID.Phi {
-        background-color: goldenrod;
-    }
+.songCardID.Phi {
+    background-color: goldenrod;
+}
 
+.playerB20Container .scoreRankingCardEle {
+    width: 25% !important;
+}
+
+.playerB20Card {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    max-width: 100%;
+    width: 300px;
+    background-color: #c5effb;
+    border-radius: 20px;
+    box-shadow:
+        #002a8328 0px 0px 20px 5px,
+        inset #002a8328 0px 0px 50px 8px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.playerB20Card .playerB20Info {
+    font-size: 0.7em;
+    font-weight: normal;
+}
+
+.playerB20Container .scoreRankingTitle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.playerB20Container #playerCardUsrAvatarParent {
+    margin-top: 0;
+}
+
+#playerCardUsrAvatar img {
+    filter: unset;
+}
+
+.playerB20Card .name {
+    font-size: 1.2em;
+}
+
+@media screen and (max-width: 700px) {
     .playerB20Container .scoreRankingCardEle {
-        width: 25% !important;
+        width: 33.3% !important;
     }
+}
 
-    .playerB20Card {
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        max-width: 100%;
-        width: 300px;
-        background-color: #c5effb;
-        border-radius: 20px;
-        box-shadow:
-            #002a8328 0px 0px 20px 5px,
-            inset #002a8328 0px 0px 50px 8px;
-        padding-top: 10px;
-        padding-bottom: 10px;
+@media screen and (max-width: 600px) {
+    .playerB20Container .scoreRankingCardEle {
+        width: 50% !important;
     }
-
-    .playerB20Card .playerB20Info {
-        font-size: 0.7em;
-        font-weight: normal;
-    }
-
-    .playerB20Container .scoreRankingTitle {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-
-    .playerB20Container #playerCardUsrAvatarParent {
-        margin-top: 0;
-    }
-
-    #playerCardUsrAvatar img {
-        filter: unset;
-    }
-
-    .playerB20Card .name {
-        font-size: 1.2em;
-    }
-
-    @media screen and (max-width: 700px) {
-        .playerB20Container .scoreRankingCardEle {
-            width: 33.3% !important;
-        }
-    }
-
-    @media screen and (max-width: 600px) {
-        .playerB20Container .scoreRankingCardEle {
-            width: 50% !important;
-        }
-    }
+}
 </style>
