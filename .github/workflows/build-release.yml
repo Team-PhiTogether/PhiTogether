@@ -32,8 +32,8 @@ jobs:
 
             - name: Commit version update
               run: |
-                  git config --local user.email 'actions@github.com'"
-                  git config --local user.name 'GitHub Actions'"
+                  git config --local user.email 'actions@github.com'
+                  git config --local user.name 'GitHub Actions'
                   git add package.json
                   git commit -m "[Release] Update to v$VERSION"
                   git push origin HEAD:main
@@ -51,8 +51,8 @@ jobs:
             #       rm -rf *
             #       cp -r dist/* .
             #       git add .
-            #       git config --local user.email 'actions@github.com'"
-            #       git config --local user.name 'GitHub Actions'"
+            #       git config --local user.email 'actions@github.com'
+            #       git config --local user.name 'GitHub Actions'
             #       git commit -m "[deploy${TARGET_BRANCH#pages}] $VERSION"
             #       git push -f origin $TARGET_BRANCH
             #       git checkout -
