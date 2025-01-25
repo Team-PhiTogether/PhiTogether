@@ -48,7 +48,7 @@ const requestFullscreen = async forced => {
     }
     if (spec.isiOSDevice && !spec.isPhiTogetherApp) {
         if (await msgHandler.confirm(i18n.global.t("requestFullscreen.requestDownloadiOSApp")))
-            window.location.href = "https://testflight.apple.com/join/jMbjenat";
+            window.location.href = "https://testflight.apple.com/join/PvFpBSft";
         shared.game.requestedFullscreen = true;
         return;
     }

@@ -2,7 +2,7 @@
 
 [English](README.md) | 中文
 
-[iOS 应用](https://testflight.apple.com/join/jMbjenat)
+[iOS 应用](https://testflight.apple.com/join/PvFpBSft)
 
 [服务状态](https://status.phitogether.fun)
 
