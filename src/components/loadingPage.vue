@@ -1,70 +1,71 @@
 <script>
-import shared from "../utils/js/shared";
+    import shared from "../utils/js/shared";
 
-export default {
-    name: "loadingPage",
-    data() {
-        return {
-            ver: spec.thisVersion,
-            loaded: false,
-            animated: false,
-            currentImageIndex: 0,
-        };
-    },
-    computed: {},
-    methods: {
-        showNextImage() {
-            const images = document.querySelectorAll(".loading-image");
-            if (this.currentImageIndex >= images.length) {
-                this.animated = true;
-                if (this.loaded) {
-                    if (this.$route.path === "/loading") this.$router.replace("/startPage");
-                } else shared.game.loadHandler.l(this.$t("loadingPage.loadingRes"), "loadRes");
-                return;
-            }
-
-            images[this.currentImageIndex].style.display = "block";
-            setTimeout(() => {
-                if (!images[this.currentImageIndex]) return;
-                images[this.currentImageIndex].style.display = "none";
-                this.currentImageIndex++;
-                this.showNextImage();
-            }, 2500);
+    export default {
+        name: "loadingPage",
+        data() {
+            return {
+                ver: spec.thisVersion,
+                loaded: false,
+                animated: false,
+                currentImageIndex: 0,
+            };
         },
-    },
-    activated() {
-        if (this.loaded) this.$router.replace("/startPage");
-    },
-    async mounted() {
-        shared.game.loaded = () => {
-            this.loaded = true;
-            if (window.spec.antiAdditionEnabled)
-                if (document.visibilityState !== "hidden") window.nativeApi.antiAddiction_start();
-                else
-                    shared.game.afterShow.push(
-                        () => window.nativeApi && window.nativeApi.antiAddiction_start()
-                    );
-            if (this.animated) {
-                shared.game.loadHandler.r("loadRes");
-                if (this.$route.path === "/loading") this.$router.replace("/startPage");
-            }
-        };
+        computed: {},
+        methods: {
+            showNextImage() {
+                const images = document.querySelectorAll(".loading-image");
+                if (this.currentImageIndex >= images.length) {
+                    this.animated = true;
+                    if (this.loaded) {
+                        if (this.$route.path === "/loading") this.$router.replace("/startPage");
+                    } else shared.game.loadHandler.l(this.$t("loadingPage.loadingRes"), "loadRes");
+                    return;
+                }
 
-        const untilFullscreen = () => {
-            return new Promise(res => {
-                const checkOnce = () => {
-                    if (shared.game.requestedFullscreen) res();
-                    else setTimeout(checkOnce, 100);
-                };
-                setTimeout(checkOnce, 100);
-            });
-        };
+                images[this.currentImageIndex].style.display = "block";
+                setTimeout(() => {
+                    if (!images[this.currentImageIndex]) return;
+                    images[this.currentImageIndex].style.display = "none";
+                    this.currentImageIndex++;
+                    this.showNextImage();
+                }, 2500);
+            },
+        },
+        activated() {
+            if (this.loaded) this.$router.replace("/startPage");
+        },
+        async mounted() {
+            shared.game.loaded = () => {
+                this.loaded = true;
+                if (window.spec.antiAdditionEnabled)
+                    if (document.visibilityState !== "hidden")
+                        window.nativeApi.antiAddiction_start();
+                    else
+                        shared.game.afterShow.push(
+                            () => window.nativeApi && window.nativeApi.antiAddiction_start()
+                        );
+                if (this.animated) {
+                    shared.game.loadHandler.r("loadRes");
+                    if (this.$route.path === "/loading") this.$router.replace("/startPage");
+                }
+            };
 
-        await untilFullscreen();
+            const untilFullscreen = () => {
+                return new Promise(res => {
+                    const checkOnce = () => {
+                        if (shared.game.requestedFullscreen) res();
+                        else setTimeout(checkOnce, 100);
+                    };
+                    setTimeout(checkOnce, 100);
+                });
+            };
 
-        this.showNextImage();
-    },
-};
+            await untilFullscreen();
+
+            this.showNextImage();
+        },
+    };
 </script>
 
 <template>
@@ -74,32 +75,32 @@ export default {
 </template>
 
 <style>
-#loadingPage {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 85vh;
-    margin-top: -7.5vh;
-    /* top: 50%;
+    #loadingPage {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 85vh;
+        margin-top: -7.5vh;
+        /* top: 50%;
     position: fixed; */
-}
-
-.loading-image {
-    display: none;
-    position: absolute;
-    max-width: 75%;
-    animation: loadingFadeInOutAnimation 2s forwards;
-}
-
-@keyframes loadingFadeInOutAnimation {
-    0%,
-    100% {
-        opacity: 0;
     }
 
-    25%,
-    75% {
-        opacity: 1;
+    .loading-image {
+        display: none;
+        position: absolute;
+        max-width: 75%;
+        animation: loadingFadeInOutAnimation 2s forwards;
     }
-}
+
+    @keyframes loadingFadeInOutAnimation {
+        0%,
+        100% {
+            opacity: 0;
+        }
+
+        25%,
+        75% {
+            opacity: 1;
+        }
+    }
 </style>
