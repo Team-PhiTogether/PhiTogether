@@ -1,8 +1,9 @@
 <script>
-    import shared from "../utils/js/shared.js";
-    import { audio } from "../utils/js/aup.js";
-    import ptdb from "../utils/ptdb";
-    import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
+    import shared from "@utils/js/shared.js";
+    import { audio } from "@utils/js/aup.js";
+    import { partyMgr } from "@utils/js/partyMgr";
+    import ptdb from "@utils/ptdb";
+    import { PhiZoneAPI as phizoneApi } from "@utils/phizone";
     export default {
         name: "chartSelect",
         data() {
