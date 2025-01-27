@@ -1,5 +1,5 @@
 import simphi from "./simphi";
-import { audio } from "@utils/js/aup.js";
+import { audio } from "@utils/js/aup";
 import {
     full,
     Timer,
