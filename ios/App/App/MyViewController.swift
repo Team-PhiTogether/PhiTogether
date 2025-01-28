@@ -39,7 +39,7 @@ class MyViewController: CAPBridgeViewController {
                    }
                    if #available(iOS 13.0, *){
                            let alertController = UIAlertController(title: "提示", message: "因iOS系统bug，PhiTogether被切至后台重新打开可能无法正常播放声音，您可以通过清除 PhiTogether 后台然后重启 PhiTogether 解决问题。", preferredStyle: .alert)
-                           let okBtn = UIAlertAction(title: "好", style: .default, handler: nil)
+                           let okBtn = UIAlertAction(title: "好/OK", style: .default, handler: nil)
                            alertController.addAction(okBtn)
                            self.present(alertController, animated: true)
                            UserDefaults.standard.set(true, forKey: "soundWarnSent")
