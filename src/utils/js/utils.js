@@ -1,6 +1,6 @@
 "use strict";
 //utils
-const Utils = {
+export const Utils = {
     /**@this {HTMLElement} */
     copyText() {
         const _this = this;
@@ -67,7 +67,7 @@ const Utils = {
         return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;");
     },
     /**@type {(familyName:string,{...options}?:{})=>Promise<void>} */
-    addFont() {},
+    addFont() { },
     throttle(func, wait) {
         let timer = null;
         return function () {
@@ -172,10 +172,10 @@ const Utils = {
             return S % 10 === 1 && S !== 11
                 ? "st"
                 : S % 10 === 2 && S !== 12
-                  ? "nd"
-                  : S % 10 === 3 && S !== 13
-                    ? "rd"
-                    : "th";
+                    ? "nd"
+                    : S % 10 === 3 && S !== 13
+                        ? "rd"
+                        : "th";
         },
         w: function () {
             return this.getDay();
@@ -250,7 +250,7 @@ const Utils = {
                     this.getUTCMinutes() / 60 +
                     this.getUTCSeconds() / 3600) *
                     1000) /
-                    24
+                24
             );
         },
         g: function () {
@@ -350,7 +350,7 @@ const Utils = {
     };
 }).call(this);
 
-function parseURL(url) {
+export function parseURL(url) {
     let tmp = url.substr(url.indexOf("//") + 2);
     let host = tmp.substr(0, tmp.indexOf("/"));
     let tmp2 = tmp.substr(tmp.indexOf("/"));
@@ -371,7 +371,7 @@ function parseURL(url) {
     };
 }
 
-function getQueryObject(search) {
+export function getQueryObject(search) {
     let query = search.substring(1);
     let vars = query.split("&");
     let res = {};
@@ -385,7 +385,7 @@ function getQueryObject(search) {
 window.Math.standardDeviation = arr =>
     Math.sqrt(
         arr.reduce((a, b) => a + (b - arr.reduce((a, b) => a + b) / arr.length) ** 2, 0) /
-            arr.length
+        arr.length
     );
 
 const html = e => e[0];

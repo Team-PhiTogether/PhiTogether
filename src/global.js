@@ -19,6 +19,8 @@ import { recordMgr } from "@components/recordMgr/recordMgr.js";
 import { replayMgr } from "@components/recordMgr/replayMgr.js";
 import ptdb from "@utils/ptdb";
 import "@utils/js/errHandler";
+import { Utils } from "@utils/js/utils";
+
 if (import.meta.env.DEV) self.ptdb = ptdb;
 
 import { renderers } from "@utils/renderer";

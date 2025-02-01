@@ -1,6 +1,7 @@
-import shared from "./shared";
-import { msgHandler } from "./msgHandler.js";
-import { getConstructorName } from "../js/common.js";
+import shared from "@utils/js/shared";
+import { msgHandler } from "@utils/js/msgHandler";
+import { getConstructorName } from "@utils/js/common";
+import { Utils } from "@utils/js/utils";
 
 const errsToReport = [];
 

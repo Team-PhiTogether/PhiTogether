@@ -1,3 +1,5 @@
+import { getQueryObject, parseURL } from "@utils/js/utils";
+
 function removeSearch(i) {
     i = i.substr(0, i.indexOf("?"));
     const k = i.indexOf("/PTVirtual/charts");

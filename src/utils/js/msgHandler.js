@@ -1,5 +1,6 @@
 import Notiflix from "notiflix";
 import i18n from "@locales";
+import { Utils } from "@utils/js/utils";
 
 export const msgHandler = {
     nodeText: document.getElementById("msg-out"),
