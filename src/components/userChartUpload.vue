@@ -115,18 +115,18 @@
                     !selectDifficulty.value ||
                     !selectLevel.value
                 )
-                    if (
-                        await shared.game.msgHandler.confirm(
-                            this.$t("userChartEdit.askToFillWithUK")
-                        )
-                    ) {
+                    // if (
+                    //     await shared.game.msgHandler.confirm(
+                    //         this.$t("userChartEdit.askToFillWithUK")
+                    //     )
+                    // ) {
                         inputName.value = inputName.value || "unknown";
                         inputArtist.value = inputArtist.value || "unknown";
                         inputIllustrator.value = inputIllustrator.value || "unknown";
                         inputCharter.value = inputCharter.value || "unknown";
                         selectDifficulty.value = selectDifficulty.value || "SP";
                         selectLevel.value = selectLevel.value || "?";
-                    } else return;
+                    // } else return;
 
                 if (this.$route.query.then === "playing") {
                     sessionStorage.removeItem("loadedChart");

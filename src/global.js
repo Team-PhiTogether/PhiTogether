@@ -95,6 +95,7 @@ router.beforeEach((to, from) => {
         .toUpperCase();
     if (!["/chartSelect"].includes(to.path)) document.querySelector("#app").scrollTop = 0;
     let s;
+    console.log(to.path)
     switch (to.path) {
         case "/chartUpload":
             s = document.getElementById("select2");
@@ -127,6 +128,8 @@ router.beforeEach((to, from) => {
                         () => window.nativeApi && window.nativeApi.antiAddiction_enterGame()
                     );
             break;
+        case "/playChart":
+            return ptmain.loadFromRedirect(new URLSearchParams(to.fullPath.slice(to.fullPath.indexOf("?") + 1)))
     }
     if (s) {
         s.classList.remove("out");
@@ -939,7 +942,7 @@ const ptAppInstance = createApp({
             stage.style.display = "none";
 
             if (searchParams && searchParams.get("play")) {
-                this.loadFromRedirect();
+                this.loadFromRedirect(searchParams);
             }
         },
         updatePrprCustomRespack() {
@@ -959,7 +962,7 @@ const ptAppInstance = createApp({
             this.isSimphiLoaded = true;
             if (this.gameConfig.resourcesType === "prpr-custom") this.updatePrprCustomRespack();
         },
-        async loadFromRedirect() {
+        async loadFromRedirect(searchParams) {
             loadHandler.l(this.$t("loadChart.loading"), "loadChartfr");
 
             try {
