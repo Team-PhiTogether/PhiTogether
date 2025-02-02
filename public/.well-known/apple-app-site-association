@@ -1,0 +1,13 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appID": "ZW372988NV.fun.phitogether.app",
+                "paths": [
+                    "*"
+                ]
+            }
+        ]
+    }
+}
