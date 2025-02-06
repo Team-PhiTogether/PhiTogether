@@ -15,6 +15,7 @@
     },
     "dependencies": {
         "@capacitor/android": "^6.2.0",
+        "@capacitor/app": "^7.0.0",
         "@capacitor/core": "^6.2.0",
         "@capacitor/ios": "^6.2.0",
         "@types/node": "^20.8.0",

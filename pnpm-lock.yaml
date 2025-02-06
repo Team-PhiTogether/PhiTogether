@@ -13,6 +13,9 @@ dependencies:
   '@capacitor/android':
     specifier: ^6.2.0
     version: registry.npmjs.org/@capacitor/android@6.2.0(@capacitor/core@6.2.0)
+  '@capacitor/app':
+    specifier: ^7.0.0
+    version: registry.npmjs.org/@capacitor/app@7.0.0(@capacitor/core@6.2.0)
   '@capacitor/core':
     specifier: ^6.2.0
     version: registry.npmjs.org/@capacitor/core@6.2.0
@@ -104,6 +107,17 @@ packages:
     version: 6.2.0
     peerDependencies:
       '@capacitor/core': ^6.2.0
+    dependencies:
+      '@capacitor/core': registry.npmjs.org/@capacitor/core@6.2.0
+    dev: false
+
+  registry.npmjs.org/@capacitor/app@7.0.0(@capacitor/core@6.2.0):
+    resolution: {integrity: sha512-/UFwfPFsw/Jen6vjrV0lfTBOQWSaDDdmrYXKpYg4Xn8hwj0xrrRPXxC43j7VmPoj9AFMVPA+hx94ygqjChPASQ==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/@capacitor/app/-/app-7.0.0.tgz}
+    id: registry.npmjs.org/@capacitor/app/7.0.0
+    name: '@capacitor/app'
+    version: 7.0.0
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
     dependencies:
       '@capacitor/core': registry.npmjs.org/@capacitor/core@6.2.0
     dev: false

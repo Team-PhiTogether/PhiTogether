@@ -512,9 +512,9 @@ const specialDrag = {
                 app.chart.offset = oldOffset;
             },
             update: offsetX => {
-                timeBgm = curTime =
-                    duration *
-                    Math.min(Math.max((offsetX - app.wlen * 0.25) / (app.wlen * 1.5), 0), 1);
+                let progress = Math.max((offsetX - app.wlen * 0.25) / (app.wlen * 1.5), 0);
+                if (progress >= 1) progress = 0.999;
+                timeBgm = curTime = duration * progress
             },
             del: () => {
                 const oldOffset = app.chart.offset;
@@ -2047,7 +2047,10 @@ function loopNoCanvas() {
     }
     if (emitter.eq("play") && isInEnd && !isOutStart)
         timeBgm = curTime + (nowTime_ms - curTime_ms) / 1e3;
-    if (timeBgm >= duration) isOutStart = true;
+    if (timeBgm >= duration)
+        if (shared.game.ptmain.playConfig.practiseMode && !(shared.game.ptmain.playConfig.previewMode && !shared.game.ptmain.playConfig.adjustOffset))
+            emitter.eq("play") && qwqPause();
+        else isOutStart = true;
     if (showTransition.checked && isOutStart && !isOutEnd) {
         isOutEnd = true;
         qwqOut.play();

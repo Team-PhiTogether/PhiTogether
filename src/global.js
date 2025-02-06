@@ -2,6 +2,7 @@ import { createApp } from "vue/dist/vue.esm-bundler";
 import * as VueRouter from "vue-router";
 import { msgHandler } from "@utils/js/msgHandler";
 import eruda from "eruda";
+import { App } from "@capacitor/app";
 
 import packageConfig from "../package.json";
 
@@ -33,6 +34,11 @@ ploading.init({
     },
 });
 const loadHandler = ploading;
+if (spec.isPhiTogetherApp) {
+    App.addListener('appUrlOpen', (event/* : URLOpenListenerEvent */) => {
+        location.href = event.url.replace("https:", "capacitor:");
+    });
+}
 
 const mainCtn = document.querySelector("div.main");
 const requestFullscreen = async forced => {
@@ -294,9 +300,8 @@ const ptAppInstance = createApp({
         if (!this.localeValue) this.localeValue = navigator.language.replace("-", "_") || "zh_CN";
         this.localeValue = this.localeValue.startsWith("en")
             ? "en_US"
-            : `zh_${
-                  this.localeValue.endsWith("HK") || this.localeValue.endsWith("TW") ? "TW" : "CN"
-              }`;
+            : `zh_${this.localeValue.endsWith("HK") || this.localeValue.endsWith("TW") ? "TW" : "CN"
+            }`;
 
         this.$i18n.locale = this.localeValue;
     },
@@ -420,7 +425,7 @@ const ptAppInstance = createApp({
                             const cache = await caches.open("PTv0-User");
                             await cache.delete("/PTVirtual/user/respack.zip");
                         }
-                    } catch (e) {}
+                    } catch (e) { }
                     if (newVal.startsWith("together-pack"))
                         this.currentRenderer.loadRespack("/src/respack/" + newVal);
                 } else if (newVal === "prpr-custom") {
@@ -1044,7 +1049,7 @@ const ptAppInstance = createApp({
                         try {
                             const assets = searchParams.get("assets").split(",");
                             for (const asset of assets) resources.push(asset + "?nocacahe=nocache");
-                        } catch {}
+                        } catch { }
                     }
 
                     // 清 加载完的东西
@@ -1144,9 +1149,8 @@ const ptAppInstance = createApp({
         },
         update() {
             caches.delete("PTv0-Main").then(() => {
-                const url = `/#${
-                    searchParams ? `/updateAndPlayChart?${searchParams.toString()}` : "update"
-                }`;
+                const url = `/#${searchParams ? `/updateAndPlayChart?${searchParams.toString()}` : "update"
+                    }`;
                 fetch(url, {
                     headers: {
                         Pragma: "no-cache",
