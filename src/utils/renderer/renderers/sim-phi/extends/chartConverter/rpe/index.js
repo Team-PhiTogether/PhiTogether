@@ -33,13 +33,7 @@ function parse(pec, filename) {
         if (typeof i.father === "number" && i.father !== -1)
             i.father = data.judgeLineList.length - 1 - i.father;
     });
-    //bpm变速
-    const bpmList = new BpmList(data.BPMList[0].bpm);
-    for (const i of data.BPMList) i.time = i.startTime[0] + i.startTime[1] / i.startTime[2];
-    data.BPMList.sort((a, b) => a.time - b.time).forEach((i, idx, arr) => {
-        if (arr[idx + 1] && arr[idx + 1].time <= 0) return; //过滤负数
-        bpmList.push(i.time < 0 ? 0 : i.time, arr[idx + 1] ? arr[idx + 1].time : 1e9, i.bpm);
-    });
+
     for (const i of data.judgeLineList) {
         if (i.zOrder === undefined) i.zOrder = 0;
         if (i.bpmfactor === undefined) i.bpmfactor = 1;
@@ -48,14 +42,24 @@ function parse(pec, filename) {
             warnings.push(
                 `未兼容isCover=${i.isCover}(可能无法正常显示)\n位于${i.LineId}号判定线\n来自${filename}`
             );
-        if (i.zOrder !== 0)
-            warnings.push(
-                `未兼容zOrder=${i.zOrder}(可能无法正常显示)\n位于${i.LineId}号判定线\n来自${filename}`
-            );
         if (i.bpmfactor !== 1)
             warnings.push(
-                `未兼容bpmfactor=${i.bpmfactor}(可能无法正常显示)\n位于${i.LineId}号判定线\n来自${filename}`
+                `检测到bpmfactor=${i.bpmfactor}(将被应用)\n位于${i.LineId}号判定线\n来自${filename}`
             );
+        
+        const bpmList = new BpmList(data.BPMList[0].bpm / i.bpmfactor);
+        for (const bpm of data.BPMList) {
+            bpm.time = bpm.startTime[0] + bpm.startTime[1] / bpm.startTime[2];
+        }
+        data.BPMList.sort((a, b) => a.time - b.time).forEach((bpm, idx, arr) => {
+            if (arr[idx + 1] && arr[idx + 1].time <= 0) return;
+            bpmList.push(
+                bpm.time < 0 ? 0 : bpm.time,
+                arr[idx + 1] ? arr[idx + 1].time : 1e9,
+                bpm.bpm * i.bpmfactor
+            );
+        });
+
         const lineRPE = new LineRPE(bpmList.baseBpm);
         lineRPE.setId(i.LineId);
         lineRPE.setZOrder(i.zOrder);
