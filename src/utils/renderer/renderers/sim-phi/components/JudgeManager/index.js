@@ -1,31 +1,14 @@
-import { recordMgr } from "@components/recordMgr/recordMgr.js";
-import { replayMgr } from "@components/recordMgr/replayMgr.js";
-import { frameTimer } from "@utils/js/common.js";
+import { recordMgr } from "@components/recordMgr/recordMgr";
+import { replayMgr } from "@components/recordMgr/replayMgr";
+import { frameTimer } from "@utils/js/common";
+import { audio } from "@utils/js/aup";
 
-/** @typedef {import('../simphi.js').NoteExtends} NoteExtends */
-/**
- * 判定和音符的水平距离
- * @param {JudgeEvent} judgeEvent
- * @param {NoteExtends} note
- */
-function getJudgeOffset(judgeEvent, note) {
-    const { offsetX, offsetY } = judgeEvent;
-    const { offsetX: x, offsetY: y, cosr, sinr } = note;
-    return Math.abs((offsetX - x) * cosr + (offsetY - y) * sinr) || 0;
-}
-/**
- * 判定和音符的曼哈顿距离
- * @param {JudgeEvent} judgeEvent
- * @param {NoteExtends} note
- */
-function getJudgeDistance(judgeEvent, note) {
-    const { offsetX, offsetY } = judgeEvent;
-    const { offsetX: x, offsetY: y, cosr, sinr } = note;
-    return (
-        Math.abs((offsetX - x) * cosr + (offsetY - y) * sinr) +
-            Math.abs((offsetX - x) * sinr - (offsetY - y) * cosr) || 0
-    );
-}
+import { getJudgeOffset, getJudgeDistance } from "./judgeUtils";
+import { JudgeEvent } from "./JudgeEvent";
+import { HitImage } from "../HitManager/HitImage";
+import { HitWord } from "../HitManager/HitWord";
+
+import { simphiPlayer } from "../../playerMain";
 
 export const judgeManager = {
     time: {
@@ -44,7 +27,7 @@ export const judgeManager = {
     addEvent(notes, realTime) {
         const { list } = this;
         list.length = 0;
-        if (app.playMode === 1) {
+        if (simphiPlayer.app.playMode === 1) {
             const dispTime = Math.min(frameTimer.disp, this.time.AP);
             const minDispTime = -Math.max(frameTimer.disp * 2, this.time.g);
             for (const i of notes) {
@@ -65,8 +48,8 @@ export const judgeManager = {
                         list[list.length] = new JudgeEvent(i.offsetX, i.offsetY, 3);
                 }
             }
-        } else if (emitter.eq("play")) {
-            for (const i of hitManager.list) {
+        } else if (simphiPlayer.emitter.eq("play")) {
+            for (const i of simphiPlayer.hitManager.list) {
                 if (!i.isTapped) list[list.length] = new JudgeEvent(i.offsetX, i.offsetY, 1);
                 if (i.isActive) list[list.length] = new JudgeEvent(i.offsetX, i.offsetY, 2);
                 if (i.type === "keyboard")
@@ -104,7 +87,7 @@ export const judgeManager = {
                 //超时且不为Hold拖判，判为Miss
                 // console.log('Miss', i.name);
                 note.status = 2;
-                stat.addCombo(2, note.type);
+                simphiPlayer.stat.addCombo(2, note.type);
                 note.scored = true;
             } else if (note.type === 2) {
                 //Drag音符
@@ -134,10 +117,10 @@ export const judgeManager = {
                     }
                 } else if (deltaTime < 0) {
                     // Drag过线
-                    if (emitter.eq("play") && !app.pauseTime)
-                        audio.play(res["HitSong1"], { gainrate: app.soundVolume });
-                    hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
-                    stat.addCombo(4, 2);
+                    if (simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime)
+                        audio.play(simphiPlayer.res["HitSong1"], { gainrate: simphiPlayer.app.soundVolume });
+                    simphiPlayer.hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
+                    simphiPlayer.stat.addCombo(4, 2);
                     note.scored = true;
                 }
             } else if (note.type === 4) {
@@ -192,10 +175,10 @@ export const judgeManager = {
                         }
                     }
                 } else if (deltaTime < 0) {
-                    if (emitter.eq("play") && !app.pauseTime)
-                        audio.play(res["HitSong2"], { gainrate: app.soundVolume });
-                    hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
-                    stat.addCombo(4, 4);
+                    if (simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime)
+                        audio.play(simphiPlayer.res["HitSong2"], { gainrate: simphiPlayer.app.soundVolume });
+                    simphiPlayer.hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
+                    simphiPlayer.stat.addCombo(4, 4);
                     note.scored = true;
                 }
             } else {
@@ -214,21 +197,21 @@ export const judgeManager = {
                             //间隔时间与bpm成反比
                             if (note.holdStatus % 4 === 0)
                                 // perfect max
-                                hitImageList.add(
+                                simphiPlayer.hitImageList.add(
                                     HitImage.perfect(note.projectX, note.projectY, note)
                                 );
                             else if (note.holdStatus % 4 === 1)
                                 // perfect early/late
-                                hitImageList.add(
+                                simphiPlayer.hitImageList.add(
                                     HitImage.perfect(note.projectX, note.projectY, note)
                                 );
                             else if (note.holdStatus % 4 === 3)
                                 // good early/late
-                                hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
+                                simphiPlayer.hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
                             note.holdTapTime = performance.now();
                         }
                         if (deltaTime + note.realHoldTime < 0.2) {
-                            if (!note.status) stat.addCombo((note.status = re.q), 3);
+                            if (!note.status) simphiPlayer.stat.addCombo((note.status = re.q), 3);
                             if (deltaTime + note.realHoldTime < 0) note.scored = true;
                             continue;
                         }
@@ -246,51 +229,51 @@ export const judgeManager = {
                             note.status = 6; //console.log('Bad', i.name);
                             note.badTime = performance.now();
                         } else {
-                            stat.addDisp(
+                            simphiPlayer.stat.addDisp(
                                 Math.max(deltaTime2, (-1 - note.frameCount) * this.time.AP || 0)
                             );
-                            if (emitter.eq("play") && !app.pauseTime)
-                                audio.play(res["HitSong0"], { gainrate: app.soundVolume });
+                            if (simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime)
+                                audio.play(simphiPlayer.res["HitSong0"], { gainrate: simphiPlayer.app.soundVolume });
                             if (re.a === 7) {
                                 note.holdStatus = 7; //console.log('Good(Early)', i.name);
-                                hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
-                                hitWordList.add(HitWord.early(note.projectX, note.projectY));
+                                simphiPlayer.hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
+                                simphiPlayer.hitWordList.add(HitWord.early(note.projectX, note.projectY));
                             } else if (re.a === 5) {
                                 note.holdStatus = 5; //console.log('Perfect(Early)', i.name);
-                                hitImageList.add(
+                                simphiPlayer.hitImageList.add(
                                     HitImage.perfect(note.projectX, note.projectY, note)
                                 );
-                                hitWordList.add(HitWord.early(note.projectX, note.projectY));
+                                simphiPlayer.hitWordList.add(HitWord.early(note.projectX, note.projectY));
                             } else if (re.a === 4) {
                                 note.holdStatus = 4; //console.log('Perfect(Max)', i.name);
-                                hitImageList.add(
+                                simphiPlayer.hitImageList.add(
                                     HitImage.perfect(note.projectX, note.projectY, note)
                                 );
                             } else if (re.a === 1) {
                                 note.holdStatus = 1; //console.log('Perfect(Late)', i.name);
-                                hitImageList.add(
+                                simphiPlayer.hitImageList.add(
                                     HitImage.perfect(note.projectX, note.projectY, note)
                                 );
-                                hitWordList.add(HitWord.late(note.projectX, note.projectY));
+                                simphiPlayer.hitWordList.add(HitWord.late(note.projectX, note.projectY));
                             } else if (re.a === 3) {
                                 note.holdStatus = 3; //console.log('Good(Late)', i.name);
-                                hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
-                                hitWordList.add(HitWord.late(note.projectX, note.projectY));
+                                simphiPlayer.hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
+                                simphiPlayer.hitWordList.add(HitWord.late(note.projectX, note.projectY));
                             }
                             if (note.type === 1) note.status = note.holdStatus;
                             if (note.type === 3) note.holdStart = realTime;
                         }
                         if (note.status) {
                             // 只有tap才会在此处有status
-                            stat.addCombo(note.status, 1);
+                            simphiPlayer.stat.addCombo(note.status, 1);
                             note.scored = true;
                         } else {
                             note.holdTapTime = performance.now();
                         }
                     }
-                    if (emitter.eq("play") && note.holdTapTime && note.holdBroken && re.q === 2) {
+                    if (simphiPlayer.emitter.eq("play") && note.holdTapTime && note.holdBroken && re.q === 2) {
                         note.status = 2; //console.log('Miss', i.name);
-                        stat.addCombo(2, 3);
+                        simphiPlayer.stat.addCombo(2, 3);
                         note.scored = true;
                     }
                     continue;
@@ -306,18 +289,18 @@ export const judgeManager = {
                         //间隔时间与bpm成反比
                         if (note.holdStatus % 4 === 0)
                             // perfect max
-                            hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
+                            simphiPlayer.hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
                         else if (note.holdStatus % 4 === 1)
                             // perfect early/late
-                            hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
+                            simphiPlayer.hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
                         else if (note.holdStatus % 4 === 3)
                             // good early/late
-                            hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
+                            simphiPlayer.hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
                         note.holdTapTime = performance.now();
                     }
                     if (deltaTime + note.realHoldTime < 0.2) {
                         if (!note.status)
-                            stat.addCombo((note.status = note.holdStatus), 3), recordMgr.add(note);
+                            simphiPlayer.stat.addCombo((note.status = note.holdStatus), 3), recordMgr.add(note);
                         if (deltaTime + note.realHoldTime < 0) note.scored = true;
                         continue;
                     }
@@ -365,37 +348,37 @@ export const judgeManager = {
                         noteJudge.badTime = performance.now();
                     } else {
                         const note = noteJudge;
-                        stat.addDisp(
+                        simphiPlayer.stat.addDisp(
                             Math.max(deltaTime2, (-1 - note.frameCount) * this.time.AP || 0)
                         );
-                        if (emitter.eq("play") && !app.pauseTime)
-                            audio.play(res["HitSong0"], { gainrate: app.soundVolume });
+                        if (simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime)
+                            audio.play(simphiPlayer.res["HitSong0"], { gainrate: simphiPlayer.app.soundVolume });
                         if (deltaTime2 > this.time.p) {
                             note.holdStatus = 7; //console.log('Good(Early)', i.name);
-                            hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
-                            hitWordList.add(HitWord.early(note.projectX, note.projectY));
+                            simphiPlayer.hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
+                            simphiPlayer.hitWordList.add(HitWord.early(note.projectX, note.projectY));
                         } else if (deltaTime2 > this.time.AP) {
                             note.holdStatus = 5; //console.log('Perfect(Early)', i.name);
-                            hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
-                            hitWordList.add(HitWord.early(note.projectX, note.projectY));
+                            simphiPlayer.hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
+                            simphiPlayer.hitWordList.add(HitWord.early(note.projectX, note.projectY));
                         } else if (deltaTime2 > -this.time.AP || note.frameCount < 1) {
                             note.holdStatus = 4; //console.log('Perfect(Max)', i.name);
-                            hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
+                            simphiPlayer.hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
                         } else if (deltaTime2 > -this.time.p || note.frameCount < 2) {
                             note.holdStatus = 1; //console.log('Perfect(Late)', i.name);
-                            hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
-                            hitWordList.add(HitWord.late(note.projectX, note.projectY));
+                            simphiPlayer.hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
+                            simphiPlayer.hitWordList.add(HitWord.late(note.projectX, note.projectY));
                         } else {
                             note.holdStatus = 3; //console.log('Good(Late)', i.name);
-                            hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
-                            hitWordList.add(HitWord.late(note.projectX, note.projectY));
+                            simphiPlayer.hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
+                            simphiPlayer.hitWordList.add(HitWord.late(note.projectX, note.projectY));
                         }
                         if (note.type === 1) note.status = note.holdStatus;
                         if (note.type === 3) note.holdStart = realTime;
                         recordMgr.add(note);
                     }
                     if (noteJudge.status) {
-                        stat.addCombo(noteJudge.status, 1);
+                        simphiPlayer.stat.addCombo(noteJudge.status, 1);
                         noteJudge.scored = true;
                     } else {
                         noteJudge.holdTapTime = performance.now();
@@ -404,25 +387,14 @@ export const judgeManager = {
                     judgeEvent.judged = true;
                     if (!nearcomp) break;
                 }
-                if (emitter.eq("play") && note.holdTapTime && note.holdBroken) {
+                if (simphiPlayer.emitter.eq("play") && note.holdTapTime && note.holdBroken) {
                     note.status = 2; //console.log('Miss', i.name);
                     // note.brokenTime = realTime;
                     recordMgr.add(note);
-                    stat.addCombo(2, 3);
+                    simphiPlayer.stat.addCombo(2, 3);
                     note.scored = true;
                 }
             }
         }
     },
 };
-
-class JudgeEvent {
-    constructor(offsetX, offsetY, type, event) {
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-        this.type = type | 0; //1-Tap,2-Hold/Drag,3-Move
-        this.judged = false; //是否被判定
-        this.event = event; //flick专用回调
-        this.preventBad = false; //是否阻止判定为Bad
-    }
-}

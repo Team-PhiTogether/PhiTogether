@@ -13,16 +13,16 @@ import {
 } from "@utils/js/common.js";
 import { urls, loadJS } from "./assetsProcessor/loader";
 import { uploader, ZipReader, readFile } from "./assetsProcessor/reader";
-import { InteractProxy } from "@utils/js/interact.js";
-import shared from "@utils/js/shared.js";
-import { recordMgr } from "@components/recordMgr/recordMgr.js";
-import { replayMgr } from "@components/recordMgr/replayMgr.js";
+import { InteractProxy } from "@utils/js/interact";
+import shared from "@utils/js/shared";
+// import { recordMgr } from "@components/recordMgr/recordMgr";
+import { replayMgr } from "@components/recordMgr/replayMgr";
 
-import { loadModYukiOri } from "./plugins/aprfools/loadModYukiOri.js";
+import { loadModYukiOri } from "./plugins/aprfools/loadModYukiOri";
 import saveAdjustedChart from "./plugins/saveAdjustedChart";
 import videoRecorder from "./plugins/video-recorder";
 import { loadSkinFromBuffer, loadSkinFromDB } from "./plugins/skin";
-import { gauge } from "./plugins/gauge.js";
+import { gauge } from "./plugins/gauge";
 
 import {
     imgBlur,
@@ -31,15 +31,18 @@ import {
     imgSplit,
     hex2rgba,
     rgba2hex,
-} from "./assetsProcessor/imgProcessor.js";
-import { createCanvas, drawRoundRect } from "./utils/canvas.js";
+} from "./assetsProcessor/imgProcessor";
+import { createCanvas, drawRoundRect } from "./utils/canvas";
 
 import ptdb from "@utils/ptdb";
-import { msgHandler } from "@utils/js/msgHandler.js";
-import { tween, Emitter, clip } from "./utils/simphiUtils.js";
+import { msgHandler } from "@utils/js/msgHandler";
+import { tween, Emitter, clip } from "./utils/simphiUtils";
 
-// import { judgeManager } from "./components/JudgeManager.js";
-import { HitManager } from "./components/HitManager.js";
+import { judgeManager } from "./components/JudgeManager";
+import { HitManager } from "./components/HitManager";
+import { HitEvents } from "./components/HitManager/HitEvents";
+import { HitWord } from './components/HitManager/HitWord';
+import { LineImage } from "./components/LineImage";
 
 const $id = query => document.getElementById(query);
 const $ = query => document.body.querySelector(query);
@@ -57,7 +60,12 @@ export const simphiPlayer = {
     filterOptions: {},
     "flag{qwq}": _ => {},
 
+    res: {}, //存放资源
+
     qwqwq: false,
+
+    /**@type {Map<ImageBitmap,LineImage>} */
+    lineImages: new Map(),
 
     stage: {
         resize(forced) {
@@ -220,12 +228,84 @@ export const simphiPlayer = {
             hitRaw.forEach(img => img.close());
         },
     },
+
+    hitFeedbackList: new HitEvents({
+        //存放点击特效
+        updateCallback: i => ++i.time > 0,
+        /**	@param {HitFeedback} i */
+        iterateCallback: i => {
+            simphiPlayer.app.ctxos.globalAlpha = 0.85;
+            simphiPlayer.app.ctxos.setTransform(1, 0, 0, 1, i.offsetX, i.offsetY); //缩放
+            simphiPlayer.app.ctxos.fillStyle = i.color;
+            simphiPlayer.app.ctxos.beginPath();
+            simphiPlayer.app.ctxos.arc(0, 0, simphiPlayer.app.lineScale * 0.5, 0, 2 * Math.PI);
+            simphiPlayer.app.ctxos.fill();
+        },
+    }),
+    hitImageList: new HitEvents({
+        //存放点击特效
+        updateCallback: i => simphiPlayer.timeInfo.nowTime_ms >= i.time + i.duration,
+        /**	@param {HitImage} i */
+        iterateCallback: i => {
+            if (!simphiPlayer.emitter.eq("play") || simphiPlayer.app.pauseTime) return;
+            const tick = (simphiPlayer.timeInfo.nowTime_ms - i.time) / i.duration;
+            const effects = i.effects;
+            simphiPlayer.app.ctxos.globalAlpha = 1;
+            simphiPlayer.app.ctxos.setTransform(
+                simphiPlayer.app.noteScaleRatio * 6,
+                0,
+                0,
+                simphiPlayer.app.noteScaleRatio * 6,
+                i.offsetX,
+                i.offsetY
+            ); //缩放
+            simphiPlayer.app.ctxos.rotate(i.rotation);
+            (effects[Math.floor(tick * effects.length)] || effects[effects.length - 1]).full(simphiPlayer.app.ctxos); //停留约0.5秒
+            simphiPlayer.app.ctxos.fillStyle = i.color;
+            simphiPlayer.app.ctxos.globalAlpha = 1 - tick; //不透明度
+            const r3 = 30 * (((0.2078 * tick - 1.6524) * tick + 1.6399) * tick + 0.4988); //方块大小
+            if (r3 < 0) return;
+            for (const j of i.direction) {
+                const ds = j[0] * ((9 * tick) / (8 * tick + 1)); //打击点距离
+                if (!simphiPlayer.customResourceMeta["loaded"]) {
+                    simphiPlayer.app.ctxos.beginPath();
+                    simphiPlayer.app.ctxos.arc(
+                        ds * Math.cos(j[1]),
+                        ds * Math.sin(j[1]),
+                        (r3 / 3) * 2,
+                        0,
+                        2 * Math.PI
+                    );
+                    simphiPlayer.app.ctxos.fill();
+                    simphiPlayer.app.ctxos.closePath();
+                } else if (simphiPlayer.customResourceMeta["hitEvtDrawer"])
+                    eval(`{ const ctxos = simphiPlayer.app.ctxos; ${simphiPlayer.customResourceMeta["hitEvtDrawer"]} }`);
+            }
+        },
+    }),
+    hitWordList: new HitEvents({
+        //存放点击特效
+        updateCallback: i => simphiPlayer.timeInfo.nowTime_ms >= i.time + i.duration,
+        /**	@param {HitWord} i */
+        iterateCallback: i => {
+            const tick = (simphiPlayer.timeInfo.nowTime_ms - i.time) / i.duration;
+            simphiPlayer.app.ctxos.setTransform(1, 0, 0, 1, i.offsetX, i.offsetY); //缩放
+            simphiPlayer.app.ctxos.font = `bold ${
+                simphiPlayer.app.noteScaleRatio *
+                (256 + 128 * (((0.2078 * tick - 1.6524) * tick + 1.6399) * tick + 0.4988))
+            }px Saira`;
+            simphiPlayer.app.ctxos.textAlign = "center";
+            simphiPlayer.app.ctxos.fillStyle = i.color;
+            simphiPlayer.app.ctxos.globalAlpha = 1 - tick; //不透明度
+            simphiPlayer.app.ctxos.fillText(i.text, 0, -simphiPlayer.app.noteScaleRatio * 128);
+        },
+    }),
+    hitManager: new HitManager(),
 };
 document.oncontextmenu = e => e.preventDefault(); //qwq
 
 shared.game.simphi = simphiPlayer.app;
 
-gauge.bind(simphiPlayer);
 simphiPlayer.now.set("gauge", gauge.calc);
 
 async function checkSupport() {
@@ -643,7 +723,7 @@ const specialClick = {
             else shared.game.ptmain.spClickRT();
         },
         () => {
-            hitManager.clear();
+            simphiPlayer.hitManager.clear();
             shared.game.ptmain.$router.back();
         },
     ],
@@ -779,548 +859,7 @@ const specialClick = {
         if (simphiPlayer.animationTimer.end.second > 0) simphiPlayer.pressTime = simphiPlayer.pressTime > 0 ? -simphiPlayer.animationTimer.end.second : simphiPlayer.animationTimer.end.second;
     },
 };
-const hitManager = new HitManager();
-class JudgeEvent {
-    constructor(offsetX, offsetY, type, event) {
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-        this.type = type | 0; //1-Tap,2-Hold/Drag,3-Move
-        this.judged = false; //是否被判定
-        this.event = event; //flick专用回调
-        this.preventBad = false; //是否阻止判定为Bad
-    }
-}
-/** @typedef {import('./simphi.js').NoteExtends} NoteExtends */
-/**
- * 判定和音符的水平距离
- * @param {JudgeEvent} judgeEvent
- * @param {NoteExtends} note
- */
-function getJudgeOffset(judgeEvent, note) {
-    const { offsetX, offsetY } = judgeEvent;
-    const { offsetX: x, offsetY: y, cosr, sinr } = note;
-    return Math.abs((offsetX - x) * cosr + (offsetY - y) * sinr) || 0;
-}
-/**
- * 判定和音符的曼哈顿距离
- * @param {JudgeEvent} judgeEvent
- * @param {NoteExtends} note
- */
-function getJudgeDistance(judgeEvent, note) {
-    const { offsetX, offsetY } = judgeEvent;
-    const { offsetX: x, offsetY: y, cosr, sinr } = note;
-    return (
-        Math.abs((offsetX - x) * cosr + (offsetY - y) * sinr) +
-            Math.abs((offsetX - x) * sinr - (offsetY - y) * cosr) || 0
-    );
-}
-const judgeManager = {
-    time: {
-        p: 0.08,
-        g: 0.16,
-        AP: 0.04,
-    },
-    setJudgeTime(p = 0.08, g = 0.16, AP = 0.04) {
-        this.time.p = p;
-        this.time.g = g;
-        this.time.AP = AP;
-    },
-    /**@type {JudgeEvent[]} */
-    list: [],
-    /**@param {NoteExtends[]} notes */
-    addEvent(notes, realTime) {
-        const { list } = this;
-        list.length = 0;
-        if (simphiPlayer.app.playMode === 1) {
-            const dispTime = Math.min(frameTimer.disp, this.time.AP);
-            const minDispTime = -Math.max(frameTimer.disp * 2, this.time.g);
-            for (const i of notes) {
-                if (i.scored || i.isFake) continue;
-                const deltaTime = i.realTime - realTime;
-                if (i.type === 1) {
-                    if (deltaTime < dispTime)
-                        list[list.length] = new JudgeEvent(i.offsetX, i.offsetY, 1);
-                } else if (i.type === 2) {
-                    if (deltaTime < dispTime)
-                        list[list.length] = new JudgeEvent(i.offsetX, i.offsetY, 2);
-                } else if (i.type === 3) {
-                    if (i.holdTapTime) list[list.length] = new JudgeEvent(i.offsetX, i.offsetY, 2);
-                    else if (deltaTime < dispTime)
-                        list[list.length] = new JudgeEvent(i.offsetX, i.offsetY, 1);
-                } else if (i.type === 4) {
-                    if (deltaTime < dispTime)
-                        list[list.length] = new JudgeEvent(i.offsetX, i.offsetY, 3);
-                }
-            }
-        } else if (simphiPlayer.emitter.eq("play")) {
-            for (const i of hitManager.list) {
-                if (!i.isTapped) list[list.length] = new JudgeEvent(i.offsetX, i.offsetY, 1);
-                if (i.isActive) list[list.length] = new JudgeEvent(i.offsetX, i.offsetY, 2);
-                if (i.type === "keyboard")
-                    list[list.length] = new JudgeEvent(i.offsetX, i.offsetY, 3); //以后加上Flick判断
-                if (i.flicking && !i.flicked) {
-                    list[list.length] = new JudgeEvent(i.offsetX, i.offsetY, 3, i);
-                    // i.flicked = true; 不能在这里判断，因为可能会判定不到
-                }
-            }
-        }
-    },
-    /**
-     * @param {NoteExtends[]} notes
-     * @param {number} realTime
-     * @param {number} width
-     */
-    execute(notes, realTime, width) {
-        const { list } = this;
-        for (const note of notes) {
-            if (note.scored) continue; //跳过已判分的Note和Fakenotes
-            let deltaTime = note.realTime - realTime;
-            if (note.isFake) {
-                // Tap和TapHold的处理
-                if (note.type === 1 || note.type === 3) {
-                    if (deltaTime < 0) {
-                        if (note.type === 3 && !note.holdTapTime) {
-                            // 对于TapHold,需要等待头部判定
-                            continue;
-                        }
-                        if (note.type === 3 && deltaTime + note.realHoldTime >= 0) {
-                            // 对于TapHold,需要等待全部经过才算PASSED
-                            continue;
-                        }
-                        note.status = 4; // 使用Perfect状态代表PASSED
-                        note.scored = true;
-                    }
-                    continue;
-                }
 
-                // 其他类型Note的处理
-                if (deltaTime < 0) {
-                    note.status = 4;
-                    note.scored = true;
-                }
-                continue;
-            }
-            if (deltaTime > (replayMgr.replaying ? 1 : 0.2)) break; //跳过判定范围外的Note
-            if (note.type !== 1 && deltaTime > this.time.g) continue;
-            note.statOffset = realTime;
-            if (
-                deltaTime < -this.time.g &&
-                note.frameCount > 4 &&
-                !note.holdStatus &&
-                !(
-                    replayMgr.replaying &&
-                    replayMgr.data[note.name] &&
-                    replayMgr.data[note.name].a !== 2
-                )
-            ) {
-                //超时且不为Hold拖判，判为Miss
-                // console.log('Miss', i.name);
-                note.status = 2;
-                simphiPlayer.stat.addCombo(2, note.type);
-                note.scored = true;
-            } else if (note.type === 2) {
-                //Drag音符
-                if (deltaTime > 0) {
-                    for (const judgeEvent of list) {
-                        if (judgeEvent.type !== 1) continue; //跳过非Tap触摸事件
-                        if (getJudgeOffset(judgeEvent, note) > width) continue;
-                        judgeEvent.preventBad = true; // Drag后防bad
-                    }
-                }
-                if (note.status !== 4) {
-                    // 未判为PM
-                    if (replayMgr.replaying) {
-                        if (replayMgr.data[note.name]) {
-                            note.status = 4;
-                            continue;
-                        }
-                        continue;
-                    }
-                    for (const judgeEvent of list) {
-                        if (judgeEvent.type !== 2) continue; //跳过非Drag触摸事件
-                        if (getJudgeOffset(judgeEvent, note) > width) continue;
-                        // console.log('Perfect', i.name);
-                        note.status = 4; // 判为PM
-                        recordMgr.add(note);
-                        break;
-                    }
-                } else if (deltaTime < 0) {
-                    // Drag过线
-                    if (simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime)
-                        audio.play(res["HitSong1"], { gainrate: simphiPlayer.app.soundVolume });
-                    hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
-                    simphiPlayer.stat.addCombo(4, 2);
-                    note.scored = true;
-                }
-            } else if (note.type === 4) {
-                //Flick音符
-                if (deltaTime > 0 || note.status !== 4) {
-                    // 对于未判为PM且未过线的Flick
-                    for (const judgeEvent of list) {
-                        if (judgeEvent.type !== 1) continue; //跳过非Tap触摸事件
-                        if (getJudgeOffset(judgeEvent, note) > width) continue;
-                        judgeEvent.preventBad = true; // 防止后判为Bad
-                    }
-                }
-                if (note.status !== 4) {
-                    if (replayMgr.replaying) {
-                        if (replayMgr.data[note.name]) {
-                            note.status = 4;
-                            continue;
-                        }
-                        continue;
-                    }
-                    for (const judgeEvent of list) {
-                        if (judgeEvent.type !== 3) continue; //跳过非Move触摸事件
-                        if (getJudgeOffset(judgeEvent, note) > width) continue;
-                        let distance = getJudgeDistance(judgeEvent, note);
-                        let noteJudge = note;
-                        let nearcomp = false;
-                        for (const nearNote of note.nearNotes) {
-                            if (nearNote.status) continue;
-                            if (
-                                nearNote.realTime - realTime /* deltaTime for nearNote */ >
-                                this.time.g
-                            )
-                                break;
-                            if (getJudgeOffset(judgeEvent, nearNote) > width) continue;
-                            const nearDistance = getJudgeDistance(judgeEvent, nearNote);
-                            if (nearDistance < distance) {
-                                distance = nearDistance;
-                                noteJudge = nearNote;
-                                nearcomp = true;
-                            }
-                        }
-                        //console.log('Perfect', i.name);
-                        if (judgeEvent.event == null) {
-                            noteJudge.status = 4;
-                            recordMgr.add(noteJudge);
-                            if (!nearcomp) break;
-                        } else if (!judgeEvent.event.flicked) {
-                            noteJudge.status = 4;
-                            judgeEvent.event.flicked = true;
-                            recordMgr.add(noteJudge);
-                            if (!nearcomp) break;
-                        }
-                    }
-                } else if (deltaTime < 0) {
-                    if (simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime)
-                        audio.play(res["HitSong2"], { gainrate: simphiPlayer.app.soundVolume });
-                    hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
-                    simphiPlayer.stat.addCombo(4, 4);
-                    note.scored = true;
-                }
-            } else {
-                //Hold & Tap音符
-                if (replayMgr.replaying) {
-                    if (!replayMgr.data[note.name]) continue; // 录制文件无此note，直接跳过
-                    const re = replayMgr.data[note.name];
-                    if (realTime < re.s + note.realTime) continue; // 该note记录事件还未开始
-                    if (note.type === 3 && note.holdTapTime) {
-                        // hold
-                        //是否触发头判
-                        if (
-                            (performance.now() - note.holdTapTime) * note.holdTime >=
-                            8e3 * note.realHoldTime
-                        ) {
-                            //间隔时间与bpm成反比
-                            if (note.holdStatus % 4 === 0)
-                                // perfect max
-                                hitImageList.add(
-                                    HitImage.perfect(note.projectX, note.projectY, note)
-                                );
-                            else if (note.holdStatus % 4 === 1)
-                                // perfect early/late
-                                hitImageList.add(
-                                    HitImage.perfect(note.projectX, note.projectY, note)
-                                );
-                            else if (note.holdStatus % 4 === 3)
-                                // good early/late
-                                hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
-                            note.holdTapTime = performance.now();
-                        }
-                        if (deltaTime + note.realHoldTime < 0.2) {
-                            if (!note.status) simphiPlayer.stat.addCombo((note.status = re.q), 3);
-                            if (deltaTime + note.realHoldTime < 0) note.scored = true;
-                            continue;
-                        }
-                        if (re.e && realTime >= re.e + note.realTime) {
-                            note.holdBroken = true;
-                        } else {
-                            note.holdBroken = false;
-                        }
-                    }
-                    if (!note.holdBroken && !note.holdTapTime) {
-                        let deltaTime2 = 2 * note.realTime - re.s;
-                        if (deltaTime2 > this.time.g && re.a === 6) {
-                            // 判bad
-                            if (note.type === 3) continue; // hold无bad
-                            note.status = 6; //console.log('Bad', i.name);
-                            note.badTime = performance.now();
-                        } else {
-                            simphiPlayer.stat.addDisp(
-                                Math.max(deltaTime2, (-1 - note.frameCount) * this.time.AP || 0)
-                            );
-                            if (simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime)
-                                audio.play(res["HitSong0"], { gainrate: simphiPlayer.app.soundVolume });
-                            if (re.a === 7) {
-                                note.holdStatus = 7; //console.log('Good(Early)', i.name);
-                                hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
-                                hitWordList.add(HitWord.early(note.projectX, note.projectY));
-                            } else if (re.a === 5) {
-                                note.holdStatus = 5; //console.log('Perfect(Early)', i.name);
-                                hitImageList.add(
-                                    HitImage.perfect(note.projectX, note.projectY, note)
-                                );
-                                hitWordList.add(HitWord.early(note.projectX, note.projectY));
-                            } else if (re.a === 4) {
-                                note.holdStatus = 4; //console.log('Perfect(Max)', i.name);
-                                hitImageList.add(
-                                    HitImage.perfect(note.projectX, note.projectY, note)
-                                );
-                            } else if (re.a === 1) {
-                                note.holdStatus = 1; //console.log('Perfect(Late)', i.name);
-                                hitImageList.add(
-                                    HitImage.perfect(note.projectX, note.projectY, note)
-                                );
-                                hitWordList.add(HitWord.late(note.projectX, note.projectY));
-                            } else if (re.a === 3) {
-                                note.holdStatus = 3; //console.log('Good(Late)', i.name);
-                                hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
-                                hitWordList.add(HitWord.late(note.projectX, note.projectY));
-                            }
-                            if (note.type === 1) note.status = note.holdStatus;
-                            if (note.type === 3) note.holdStart = realTime;
-                        }
-                        if (note.status) {
-                            // 只有tap才会在此处有status
-                            simphiPlayer.stat.addCombo(note.status, 1);
-                            note.scored = true;
-                        } else {
-                            note.holdTapTime = performance.now();
-                        }
-                    }
-                    if (simphiPlayer.emitter.eq("play") && note.holdTapTime && note.holdBroken && re.q === 2) {
-                        note.status = 2; //console.log('Miss', i.name);
-                        simphiPlayer.stat.addCombo(2, 3);
-                        note.scored = true;
-                    }
-                    continue;
-                }
-
-                // hold
-                if (note.type === 3 && note.holdTapTime) {
-                    //是否触发头判
-                    if (
-                        (performance.now() - note.holdTapTime) * note.holdTime >=
-                        1.6e4 * note.realHoldTime
-                    ) {
-                        //间隔时间与bpm成反比
-                        if (note.holdStatus % 4 === 0)
-                            // perfect max
-                            hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
-                        else if (note.holdStatus % 4 === 1)
-                            // perfect early/late
-                            hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
-                        else if (note.holdStatus % 4 === 3)
-                            // good early/late
-                            hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
-                        note.holdTapTime = performance.now();
-                    }
-                    if (deltaTime + note.realHoldTime < 0.2) {
-                        if (!note.status)
-                            simphiPlayer.stat.addCombo((note.status = note.holdStatus), 3), recordMgr.add(note);
-                        if (deltaTime + note.realHoldTime < 0) note.scored = true;
-                        continue;
-                    }
-                    note.holdBroken = true; //若1帧内未按住并使其转为false，则判定为Miss
-                }
-                for (const judgeEvent of list) {
-                    // if (judgeEvent.event.flicked) continue; // 跳过已flick触摸事件
-                    if (note.holdTapTime) {
-                        //头判
-                        if (judgeEvent.type !== 2) continue;
-                        if (getJudgeOffset(judgeEvent, note) <= width) {
-                            note.holdBroken = false;
-                            break;
-                        }
-                        continue;
-                    }
-                    if (judgeEvent.type !== 1) continue; //跳过非Tap触摸事件
-                    if (judgeEvent.judged) continue; //跳过已触发的判定
-                    if (getJudgeOffset(judgeEvent, note) > width) continue;
-                    let deltaTime2 = deltaTime;
-                    let distance = getJudgeDistance(judgeEvent, note);
-                    let noteJudge = note;
-                    let nearcomp = false;
-                    for (const nearNote of note.nearNotes) {
-                        if (nearNote.status) continue; // 跳过已判
-                        if (nearNote.holdTapTime) continue; // 跳过tap已头判
-                        const nearDeltaTime = nearNote.realTime - realTime;
-                        if (nearDeltaTime > 0.2) break; // 跳过nearNote在判定范围外
-                        if (nearNote.type === 3 && nearDeltaTime > this.time.g) continue; // hold无bad
-                        if (getJudgeOffset(judgeEvent, nearNote) > width) continue;
-                        const nearDistance = getJudgeDistance(judgeEvent, nearNote);
-                        if (nearDistance < distance) {
-                            deltaTime2 = nearDeltaTime;
-                            distance = nearDistance;
-                            noteJudge = nearNote;
-                            noteJudge.statOffset = realTime;
-                            nearcomp = true;
-                        }
-                    }
-                    if (deltaTime2 > this.time.g) {
-                        // 判bad
-                        if (judgeEvent.preventBad) continue;
-                        noteJudge.status = 6; //console.log('Bad', i.name);
-                        recordMgr.add(noteJudge);
-                        noteJudge.badTime = performance.now();
-                    } else {
-                        const note = noteJudge;
-                        simphiPlayer.stat.addDisp(
-                            Math.max(deltaTime2, (-1 - note.frameCount) * this.time.AP || 0)
-                        );
-                        if (simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime)
-                            audio.play(res["HitSong0"], { gainrate: simphiPlayer.app.soundVolume });
-                        if (deltaTime2 > this.time.p) {
-                            note.holdStatus = 7; //console.log('Good(Early)', i.name);
-                            hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
-                            hitWordList.add(HitWord.early(note.projectX, note.projectY));
-                        } else if (deltaTime2 > this.time.AP) {
-                            note.holdStatus = 5; //console.log('Perfect(Early)', i.name);
-                            hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
-                            hitWordList.add(HitWord.early(note.projectX, note.projectY));
-                        } else if (deltaTime2 > -this.time.AP || note.frameCount < 1) {
-                            note.holdStatus = 4; //console.log('Perfect(Max)', i.name);
-                            hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
-                        } else if (deltaTime2 > -this.time.p || note.frameCount < 2) {
-                            note.holdStatus = 1; //console.log('Perfect(Late)', i.name);
-                            hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
-                            hitWordList.add(HitWord.late(note.projectX, note.projectY));
-                        } else {
-                            note.holdStatus = 3; //console.log('Good(Late)', i.name);
-                            hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
-                            hitWordList.add(HitWord.late(note.projectX, note.projectY));
-                        }
-                        if (note.type === 1) note.status = note.holdStatus;
-                        if (note.type === 3) note.holdStart = realTime;
-                        recordMgr.add(note);
-                    }
-                    if (noteJudge.status) {
-                        simphiPlayer.stat.addCombo(noteJudge.status, 1);
-                        noteJudge.scored = true;
-                    } else {
-                        noteJudge.holdTapTime = performance.now();
-                        noteJudge.holdBroken = false;
-                    }
-                    judgeEvent.judged = true;
-                    if (!nearcomp) break;
-                }
-                if (simphiPlayer.emitter.eq("play") && note.holdTapTime && note.holdBroken) {
-                    note.status = 2; //console.log('Miss', i.name);
-                    // note.brokenTime = realTime;
-                    recordMgr.add(note);
-                    simphiPlayer.stat.addCombo(2, 3);
-                    note.scored = true;
-                }
-            }
-        }
-    },
-};
-class HitEvents extends Array {
-    constructor({ updateCallback = _ => {}, iterateCallback = _ => {} } = {}) {
-        super();
-        this.update = this.defilter.bind(this, updateCallback);
-        this.animate = this.iterate.bind(this, iterateCallback);
-    }
-    /**	@param {(value)=>boolean} predicate */
-    defilter(predicate) {
-        let i = this.length;
-        while (i--) predicate(this[i]) && this.splice(i, 1);
-        return this;
-    }
-    /**	@param {(item)=>any} callback */
-    iterate(callback) {
-        for (const i of this) callback(i); //qwq
-    }
-    add(value) {
-        this[this.length] = value;
-    }
-    clear() {
-        this.length = 0;
-    }
-}
-const hitFeedbackList = new HitEvents({
-    //存放点击特效
-    updateCallback: i => ++i.time > 0,
-    /**	@param {HitFeedback} i */
-    iterateCallback: i => {
-        simphiPlayer.app.ctxos.globalAlpha = 0.85;
-        simphiPlayer.app.ctxos.setTransform(1, 0, 0, 1, i.offsetX, i.offsetY); //缩放
-        simphiPlayer.app.ctxos.fillStyle = i.color;
-        simphiPlayer.app.ctxos.beginPath();
-        simphiPlayer.app.ctxos.arc(0, 0, simphiPlayer.app.lineScale * 0.5, 0, 2 * Math.PI);
-        simphiPlayer.app.ctxos.fill();
-    },
-});
-const hitImageList = new HitEvents({
-    //存放点击特效
-    updateCallback: i => simphiPlayer.timeInfo.nowTime_ms >= i.time + i.duration,
-    /**	@param {HitImage} i */
-    iterateCallback: i => {
-        if (!simphiPlayer.emitter.eq("play") || simphiPlayer.app.pauseTime) return;
-        const tick = (simphiPlayer.timeInfo.nowTime_ms - i.time) / i.duration;
-        const effects = i.effects;
-        simphiPlayer.app.ctxos.globalAlpha = 1;
-        simphiPlayer.app.ctxos.setTransform(
-            simphiPlayer.app.noteScaleRatio * 6,
-            0,
-            0,
-            simphiPlayer.app.noteScaleRatio * 6,
-            i.offsetX,
-            i.offsetY
-        ); //缩放
-        simphiPlayer.app.ctxos.rotate(i.rotation);
-        (effects[Math.floor(tick * effects.length)] || effects[effects.length - 1]).full(simphiPlayer.app.ctxos); //停留约0.5秒
-        simphiPlayer.app.ctxos.fillStyle = i.color;
-        simphiPlayer.app.ctxos.globalAlpha = 1 - tick; //不透明度
-        const r3 = 30 * (((0.2078 * tick - 1.6524) * tick + 1.6399) * tick + 0.4988); //方块大小
-        if (r3 < 0) return;
-        for (const j of i.direction) {
-            const ds = j[0] * ((9 * tick) / (8 * tick + 1)); //打击点距离
-            if (!simphiPlayer.customResourceMeta["loaded"]) {
-                simphiPlayer.app.ctxos.beginPath();
-                simphiPlayer.app.ctxos.arc(
-                    ds * Math.cos(j[1]),
-                    ds * Math.sin(j[1]),
-                    (r3 / 3) * 2,
-                    0,
-                    2 * Math.PI
-                );
-                simphiPlayer.app.ctxos.fill();
-                simphiPlayer.app.ctxos.closePath();
-            } else if (simphiPlayer.customResourceMeta["hitEvtDrawer"])
-                eval(`{ const ctxos = simphiPlayer.app.ctxos; ${simphiPlayer.customResourceMeta["hitEvtDrawer"]} }`);
-        }
-    },
-});
-const hitWordList = new HitEvents({
-    //存放点击特效
-    updateCallback: i => simphiPlayer.timeInfo.nowTime_ms >= i.time + i.duration,
-    /**	@param {HitWord} i */
-    iterateCallback: i => {
-        const tick = (simphiPlayer.timeInfo.nowTime_ms - i.time) / i.duration;
-        simphiPlayer.app.ctxos.setTransform(1, 0, 0, 1, i.offsetX, i.offsetY); //缩放
-        simphiPlayer.app.ctxos.font = `bold ${
-            simphiPlayer.app.noteScaleRatio *
-            (256 + 128 * (((0.2078 * tick - 1.6524) * tick + 1.6399) * tick + 0.4988))
-        }px Saira`;
-        simphiPlayer.app.ctxos.textAlign = "center";
-        simphiPlayer.app.ctxos.fillStyle = i.color;
-        simphiPlayer.app.ctxos.globalAlpha = 1 - tick; //不透明度
-        simphiPlayer.app.ctxos.fillText(i.text, 0, -simphiPlayer.app.noteScaleRatio * 128);
-    },
-});
 class HitFeedback {
     constructor(offsetX, offsetY, n1, n2) {
         this.offsetX = Number(offsetX);
@@ -1339,64 +878,48 @@ class HitFeedback {
         return new HitFeedback(offsetX, offsetY, "violet", "");
     }
 }
-class HitImage {
-    constructor(offsetX, offsetY, n1, n3, rotation) {
-        const packs = simphiPlayer.noteRender.hitFX[n1];
-        this.offsetX = Number(offsetX) || 0;
-        this.offsetY = Number(offsetY) || 0;
-        this.rotation = simphiPlayer.tmps.hitFxRotate ? Number(rotation) || 0 : 0;
-        this.time = performance.now();
-        this.duration = packs.duration;
-        this.effects = packs.effects;
-        this.direction = Array(packs.numOfParts || 0)
-            .fill()
-            .map(() => [Math.random() * 80 + 185, Math.random() * 2 * Math.PI]);
-        this.color = String(n3);
-    }
-    static perfect(offsetX, offsetY, note) {
-        return new HitImage(
-            offsetX,
-            offsetY,
-            "Perfect",
-            simphiPlayer.tmps.hitPerfectColor || "#ffeca0",
-            note.line.rotation
-        );
-    }
-    static good(offsetX, offsetY, note) {
-        return new HitImage(
-            offsetX,
-            offsetY,
-            "Good",
-            simphiPlayer.tmps.hitGoodColor || "#b4e1ff",
-            note.line.rotation
-        );
-    }
-}
-class HitWord {
-    constructor(offsetX, offsetY, n1, n2) {
-        this.offsetX = Number(offsetX) || 0;
-        this.offsetY = Number(offsetY) || 0;
-        this.time = performance.now();
-        this.duration = 250;
-        this.color = String(n1);
-        this.text = String(n2);
-    }
-    static early(offsetX, offsetY) {
-        return new HitWord(offsetX, offsetY, "#03aaf9", "Early");
-    }
-    static late(offsetX, offsetY) {
-        return new HitWord(offsetX, offsetY, "#ff4612", "Late");
-    }
-}
+// class HitImage {
+//     constructor(offsetX, offsetY, n1, n3, rotation) {
+//         const packs = simphiPlayer.noteRender.hitFX[n1];
+//         this.offsetX = Number(offsetX) || 0;
+//         this.offsetY = Number(offsetY) || 0;
+//         this.rotation = simphiPlayer.tmps.hitFxRotate ? Number(rotation) || 0 : 0;
+//         this.time = performance.now();
+//         this.duration = packs.duration;
+//         this.effects = packs.effects;
+//         this.direction = Array(packs.numOfParts || 0)
+//             .fill()
+//             .map(() => [Math.random() * 80 + 185, Math.random() * 2 * Math.PI]);
+//         this.color = String(n3);
+//     }
+//     static perfect(offsetX, offsetY, note) {
+//         return new HitImage(
+//             offsetX,
+//             offsetY,
+//             "Perfect",
+//             simphiPlayer.tmps.hitPerfectColor || "#ffeca0",
+//             note.line.rotation
+//         );
+//     }
+//     static good(offsetX, offsetY, note) {
+//         return new HitImage(
+//             offsetX,
+//             offsetY,
+//             "Good",
+//             simphiPlayer.tmps.hitGoodColor || "#b4e1ff",
+//             note.line.rotation
+//         );
+//     }
+// }
 const interact = new InteractProxy(simphiPlayer.app.canvas);
 //兼容PC鼠标
 interact.setMouseEvent({
     mousedownCallback(evt) {
         const idx = evt.button;
         const { x, y } = getPos(evt);
-        if (idx === 1) hitManager.activate("mouse", 4, x, y);
-        else if (idx === 2) hitManager.activate("mouse", 2, x, y);
-        else hitManager.activate("mouse", 1 << idx, x, y);
+        if (idx === 1) simphiPlayer.hitManager.activate("mouse", 4, x, y);
+        else if (idx === 2) simphiPlayer.hitManager.activate("mouse", 2, x, y);
+        else simphiPlayer.hitManager.activate("mouse", 1 << idx, x, y);
         specialClick.qwq(x, y);
         specialDrag.reg("mouse", x, y);
     },
@@ -1405,16 +928,16 @@ interact.setMouseEvent({
         const { x, y } = getPos(evt);
         for (let i = 1; i < 32; i <<= 1) {
             // 同时按住多个键时，只有最后一个键的move事件会触发
-            if (idx & i) hitManager.moving("mouse", i, x, y);
-            else hitManager.deactivate("mouse", i);
+            if (idx & i) simphiPlayer.hitManager.moving("mouse", i, x, y);
+            else simphiPlayer.hitManager.deactivate("mouse", i);
             specialDrag.update("mouse", x, y);
         }
     },
     mouseupCallback(evt) {
         const idx = evt.button;
-        if (idx === 1) hitManager.deactivate("mouse", 4);
-        else if (idx === 2) hitManager.deactivate("mouse", 2);
-        else hitManager.deactivate("mouse", 1 << idx);
+        if (idx === 1) simphiPlayer.hitManager.deactivate("mouse", 4);
+        else if (idx === 2) simphiPlayer.hitManager.deactivate("mouse", 2);
+        else simphiPlayer.hitManager.deactivate("mouse", 1 << idx);
         specialDrag.del("mouse");
     },
 });
@@ -1425,22 +948,22 @@ interact.setKeyboardEvent({
         if (evt.key === "Shift") btnPause.click();
         if (evt.key === " " && shared.game.ptmain.playConfig.mode === "preview") btnPause.click();
         else if (
-            hitManager.list.find(i => i.type === "keyboard" && i.id === evt.code) //按住一个键时，会触发多次keydown事件
+            simphiPlayer.hitManager.list.find(i => i.type === "keyboard" && i.id === evt.code) //按住一个键时，会触发多次keydown事件
         );
-        else hitManager.activate("keyboard", evt.code, NaN, NaN);
+        else simphiPlayer.hitManager.activate("keyboard", evt.code, NaN, NaN);
     },
     keyupCallback(evt) {
         if (simphiPlayer.emitter.eq("stop")) return;
-        hitManager.deactivate("keyboard", evt.code);
+        simphiPlayer.hitManager.deactivate("keyboard", evt.code);
     },
 });
-self.addEventListener("blur", () => hitManager.clear("keyboard"));
+self.addEventListener("blur", () => simphiPlayer.hitManager.clear("keyboard"));
 //兼容移动设备
 interact.setTouchEvent({
     touchstartCallback(evt) {
         for (const i of evt.changedTouches) {
             const { x, y } = getPos(i);
-            hitManager.activate("touch", i.identifier, x, y);
+            simphiPlayer.hitManager.activate("touch", i.identifier, x, y);
             specialClick.qwq(x, y);
             specialDrag.reg(i.identifier, x, y);
         }
@@ -1448,20 +971,20 @@ interact.setTouchEvent({
     touchmoveCallback(evt) {
         for (const i of evt.changedTouches) {
             const { x, y } = getPos(i);
-            hitManager.moving("touch", i.identifier, x, y);
+            simphiPlayer.hitManager.moving("touch", i.identifier, x, y);
             specialDrag.update(i.identifier, x, y);
         }
     },
     touchendCallback(evt) {
         for (const i of evt.changedTouches) {
-            hitManager.deactivate("touch", i.identifier);
+            simphiPlayer.hitManager.deactivate("touch", i.identifier);
             specialDrag.del(i.identifier);
         }
     },
     touchcancelCallback(evt) {
         // if (emitter.eq('play')) qwqPause();
         for (const i of evt.changedTouches) {
-            hitManager.deactivate("touch", i.identifier);
+            simphiPlayer.hitManager.deactivate("touch", i.identifier);
             specialDrag.del(i.identifier);
         }
     },
@@ -1479,7 +1002,6 @@ function getPos(obj) {
     };
 }
 //hit end
-const res = {}; //存放资源
 simphiPlayer.customResourceMeta = {};
 let defaultCRM = {
     name: "PhiTogether Default 1",
@@ -1524,9 +1046,9 @@ const loadRes = (shared.game.simphi.reloadRes = async (
             "FlickHL",
             "HitFXRaw",
         ];
-        for (const i of entries) await simphiPlayer.noteRender.update(i, res[i], 1);
-        res["JudgeLineMP"] = await imgShader(res["JudgeLine"], "#feffa9");
-        res["JudgeLineFC"] = await imgShader(res["JudgeLine"], "#a2eeff");
+        for (const i of entries) await simphiPlayer.noteRender.update(i, simphiPlayer.res[i], 1);
+        simphiPlayer.res["JudgeLineMP"] = await imgShader(simphiPlayer.res["JudgeLine"], "#feffa9");
+        simphiPlayer.res["JudgeLineFC"] = await imgShader(simphiPlayer.res["JudgeLine"], "#a2eeff");
         simphiPlayer.tmps.hitPerfectColor = simphiPlayer.tmps.hitGoodColor = null;
         simphiPlayer.tmps.hitFxRotate = false;
         // }
@@ -1691,13 +1213,13 @@ async function updateRes(resources, manual = false) {
                 resources[i],
                 ["HoldHL", "HoldHeadHL"].includes(i) ? 8080 / 7875 : 1
             );
-            if (manual) res[i.replaceAll(/\.(jpg|png)/gi, "")] = resources[i];
+            if (manual) simphiPlayer.res[i.replaceAll(/\.(jpg|png)/gi, "")] = resources[i];
         }
     }
     if (resources["HitFXRaw"]) await simphiPlayer.noteRender.updateFX(resources["HitFXRaw"], 1);
     for (let i = 0; i < 3; i++) {
         const str = `HitSong${i}`;
-        if (resources[str]) res[str] = resources[str];
+        if (resources[str]) simphiPlayer.res[str] = resources[str];
     }
     if (manual)
         shared.game.msgHandler.sendMessage(
@@ -1714,10 +1236,10 @@ window.addEventListener(
             ...shared.game,
             init: true,
             app: simphiPlayer.app,
-            res,
+            res: simphiPlayer.res,
             charts: simphiPlayer.chartData.charts,
             stat: simphiPlayer.stat,
-            hitManager,
+            hitManager: simphiPlayer.hitManager,
             judgeManager,
             stage: simphiPlayer.stage,
             clearStat: simphiPlayer.clearStat,
@@ -1809,9 +1331,9 @@ window.addEventListener(
                                 const header1 = a.getUint32(0);
                                 const header2 = a.getUint32(4);
                                 if (header1 === 0x4f676753)
-                                    res[name] = await audio.decode(xhr.response);
+                                    simphiPlayer.res[name] = await audio.decode(xhr.response);
                                 else if (header1 === 0x89504e47 && header2 === 0x0d0a1a0a)
-                                    res[name] = await createImageBitmap(new Blob([xhr.response]));
+                                    simphiPlayer.res[name] = await createImageBitmap(new Blob([xhr.response]));
                                 else
                                     msgHandler.sendError(
                                         shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [
@@ -1830,21 +1352,21 @@ window.addEventListener(
             return msgHandler.sendError(
                 shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [errorNum])
             );
-        res["NoImageBlack"] = await createImageBitmap(
+        simphiPlayer.res["NoImageBlack"] = await createImageBitmap(
             new ImageData(new Uint8ClampedArray(4).fill(0), 1, 1)
         );
-        res["NoImageWhite"] = await createImageBitmap(
+        simphiPlayer.res["NoImageWhite"] = await createImageBitmap(
             new ImageData(new Uint8ClampedArray(4).fill(255), 1, 1)
         );
-        res["JudgeLineMP"] = await imgShader(res["JudgeLine"], "#feffa9");
-        res["JudgeLineFC"] = await imgShader(res["JudgeLine"], "#a2eeff");
-        res["Ranks"] = await imgSplit(res["Rank"]);
-        res["Rank"].close();
-        res["mute"] = audio.mute(1);
+        simphiPlayer.res["JudgeLineMP"] = await imgShader(simphiPlayer.res["JudgeLine"], "#feffa9");
+        simphiPlayer.res["JudgeLineFC"] = await imgShader(simphiPlayer.res["JudgeLine"], "#a2eeff");
+        simphiPlayer.res["Ranks"] = await imgSplit(simphiPlayer.res["Rank"]);
+        simphiPlayer.res["Rank"].close();
+        simphiPlayer.res["mute"] = audio.mute(1);
         if (
             !(() => {
                 const b = createCanvas(1, 1).getContext("2d");
-                b.drawImage(res["JudgeLine"], 0, 0);
+                b.drawImage(simphiPlayer.res["JudgeLine"], 0, 0);
                 return b.getImageData(0, 0, 1, 1).data[0];
             })()
         )
@@ -1934,7 +1456,7 @@ function mainLoop() {
                 simphiPlayer.chartData.levelText.slice(0, 2).toLocaleLowerCase()
             );
             audio.play(
-                res[
+                simphiPlayer.res[
                     `LevelOver${
                         !shared.game.ptmain.gameConfig.usekwlevelOverbgm
                             ? difficulty < 0
@@ -1959,7 +1481,7 @@ function mainLoop() {
         resultPageRenderer(fucktemp2);
         simphiPlayer.app.ctxos.globalAlpha = 0.5;
         simphiPlayer.app.ctxos.drawImage(
-            res["Retry"],
+            simphiPlayer.res["Retry"],
             simphiPlayer.app.canvasos.width - simphiPlayer.app.lineScale * 1,
             simphiPlayer.app.canvasos.height - simphiPlayer.app.lineScale * 1,
             simphiPlayer.app.lineScale * 0.75,
@@ -1986,7 +1508,7 @@ function mainLoop() {
     if (!simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime && !fucktemp2) {
         simphiPlayer.app.ctxos.globalAlpha = 0.5;
         simphiPlayer.app.ctxos.drawImage(
-            res["Loop"],
+            simphiPlayer.res["Loop"],
             simphiPlayer.app.lineScale * 0.25,
             simphiPlayer.app.canvasos.height - simphiPlayer.app.lineScale * 1,
             simphiPlayer.app.lineScale * 0.75,
@@ -2060,15 +1582,15 @@ function loopNoCanvas() {
     //遍历判定线events和Note
     simphiPlayer.app.updateByTime(simphiPlayer.timeInfo.timeChart);
     //更新打击特效和触摸点动画
-    hitFeedbackList.update();
-    hitImageList.update();
-    hitWordList.update();
-    for (const i of hitManager.list) {
+    simphiPlayer.hitFeedbackList.update();
+    simphiPlayer.hitImageList.update();
+    simphiPlayer.hitWordList.update();
+    for (const i of simphiPlayer.hitManager.list) {
         if (i.type === "keyboard") continue;
-        if (!i.isTapped) hitFeedbackList.add(HitFeedback.tap(i.offsetX, i.offsetY));
+        if (!i.isTapped) simphiPlayer.hitFeedbackList.add(HitFeedback.tap(i.offsetX, i.offsetY));
         else if (i.isMoving)
-            hitFeedbackList.add(HitFeedback.move(i.offsetX, i.offsetY)); //qwq
-        else if (i.isActive) hitFeedbackList.add(HitFeedback.hold(i.offsetX, i.offsetY));
+            simphiPlayer.hitFeedbackList.add(HitFeedback.move(i.offsetX, i.offsetY)); //qwq
+        else if (i.isActive) simphiPlayer.hitFeedbackList.add(HitFeedback.hold(i.offsetX, i.offsetY));
     }
     //触发判定和播放打击音效
     if (simphiPlayer.animationInfo.isInEnd && !simphiPlayer.app.pauseTime) {
@@ -2079,7 +1601,7 @@ function loopNoCanvas() {
         judgeManager.execute(simphiPlayer.app.tapholds, simphiPlayer.timeInfo.timeChart, judgeWidth);
     }
     //更新判定
-    hitManager.update();
+    simphiPlayer.hitManager.update();
     simphiPlayer.tmps.bgImage = shared.game.ptmain.gameConfig.imageBlur ? simphiPlayer.app.bgImageBlur : simphiPlayer.app.bgImage;
     simphiPlayer.tmps.bgVideo = simphiPlayer.app.bgVideo;
     simphiPlayer.tmps.progress = (simphiPlayer.qwqwq ? simphiPlayer.timeInfo.duration - simphiPlayer.timeInfo.timeBgm : simphiPlayer.timeInfo.timeBgm) / simphiPlayer.timeInfo.duration;
@@ -2177,9 +1699,9 @@ function loopCanvas() {
         }
     }
     // if (qwq[4]) ctxos.filter = `hue-rotate(${stat.combo*360/7}deg)`;
-    hitImageList.animate(); //绘制打击特效1
+    simphiPlayer.hitImageList.animate(); //绘制打击特效1
     // if (qwq[4]) ctxos.filter = 'none';
-    if (shared.game.ptmain.gameConfig.showCE2) hitWordList.animate(); //绘制打击特效2
+    if (shared.game.ptmain.gameConfig.showCE2) simphiPlayer.hitWordList.animate(); //绘制打击特效2
     simphiPlayer.app.ctxos.globalAlpha = 1;
     //绘制进度条
     simphiPlayer.app.ctxos.setTransform(
@@ -2194,7 +1716,7 @@ function loopCanvas() {
                 : -tween.easeOutSine(simphiPlayer.animationTimer.out.second * 1.5)) *
             1.75
     );
-    simphiPlayer.app.ctxos.drawImage(res["ProgressBar"], simphiPlayer.tmps.progress * 1920 - 1920, 0);
+    simphiPlayer.app.ctxos.drawImage(simphiPlayer.res["ProgressBar"], simphiPlayer.tmps.progress * 1920 - 1920, 0);
     //绘制文字
     simphiPlayer.app.ctxos.resetTransform();
     for (const i of simphiPlayer.after.values()) i();
@@ -2257,7 +1779,7 @@ function loopCanvas() {
         const imgH = lineScale * 0.15; //0.1333...
         if (simphiPlayer.animationTimer.in.second >= 2.5) simphiPlayer.app.ctxos.globalAlpha = tween.easeOutSine(6 - simphiPlayer.animationTimer.in.second * 2);
         simphiPlayer.app.ctxos.drawImage(
-            shared.game.ptmain.gameConfig.lineColor ? res["JudgeLineMP"] : res["JudgeLine"],
+            shared.game.ptmain.gameConfig.lineColor ? simphiPlayer.res["JudgeLineMP"] : simphiPlayer.res["JudgeLine"],
             -imgW / 2,
             -imgH / 2,
             imgW,
@@ -2367,7 +1889,7 @@ function loopCanvas() {
     simphiPlayer.app.ctxos.resetTransform();
     if ((simphiPlayer.animationInfo.isInEnd || simphiPlayer.animationTimer.in.second >= 2.5) && simphiPlayer.tmps.customForeDraw != null) simphiPlayer.tmps.customForeDraw(simphiPlayer.app.ctxos); // 自定义前景
     if (simphiPlayer.animationInfo.isInEnd && simphiPlayer.filter) simphiPlayer.filter(simphiPlayer.app.ctxos, simphiPlayer.timeInfo.timeBgm, simphiPlayer.timeInfo.nowTime_ms / 1e3); //滤镜处理
-    if (shared.game.ptmain.gameConfig.feedback) hitFeedbackList.animate(); //绘制打击特效0
+    if (shared.game.ptmain.gameConfig.feedback) simphiPlayer.hitFeedbackList.animate(); //绘制打击特效0
     simphiPlayer.app.ctxos.resetTransform();
     try {
         shared.game.graphicHandler.whilePlayingHook(simphiPlayer.app.ctx, simphiPlayer.app.ctxos, lineScale);
@@ -2391,7 +1913,7 @@ function loopCanvas() {
     simphiPlayer.app.ctxos.globalAlpha = simphiPlayer.tmps.canPause ? simphiPlayer.tmps.statStatus.pause.alpha : 0.5;
     if (simphiPlayer.tmps.showStat)
         simphiPlayer.app.ctxos.drawImage(
-            res["Pause"],
+            simphiPlayer.res["Pause"],
             lineScale * 0.6 + simphiPlayer.tmps.statStatus.pause.offsetX,
             lineScale * 0.7 + simphiPlayer.tmps.statStatus.pause.offsetY,
             lineScale * 0.63,
@@ -2556,21 +2078,21 @@ function loopCanvas() {
             const imgBaseLine = n => simphiPlayer.app.hlen - (lineScale * n) / 2;
             const imgX = n => simphiPlayer.app.wlen + lineScale * (n * 2 - 0.5);
             simphiPlayer.app.ctxos.drawImage(
-                res["Back"],
+                simphiPlayer.res["Back"],
                 imgX(-1.1),
                 imgBaseLine(1.5),
                 lineScale * 1.5,
                 lineScale * 1.5
             );
             simphiPlayer.app.ctxos.drawImage(
-                res["Retry"],
+                simphiPlayer.res["Retry"],
                 imgX(0),
                 imgBaseLine(1.25),
                 lineScale * 1.25,
                 lineScale * 1.25
             );
             simphiPlayer.app.ctxos.drawImage(
-                res["Resume"],
+                simphiPlayer.res["Resume"],
                 imgX(1),
                 imgBaseLine(1.5),
                 lineScale * 1.5,
@@ -2875,10 +2397,10 @@ function resultPageRenderer(statData) {
     const qwq2 = 293 + clip((simphiPlayer.animationTimer.end.second - 1.3) * 3.75) * 100;
     const qwq3 = 410 - tween.ease15(clip((simphiPlayer.animationTimer.end.second - 1.3) * 1.5)) * 164;
     if (simphiPlayer.stat.lineStatus == 3)
-        simphiPlayer.app.ctxos.drawImage(res["FCV"], 1685 - qwq3, 373 - qwq3, qwq3 * 2, qwq3 * 2);
+        simphiPlayer.app.ctxos.drawImage(simphiPlayer.res["FCV"], 1685 - qwq3, 373 - qwq3, qwq3 * 2, qwq3 * 2);
     else
         simphiPlayer.app.ctxos.drawImage(
-            res["Ranks"][simphiPlayer.stat.rankStatus],
+            simphiPlayer.res["Ranks"][simphiPlayer.stat.rankStatus],
             1685 - qwq3,
             373 - qwq3,
             qwq3 * 2,
@@ -3177,51 +2699,7 @@ function adjustSize(source, dest, scale) {
         dh * scale,
     ];
 }
-/**@type {Map<ImageBitmap,LineImage>} */
-const lineImages = new Map();
-class LineImage {
-    /**@param {ImageBitmap} image */
-    constructor(image) {
-        this.image = image;
-        this.imageFC = null;
-        this.imageAP = null;
-        this.imageMP = null;
-    }
-    async getFC() {
-        if (!this.imageFC) this.imageFC = await imgShader(this.image, "#a2eeff");
-        return this.imageFC;
-    }
-    async getAP() {
-        if (!this.imageAP) this.imageAP = await imgShader(this.image, "#a3ffac");
-        return this.imageAP;
-    }
-    async getMP() {
-        if (!this.imageMP) this.imageMP = await imgShader(this.image, "#feffa9");
-        return this.imageMP;
-    }
-}
-//byte转人类可读
-function bytefm(byte = 0) {
-    if (byte < 1024) return `${byte}B`;
-    byte /= 1024;
-    if (byte < 1024) return `${byte.toFixed(2)}KB`;
-    byte /= 1024;
-    if (byte < 1024) return `${byte.toFixed(2)}MB`;
-    byte /= 1024;
-    if (byte < 1024) return `${byte.toFixed(2)}GB`;
-    byte /= 1024;
-    if (byte < 1024) return `${byte.toFixed(2)}TB`;
-    byte /= 1024;
-    if (byte < 1024) return `${byte.toFixed(2)}PB`;
-    byte /= 1024;
-    if (byte < 1024) return `${byte.toFixed(2)}EB`;
-    byte /= 1024;
-    if (byte < 1024) return `${byte.toFixed(2)}ZB`;
-    byte /= 1024;
-    if (byte < 1024) return `${byte.toFixed(2)}YB`;
-    byte /= 1024;
-    return `${byte}BB`;
-}
+
 //html交互(WIP)
 $id("select-note-scale").addEventListener("change", evt => simphiPlayer.app.setNoteScale(evt.target.value));
 $id("select-background-dim").addEventListener(
@@ -3347,14 +2825,14 @@ async function qwqStop() {
             return msgHandler.sendError(shared.game.i18n.t("simphi.playErr.noMusicSelected"));
         simphiPlayer.app.stage.style.display = "block";
         for (const i of simphiPlayer.before.values()) await i();
-        audio.play(res["mute"], { loop: true, isOut: false }); //播放空音频(避免音画不同步)
+        audio.play(simphiPlayer.res["mute"], { loop: true, isOut: false }); //播放空音频(避免音画不同步)
         simphiPlayer.app.prerenderChart(simphiPlayer.modify(simphiPlayer.chartData.charts.get(selectchart.value))); //fuckqwq
         const md5 = simphiPlayer.chartData.chartsMD5.get(selectchart.value);
         simphiPlayer.stat.level = Number(simphiPlayer.chartData.levelText.match(/\d+$/));
         simphiPlayer.stat.reset(simphiPlayer.app.chart.numOfNotes, md5, selectspeed.value);
         await loadLineData();
-        simphiPlayer.app.bgImage = simphiPlayer.chartData.bgs.get(selectbg.value) || res["NoImageWhite"];
-        simphiPlayer.app.bgImageBlur = simphiPlayer.chartData.bgsBlur.get(selectbg.value) || res["NoImageWhite"];
+        simphiPlayer.app.bgImage = simphiPlayer.chartData.bgs.get(selectbg.value) || simphiPlayer.res["NoImageWhite"];
+        simphiPlayer.app.bgImageBlur = simphiPlayer.chartData.bgsBlur.get(selectbg.value) || simphiPlayer.res["NoImageWhite"];
         const bgm = simphiPlayer.chartData.bgms.get(selectbgm.value);
         simphiPlayer.app.bgMusic = bgm.audio;
         simphiPlayer.app.bgVideo = bgm.video;
@@ -3379,9 +2857,9 @@ async function qwqStop() {
         fucktemp2 = null;
         if (simphiPlayer.app.pauseNextTick)
             clearInterval(simphiPlayer.app.pauseNextTick), (simphiPlayer.app.pauseTime = 0), (simphiPlayer.app.pauseNextTick = null);
-        hitFeedbackList.clear();
-        hitImageList.clear();
-        hitWordList.clear();
+        simphiPlayer.hitFeedbackList.clear();
+        simphiPlayer.hitImageList.clear();
+        simphiPlayer.hitWordList.clear();
         simphiPlayer.animationTimer.in.reset();
         simphiPlayer.animationTimer.out.reset();
         simphiPlayer.animationTimer.end.reset();
@@ -3395,7 +2873,7 @@ async function loadLineData() {
     for (const i of simphiPlayer.app.lines) {
         i.imageW = 6220.8; //1920
         i.imageH = 7.68; //3
-        i.imageL = [res["JudgeLine"], res["JudgeLineMP"], null, res["JudgeLineFC"]];
+        i.imageL = [simphiPlayer.res["JudgeLine"], simphiPlayer.res["JudgeLineMP"], null, simphiPlayer.res["JudgeLineFC"]];
         i.imageS = 1; //2.56
         i.imageA = 1; //1.5625
         i.imageD = false;
@@ -3415,11 +2893,11 @@ async function loadLineData() {
                     shared.game.i18n.t("simphi.playErr.imageDoesentExist", [i.image])
                 );
             /** @type {ImageBitmap} */
-            const image = simphiPlayer.chartData.bgs.get(i.Image) || res["NoImageBlack"];
+            const image = simphiPlayer.chartData.bgs.get(i.Image) || simphiPlayer.res["NoImageBlack"];
             simphiPlayer.app.lines[i.LineId].imageW = image.width;
             simphiPlayer.app.lines[i.LineId].imageH = image.height;
-            if (!lineImages.has(image)) lineImages.set(image, new LineImage(image));
-            const lineImage = lineImages.get(image);
+            if (!simphiPlayer.lineImages.has(image)) simphiPlayer.lineImages.set(image, new LineImage(image));
+            const lineImage = simphiPlayer.lineImages.get(image);
             simphiPlayer.app.lines[i.LineId].imageL = [
                 image,
                 await lineImage.getMP(),
@@ -3549,7 +3027,7 @@ const enableFilter = $id("enableFilter");
     enableFilter.dispatchEvent(new Event("change"));
 })();
 
-simphiPlayer.res = res;
+simphiPlayer.res = simphiPlayer.res;
 simphiPlayer.audio = audio;
 simphiPlayer.msgHandler = msgHandler;
 
