@@ -475,8 +475,8 @@ const specialDrag = {
                 offsetY >= app.hlen + lineScale * 2.5 &&
                 offsetX >= app.wlen * 0.25 &&
                 offsetX <= app.wlen * 1.75 &&
-                offsetY <= app.hlen + lineScale * 3.75 &&
-                qwqIn.second >= 3
+                offsetY <= app.hlen + lineScale * 3.75 /* &&
+                qwqIn.second >= 3 */
             ) {
                 this.listeningEvts.set(evt, 0);
                 this.func[0].reg(offsetX, offsetY);
@@ -484,8 +484,8 @@ const specialDrag = {
                 offsetY >= app.hlen + lineScale * 0.1 &&
                 offsetX >= app.wlen + lineScale * 4 &&
                 offsetX <= app.wlen * 1.5 + lineScale * 4 &&
-                offsetY <= app.hlen + lineScale * 0.5 &&
-                qwqIn.second >= 3
+                offsetY <= app.hlen + lineScale * 0.5 /* &&
+                qwqIn.second >= 3 */
             ) {
                 this.listeningEvts.set(evt, 1);
                 this.func[1].reg(offsetX, offsetY);
@@ -515,6 +515,7 @@ const specialDrag = {
                 let progress = Math.max((offsetX - app.wlen * 0.25) / (app.wlen * 1.5), 0);
                 if (progress < 1) timeBgm = curTime = duration * progress;
                 else timeBgm = curTime = duration - 0.01;
+                // if (qwqIn.second < 3) qwqIn.addTime(3 - qwqIn.second);
             },
             del: () => {
                 const oldOffset = app.chart.offset;
@@ -652,8 +653,8 @@ const specialClick = {
             if (
                 shared.game.ptmain.playConfig.practiseMode &&
                 offsetY >= app.hlen - lineScale * 0.6 &&
-                offsetY <= app.hlen + lineScale * 0.2 &&
-                qwqIn.second >= 3
+                offsetY <= app.hlen + lineScale * 0.2 /* &&
+                qwqIn.second >= 3 */
             ) {
                 if (
                     offsetX >= app.wlen * 1.5 + lineScale * 2.4 &&
@@ -2040,10 +2041,12 @@ function mainLoop() {
 }
 
 function loopNoCanvas() {
-    if (!isInEnd && qwqIn.second >= 3) {
+    if (!isInEnd && (qwqIn.second >= 3 || timeBgm > 0)) {
         isInEnd = true;
-        playBgm(app.bgMusic);
-        if (app.bgVideo) playVideo(app.bgVideo);
+        if (emitter.eq("play")) {
+            playBgm(app.bgMusic);
+            if (app.bgVideo) playVideo(app.bgVideo);
+        }
     }
     if (emitter.eq("play") && isInEnd && !isOutStart)
         timeBgm = curTime + (nowTime_ms - curTime_ms) / 1e3;
@@ -2124,11 +2127,11 @@ function loopCanvas() {
         app.ctxos.drawImage(tmps.bgVideo, ...adjustSize({ width, height }, app.canvasos, 1));
     }
     // if (qwq[4]) ctxos.filter = `hue-rotate(${stat.combo*360/7}deg)`;
-    if (qwqIn.second >= 2.5 && !stat.lineStatus) drawLine(0, lineScale); //绘制判定线(背景后0)
+    if ((isInEnd || qwqIn.second >= 2.5) && !stat.lineStatus) drawLine(0, lineScale); //绘制判定线(背景后0)
     // if (qwq[4]) ctxos.filter = 'none';
     app.ctxos.resetTransform();
     app.ctxos.fillStyle = "#000"; //背景变暗
-    if (qwqIn.second < 0.67)
+    if ((!isInEnd && qwqIn.second < 0.67))
         app.ctxos.globalAlpha =
             tween.easeOutSine(qwqIn.second * 1.5) * shared.game.ptmain.gameConfig.backgroundDim;
     else
@@ -2137,12 +2140,12 @@ function loopCanvas() {
             tween.easeOutSine(qwqOut.second * 1.5) *
                 (shared.game.ptmain.gameConfig.backgroundDim - 0.2);
     app.ctxos.fillRect(0, 0, app.canvasos.width, app.canvasos.height);
-    if (qwqIn.second >= 2.5 && tmps.customBackDraw != null) tmps.customBackDraw(app.ctxos); // 自定义背景
+    if ((isInEnd || qwqIn.second >= 2.5) && tmps.customBackDraw != null) tmps.customBackDraw(app.ctxos); // 自定义背景
     // if (qwq[4]) ctxos.filter = `hue-rotate(${stat.combo*360/7}deg)`;
-    if (qwqIn.second >= 2.5) drawLine(stat.lineStatus ? 2 : 1, lineScale); //绘制判定线(背景前1)
+    if (isInEnd || qwqIn.second >= 2.5) drawLine(stat.lineStatus ? 2 : 1, lineScale); //绘制判定线(背景前1)
     // if (qwq[4]) ctxos.filter = 'none';
     app.ctxos.resetTransform();
-    if (qwqIn.second >= 3 && qwqOut.second === 0) {
+    if (isInEnd && qwqOut.second === 0) {
         //绘制note
         drawNotes();
         if (shared.game.ptmain.gameConfig.showPoint) {
@@ -2193,7 +2196,7 @@ function loopCanvas() {
         app.canvasos.width / 1920,
         0,
         lineScale *
-            (qwqIn.second < 0.67
+            ((!isInEnd && qwqIn.second < 0.67)
                 ? tween.easeOutSine(qwqIn.second * 1.5) - 1
                 : -tween.easeOutSine(qwqOut.second * 1.5)) *
             1.75
@@ -2204,7 +2207,7 @@ function loopCanvas() {
     for (const i of main.after.values()) i();
     app.ctxos.fillStyle = "#fff";
     //开头过渡动画
-    if (qwqIn.second < 3) {
+    if (!isInEnd) {
         if (qwqIn.second < 0.67) app.ctxos.globalAlpha = tween.easeOutSine(qwqIn.second * 1.5);
         else if (qwqIn.second >= 2.5)
             app.ctxos.globalAlpha = tween.easeOutSine(6 - qwqIn.second * 2);
@@ -2281,7 +2284,7 @@ function loopCanvas() {
         1,
         0,
         lineScale *
-            (qwqIn.second < 0.67
+            ((!isInEnd && qwqIn.second < 0.67)
                 ? tween.easeIOCubic(qwqIn.second * 1.5) - 1
                 : -tween.easeIOCubic(qwqOut.second * 1.5)) *
             1.75
@@ -2320,7 +2323,7 @@ function loopCanvas() {
         lineScale * 1.375 + tmps.statStatus.combonumber.offsetY
     );
     app.ctxos.globalAlpha =
-        qwqIn.second < 0.67
+        (!isInEnd && qwqIn.second < 0.67)
             ? tween.easeOutSine(qwqIn.second * 1.5)
             : 1 - tween.easeOutSine(qwqOut.second * 1.5);
     app.ctxos.globalAlpha *= tmps.statStatus.combo.alpha;
@@ -2338,7 +2341,7 @@ function loopCanvas() {
         1,
         0,
         lineScale *
-            (qwqIn.second < 0.67
+            ((!isInEnd && qwqIn.second < 0.67)
                 ? 1 - tween.easeIOCubic(qwqIn.second * 1.5)
                 : tween.easeIOCubic(qwqOut.second * 1.5)) *
             1.75
@@ -2369,8 +2372,8 @@ function loopCanvas() {
     );
     app.ctxos.globalAlpha = 1;
     app.ctxos.resetTransform();
-    if (qwqIn.second >= 2.5 && tmps.customForeDraw != null) tmps.customForeDraw(app.ctxos); // 自定义前景
-    if (qwqIn.second > 3 && main.filter) main.filter(app.ctxos, timeBgm, nowTime_ms / 1e3); //滤镜处理
+    if ((isInEnd || qwqIn.second >= 2.5) && tmps.customForeDraw != null) tmps.customForeDraw(app.ctxos); // 自定义前景
+    if (isInEnd && main.filter) main.filter(app.ctxos, timeBgm, nowTime_ms / 1e3); //滤镜处理
     if (shared.game.ptmain.gameConfig.feedback) hitFeedbackList.animate(); //绘制打击特效0
     app.ctxos.resetTransform();
     try {
@@ -2380,7 +2383,7 @@ function loopCanvas() {
     }
     //绘制时间和帧率以及note打击数
     app.ctxos.fillStyle = "#fff";
-    if (qwqIn.second < 0.67) app.ctxos.globalAlpha = tween.easeOutSine(qwqIn.second * 1.5);
+    if (!isInEnd && qwqIn.second < 0.67) app.ctxos.globalAlpha = tween.easeOutSine(qwqIn.second * 1.5);
     else app.ctxos.globalAlpha = 1 - tween.easeOutSine(qwqOut.second * 1.5);
     app.ctxos.font = `${lineScale * 0.4}px Saira`;
     app.ctxos.textBaseline = "middle";
@@ -2580,7 +2583,7 @@ function loopCanvas() {
                 lineScale * 1.5,
                 lineScale * 1.5
             );
-            if (shared.game.ptmain.playConfig.practiseMode && qwqIn.second >= 3) {
+            if (shared.game.ptmain.playConfig.practiseMode) {
                 app.ctxos.font = `${lineScale * 0.5}px Saira`;
                 app.ctxos.fillStyle = "#fff";
                 app.ctxos.textAlign = "center";
