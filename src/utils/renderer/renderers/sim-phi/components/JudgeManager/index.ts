@@ -95,8 +95,33 @@ export const judgeManager = {
     execute(notes: NoteExtends[], realTime: number, width: number): void {
         const { list } = this;
         for (const note of notes) {
-            if (note.scored || note.isFake) continue; //跳过已判分的Note和Fakenotes
+            if (note.scored) continue; //跳过已判分的Note和Fakenotes
             let deltaTime = note.realTime - realTime;
+            if (note.isFake) {
+                // Tap和TapHold的处理
+                if (note.type === 1 || note.type === 3) {
+                    if (deltaTime < 0) {
+                        if (note.type === 3 && !note.holdTapTime) {
+                            // 对于TapHold,需要等待头部判定
+                            continue;
+                        }
+                        if (note.type === 3 && deltaTime + note.realHoldTime >= 0) {
+                            // 对于TapHold,需要等待全部经过才算PASSED
+                            continue;
+                        }
+                        note.status = 4; // 使用Perfect状态代表PASSED
+                        note.scored = true;
+                    }
+                    continue;
+                }
+
+                // 其他类型Note的处理
+                if (deltaTime < 0) {
+                    note.status = 4;
+                    note.scored = true;
+                }
+                continue;
+            }
             if (deltaTime > (replayMgr.replaying ? 1 : 0.2)) break; //跳过判定范围外的Note
             if (note.type !== 1 && deltaTime > this.time.g) continue;
             note.statOffset = realTime;
