@@ -3,8 +3,31 @@ import shared from "@utils/js/shared";
 import { tween } from "../utils/tween";
 import { imgShader } from "../assetsProcessor/imgProcessor";
 
+interface Line {
+    imageD: number;
+    alpha: number;
+    attachUI?: string;
+    offsetX: number;
+    offsetY: number;
+    cosr: number;
+    sinr: number;
+    imageU: boolean;
+    imageS: number;
+    imageW: number;
+    imageH: number;
+    imageA: number;
+    scaleX?: number;
+    scaleY?: number;
+    text?: string;
+    color?: string;
+    imageL: HTMLImageElement[];
+    imageC: boolean;
+    isCustomImage?: boolean;
+    imagesColored: { [key: string]: HTMLImageElement };
+}
+
 //判定线函数，undefined/0:默认,1:非,2:恒成立
-export function drawLine(bool, lineScale) {
+export function drawLine(bool: number, lineScale: number): void {
     simphiPlayer.app.ctxos.globalAlpha = 1;
     const tw = 1 - tween.easeOutSine(simphiPlayer.animationTimer.out.second * 1.5);
     for (const i of simphiPlayer.app.linesReversed) {
@@ -92,7 +115,7 @@ export function drawLine(bool, lineScale) {
         }
     }
 }
-function getColoredLineImage(line, hex) {
+function getColoredLineImage(line: Line, hex: string | undefined): HTMLImageElement | Promise<ImageBitmap | HTMLCanvasElement> {
     if (!hex)
         return line.imageL[
             line.imageC && shared.game.ptmain.gameConfig.lineColor ? simphiPlayer.stat.lineStatus : 0

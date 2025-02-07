@@ -1,6 +1,5 @@
-import simphi from "./simphi.js";
+import simphi from "./simphi";
 import { audio } from "@utils/js/aup";
-import { Utils } from "@utils/js/utils";
 import {
     full,
     Timer,
@@ -12,16 +11,16 @@ import {
     FrameAnimater,
 } from "@utils/js/common";
 import { checkSupport } from "./utils/checkSupport";
-import { uploader, ZipReader, readFile } from "./assetsProcessor/reader.js";
+import { uploader, ZipReader, readFile } from "./assetsProcessor/reader";
 import { InteractProxy } from "@utils/js/interact";
 import shared from "@utils/js/shared";
 // import { recordMgr } from "@components/recordMgr/recordMgr";
 import { replayMgr } from "@components/recordMgr/replayMgr";
 
-import { loadModYukiOri } from "./plugins/aprfools/loadModYukiOri.js";
-import saveAdjustedChart from "./plugins/saveAdjustedChart.js";
-import videoRecorder from "./plugins/video-recorder.js";
-import { loadSkinFromBuffer, loadSkinFromDB } from "./plugins/skin.js";
+import { loadModYukiOri } from "./plugins/aprfools/loadModYukiOri";
+import saveAdjustedChart from "./plugins/saveAdjustedChart";
+import videoRecorder from "./plugins/video-recorder";
+import { loadSkinFromBuffer, loadSkinFromDB } from "./plugins/skin";
 import { gauge } from "./plugins/gauge.js";
 
 import {
@@ -44,6 +43,9 @@ import { HitManager } from "./components/HitManager";
 import { HitEvents } from "./components/HitManager/HitEvents";
 import { HitWord } from './components/HitManager/HitWord';
 import { LineImage } from "./components/LineImage";
+import { specialDrag } from "./components/specialDrag";
+import { specialClick } from "./components/specialClick";
+import { loadLineData } from "./components/LoadLineData";
 
 import { drawNotes } from "./renderers/Notes";
 import { drawLine } from "./renderers/Lines";
@@ -67,6 +69,7 @@ export const simphiPlayer = {
     
     //qwq[water,demo,democlick]
     qwq: [null, false, null, null, 0, null],
+    fucktemp2: null,
 
     res: {}, //存放资源
 
@@ -91,7 +94,7 @@ export const simphiPlayer = {
 
     stage: {
         resize(forced) {
-            const ranking = forced || fucktemp2;
+            const ranking = forced || simphiPlayer.fucktemp2;
             simphiPlayer.app.stage.style.cssText = `;position:fixed;top:${forced ? 60 : 0}px;left:0;bottom:0;right:0;z-index:${ranking ? 0 : 1002};display:${location.hash.startsWith("#/playing") ? "block" : "none"};`;
         },
         async doFullScreen() {
@@ -535,286 +538,7 @@ self.addEventListener("resize", () => simphiPlayer.stage.resize());
     }
 }
 //qwq end
-const specialDrag = {
-    listeningEvts: new Map(),
-    update(evt, offsetX, offsetY) {
-        if (!this.listeningEvts.has(evt)) return;
-        this.func[this.listeningEvts.get(evt)].update(offsetX, offsetY);
-    },
-    reg(evt, offsetX, offsetY) {
-        const { lineScale } = simphiPlayer.app;
-        if (!simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime && shared.game.ptmain.playConfig.practiseMode) {
-            if (
-                offsetY >= simphiPlayer.app.hlen + lineScale * 2.5 &&
-                offsetX >= simphiPlayer.app.wlen * 0.25 &&
-                offsetX <= simphiPlayer.app.wlen * 1.75 &&
-                offsetY <= simphiPlayer.app.hlen + lineScale * 3.75 /* &&
-                qwqIn.second >= 3 */
-            ) {
-                this.listeningEvts.set(evt, 0);
-                this.func[0].reg(offsetX, offsetY);
-            } else if (
-                offsetY >= simphiPlayer.app.hlen + lineScale * 0.1 &&
-                offsetX >= simphiPlayer.app.wlen + lineScale * 4 &&
-                offsetX <= simphiPlayer.app.wlen * 1.5 + lineScale * 4 &&
-                offsetY <= simphiPlayer.app.hlen + lineScale * 0.5 /* &&
-                qwqIn.second >= 3 */
-            ) {
-                this.listeningEvts.set(evt, 1);
-                this.func[1].reg(offsetX, offsetY);
-            }
-        }
-        this.update(evt, offsetX, offsetY);
-    },
-    del(evt) {
-        if (!this.listeningEvts.has(evt)) return;
-        this.func[this.listeningEvts.get(evt)].del();
-        this.listeningEvts.delete(evt);
-    },
-    func: [
-        {
-            reg: () => {
-                const oldOffset = simphiPlayer.app.chart.offset;
-                simphiPlayer.app.prerenderChart(simphiPlayer.modify(simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value))); //fuckqwq
-                simphiPlayer.stat.reset(
-                    simphiPlayer.app.chart.numOfNotes,
-                    simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value),
-                    simphiPlayer.selectspeed.value
-                );
-                loadLineData();
-                simphiPlayer.app.chart.offset = oldOffset;
-            },
-            update: offsetX => {
-                let progress = Math.max((offsetX - simphiPlayer.app.wlen * 0.25) / (simphiPlayer.app.wlen * 1.5), 0);
-                if (progress < 1) simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.duration * progress;
-                else simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.duration - 0.01;
-                // if (qwqIn.second < 3) qwqIn.addTime(3 - qwqIn.second);
-            },
-            del: () => {
-                const oldOffset = simphiPlayer.app.chart.offset;
-                simphiPlayer.app.prerenderChart(simphiPlayer.modify(simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value))); //fuckqwq
-                simphiPlayer.stat.reset(
-                    simphiPlayer.app.chart.numOfNotes,
-                    simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value),
-                    simphiPlayer.selectspeed.value
-                );
-                loadLineData();
-                simphiPlayer.app.chart.offset = oldOffset;
-            },
-        },
-        {
-            reg: () => {
-                simphiPlayer.app.prerenderChart(simphiPlayer.modify(simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value))); //fuckqwq
-                simphiPlayer.stat.reset(
-                    simphiPlayer.app.chart.numOfNotes,
-                    simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value),
-                    simphiPlayer.selectspeed.value
-                );
-                loadLineData();
-            },
-            update: offsetX => {
-                const speedNew =
-                    0.5 +
-                    Math.round(
-                        Math.min(
-                            Math.max(
-                                (offsetX - simphiPlayer.app.wlen - simphiPlayer.app.lineScale * 4) / (simphiPlayer.app.wlen * 0.5),
-                                0
-                            ),
-                            1
-                        ) * 30
-                    ) *
-                        0.05;
-                const deltaSpeed = simphiPlayer.app.speed / speedNew;
-                (simphiPlayer.app.speed = speedNew),
-                    (simphiPlayer.timeInfo.duration = simphiPlayer.app.bgMusic.duration / speedNew),
-                    (simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.curTime * deltaSpeed);
-            },
-            del: () => {
-                simphiPlayer.app.prerenderChart(simphiPlayer.modify(simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value))); //fuckqwq
-                simphiPlayer.stat.reset(
-                    simphiPlayer.app.chart.numOfNotes,
-                    simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value),
-                    simphiPlayer.selectspeed.value
-                );
-                loadLineData();
-            },
-        },
-    ],
-};
 //hit start
-const specialClick = {
-    time: [0, 0, 0, 0],
-    func: [
-        function spClickLT() {
-            if (simphiPlayer.emitter.eq("play")) simphiPlayer.btnPause.click();
-        },
-        async function spClickRT() {
-            if (this.gameMode === "multi") return;
-            simphiPlayer.btnPause.value === "暂停" && simphiPlayer.btnPause.click();
-            if (shared.game.app.pauseNextTick)
-                clearInterval(shared.game.app.pauseNextTick),
-                    (shared.game.app.pauseTime = 0),
-                    (shared.game.app.pauseNextTick = null);
-            await shared.game.ptmain.retry();
-            Promise.resolve().then(shared.game.qwqStop).then(shared.game.qwqStop);
-        },
-        function spClickLB() {
-            if (shared.game.isPlayFinished() && shared.game.ptmain.playConfig.mode !== "preview") {
-                shared.game.exportRecord && shared.game.exportRecord();
-            } else if (shared.game.ptmain.gameMode === "single") {
-                if (simphiPlayer.btnPause.value == "暂停") return; //btnPause.click();
-                simphiPlayer.selectflip.value = simphiPlayer.app.mirrorView([3 - simphiPlayer.selectflip.value]);
-            } else {
-                shared.game.multiInstance.JITSOpen = !shared.game.multiInstance.JITSOpen;
-            }
-        },
-        function spClickRB() {
-            if (!fucktemp2) return;
-            if (
-                shared.game.ptmain.$route.path !== "/multipanel" &&
-                shared.game.ptmain.gameMode === "multi"
-            )
-                shared.game.multiInstance.showStat();
-            else shared.game.ptmain.spClickRT();
-        },
-        () => {
-            simphiPlayer.hitManager.clear();
-            shared.game.ptmain.$router.back();
-        },
-    ],
-    click(id) {
-        const now = performance.now();
-        if (now - this.time[id] < 300) this.func[id]();
-        else this.time[id] = now;
-    },
-    qwq(offsetX, offsetY) {
-        const { lineScale } = simphiPlayer.app;
-        if (offsetX < lineScale * 1.5 && offsetY < lineScale * 1.5) this.click(0);
-        if (offsetX > simphiPlayer.app.canvasos.width - lineScale * 1.5 && offsetY < lineScale * 1.5)
-            this.click(1);
-        if (offsetX < lineScale * 1.5 && offsetY > simphiPlayer.app.canvasos.height - lineScale * 1.5)
-            this.click(2);
-        if (
-            offsetX > simphiPlayer.app.canvasos.width - lineScale * 1.5 &&
-            offsetY > simphiPlayer.app.canvasos.height - lineScale * 1.5
-        )
-            this.click(3);
-        if (!simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime) {
-            if (offsetY < simphiPlayer.app.hlen + lineScale && offsetY > simphiPlayer.app.hlen - lineScale) {
-                const imgX = n => simphiPlayer.app.wlen + lineScale * (n * 2 - 0.5);
-                const imgXs = [imgX(-1.1), imgX(0), imgX(1), imgX(1) + lineScale * 1.5];
-                if (
-                    // back
-                    imgXs[0] < offsetX &&
-                    offsetX < imgXs[1]
-                )
-                    this.func[4]();
-                if (
-                    // retry
-                    imgXs[1] < offsetX &&
-                    offsetX < imgXs[2]
-                )
-                    this.func[1]();
-                if (
-                    // resume
-                    imgXs[2] < offsetX &&
-                    offsetX < imgXs[3]
-                )
-                    simphiPlayer.btnPause.click();
-            }
-            if (
-                shared.game.ptmain.playConfig.practiseMode &&
-                offsetY >= simphiPlayer.app.hlen - lineScale * 0.6 &&
-                offsetY <= simphiPlayer.app.hlen + lineScale * 0.2 /* &&
-                qwqIn.second >= 3 */
-            ) {
-                if (
-                    offsetX >= simphiPlayer.app.wlen * 1.5 + lineScale * 2.4 &&
-                    offsetX <= simphiPlayer.app.wlen * 1.5 + lineScale * 3.2
-                ) {
-                    const speedNew = Math.max(simphiPlayer.app.speed - 0.05, 0.5);
-                    const deltaSpeed = simphiPlayer.app.speed / speedNew;
-                    (simphiPlayer.app.speed = speedNew),
-                        (simphiPlayer.timeInfo.duration = simphiPlayer.app.bgMusic.duration / speedNew),
-                        (simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.curTime * deltaSpeed);
-                    simphiPlayer.app.prerenderChart(simphiPlayer.modify(simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value))); //fuckqwq
-                    simphiPlayer.stat.reset(
-                        simphiPlayer.app.chart.numOfNotes,
-                        simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value),
-                        simphiPlayer.selectspeed.value
-                    );
-                    loadLineData();
-                } else if (
-                    offsetX >= simphiPlayer.app.wlen * 1.5 + lineScale * 3.3 &&
-                    offsetX <= simphiPlayer.app.wlen * 1.5 + lineScale * 4.1
-                ) {
-                    const speedNew = Math.min(simphiPlayer.app.speed + 0.05, 2);
-                    const deltaSpeed = simphiPlayer.app.speed / speedNew;
-                    (simphiPlayer.app.speed = speedNew),
-                        (simphiPlayer.timeInfo.duration = simphiPlayer.app.bgMusic.duration / speedNew),
-                        (simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.curTime * deltaSpeed);
-                    simphiPlayer.app.prerenderChart(simphiPlayer.modify(simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value))); //fuckqwq
-                    simphiPlayer.stat.reset(
-                        simphiPlayer.app.chart.numOfNotes,
-                        simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value),
-                        simphiPlayer.selectspeed.value
-                    );
-                    loadLineData();
-                }
-            }
-        }
-        if (
-            shared.game.ptmain.playConfig.adjustOffset &&
-            simphiPlayer.emitter.eq("play") &&
-            offsetX > simphiPlayer.app.canvasos.width - lineScale * 7.5 &&
-            offsetY > simphiPlayer.app.canvasos.height - lineScale * 5 &&
-            !fucktemp2
-        ) {
-            const getBtnAxis = (p, ps) => {
-                const h = lineScale * 0.5 - lineScale * Math.abs(p) * 0.1;
-                const x = simphiPlayer.app.canvasos.width - 3.75 * lineScale + lineScale * ps;
-                const y = simphiPlayer.app.canvasos.height - lineScale * 2.5 - h;
-                return [x, y, x + h * 2, y + h * 2];
-            };
-            const btns = [
-                [-3, -3.5, -1],
-                [-2, -3, -5],
-                [-1, -2.25, -50],
-                [1, 1.5, 50],
-                [2, 2.45, 5],
-                [3, 3.15, 1],
-            ];
-            for (const i of btns) {
-                const btnAxis = getBtnAxis(i[0], i[1]);
-                if (
-                    btnAxis[0] < offsetX &&
-                    offsetX < btnAxis[2] &&
-                    btnAxis[1] < offsetY &&
-                    offsetY < btnAxis[3]
-                ) {
-                    simphiPlayer.app.chart.offset = (simphiPlayer.app.chart.offset * 1e3 + i[2]) / 1e3;
-                }
-            }
-            if (
-                simphiPlayer.app.canvasos.width - 3.5 * lineScale < offsetX &&
-                offsetX < simphiPlayer.app.canvasos.width - 0.5 * lineScale &&
-                simphiPlayer.app.canvasos.height - lineScale * 1.25 < offsetY &&
-                offsetY < simphiPlayer.app.canvasos.height - lineScale * 0.25
-            ) {
-                saveAdjustedChart(simphiPlayer.app, fucktemp2);
-            } else if (
-                simphiPlayer.app.canvasos.width - 7 * lineScale < offsetX &&
-                offsetX < simphiPlayer.app.canvasos.width - 5 * lineScale &&
-                simphiPlayer.app.canvasos.height - lineScale * 1.25 < offsetY &&
-                offsetY < simphiPlayer.app.canvasos.height - lineScale * 0.25
-            ) {
-                simphiPlayer.app.chart.offset = simphiPlayer.app.chart.offsetBak;
-            }
-        }
-        if (simphiPlayer.animationTimer.end.second > 0) simphiPlayer.pressTime = simphiPlayer.pressTime > 0 ? -simphiPlayer.animationTimer.end.second : simphiPlayer.animationTimer.end.second;
-    },
-};
 
 class HitFeedback {
     constructor(offsetX, offsetY, n1, n2) {
@@ -1379,7 +1103,6 @@ function playVideo(data, offset) {
     return data.play();
 }
 let resultPageData = false;
-let fucktemp2 = null;
 simphiPlayer.stage.resize(); //qwq
 //作图
 function mainLoop() {
@@ -1426,15 +1149,15 @@ function mainLoop() {
             simphiPlayer.animationTimer.end.reset();
             simphiPlayer.animationTimer.end.play();
             simphiPlayer.stat.level = Number(simphiPlayer.chartData.levelText.match(/\d+$/));
-            fucktemp2 = simphiPlayer.stat.getData(simphiPlayer.app.playMode === 1, simphiPlayer.selectspeed.value);
+            simphiPlayer.fucktemp2 = simphiPlayer.stat.getData(simphiPlayer.app.playMode === 1, simphiPlayer.selectspeed.value);
         }, 1e3);
         shared.game.ptmain.playFinished();
-        if (shared.game.ptmain.playConfig.adjustOffset) saveAdjustedChart(simphiPlayer.app, fucktemp2);
+        if (shared.game.ptmain.playConfig.adjustOffset) saveAdjustedChart(simphiPlayer.app, simphiPlayer.fucktemp2);
         simphiPlayer.app.stage.style.zIndex = 0;
         simphiPlayer.stage.resize(true);
     } //只让它执行一次
-    if (fucktemp2) {
-        resultPageRenderer(fucktemp2);
+    if (simphiPlayer.fucktemp2) {
+        resultPageRenderer(simphiPlayer.fucktemp2);
         simphiPlayer.app.ctxos.globalAlpha = 0.5;
         simphiPlayer.app.ctxos.drawImage(
             simphiPlayer.res["Retry"],
@@ -1461,7 +1184,7 @@ function mainLoop() {
         // };
         simphiPlayer.app.ctxos.textAlign = null;
     }
-    if (!simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime && !fucktemp2) {
+    if (!simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime && !simphiPlayer.fucktemp2) {
         simphiPlayer.app.ctxos.globalAlpha = 0.5;
         simphiPlayer.app.ctxos.drawImage(
             simphiPlayer.res["Loop"],
@@ -1474,10 +1197,10 @@ function mainLoop() {
     if (
         simphiPlayer.app.canvas.width > simphiPlayer.app.canvasos.width ||
         simphiPlayer.app.canvas.height > simphiPlayer.app.canvasos.height ||
-        fucktemp2
+        simphiPlayer.fucktemp2
     ) {
         simphiPlayer.app.ctx.globalAlpha = 1;
-        if (shared.game.ptmain.gameConfig.imageBlur || fucktemp2)
+        if (shared.game.ptmain.gameConfig.imageBlur || simphiPlayer.fucktemp2)
             simphiPlayer.app.ctx.drawImage(simphiPlayer.app.bgImageBlur, ...adjustSize(simphiPlayer.app.bgImageBlur, simphiPlayer.app.canvas, 1.1));
         else simphiPlayer.app.ctx.drawImage(simphiPlayer.app.bgImage, ...adjustSize(simphiPlayer.app.bgImage, simphiPlayer.app.canvas, 1.1));
         simphiPlayer.app.ctx.fillStyle = "#000";
@@ -2331,7 +2054,7 @@ async function qwqStop() {
         simphiPlayer.frameAnimater.stop();
         //清除原有数据
         resultPageData = false;
-        fucktemp2 = null;
+        simphiPlayer.fucktemp2 = null;
         if (simphiPlayer.app.pauseNextTick)
             clearInterval(simphiPlayer.app.pauseNextTick), (simphiPlayer.app.pauseTime = 0), (simphiPlayer.app.pauseNextTick = null);
         simphiPlayer.hitFeedbackList.clear();
@@ -2344,61 +2067,6 @@ async function qwqStop() {
         simphiPlayer.timeInfo.curTime_ms = 0;
         simphiPlayer.timeInfo.duration = 0;
         for (const i of simphiPlayer.end.values()) await i();
-    }
-}
-async function loadLineData() {
-    for (const i of simphiPlayer.app.lines) {
-        i.imageW = 6220.8; //1920
-        i.imageH = 7.68; //3
-        i.imageL = [simphiPlayer.res["JudgeLine"], simphiPlayer.res["JudgeLineMP"], null, simphiPlayer.res["JudgeLineFC"]];
-        i.imageS = 1; //2.56
-        i.imageA = 1; //1.5625
-        i.imageD = false;
-        i.imageC = true;
-        i.imageU = true;
-    }
-    for (const i of simphiPlayer.chartData.chartLineData) {
-        if (simphiPlayer.selectchart.value === i.Chart) {
-            if (!simphiPlayer.app.lines[i.LineId]) {
-                msgHandler.sendWarning(
-                    shared.game.i18n.t("simphi.playErr.judgeLineDoesentExist", [i.LineId])
-                );
-                continue;
-            }
-            if (!simphiPlayer.chartData.bgs.has(i.Image))
-                msgHandler.sendWarning(
-                    shared.game.i18n.t("simphi.playErr.imageDoesentExist", [i.image])
-                );
-            /** @type {ImageBitmap} */
-            const image = simphiPlayer.chartData.bgs.get(i.Image) || simphiPlayer.res["NoImageBlack"];
-            simphiPlayer.app.lines[i.LineId].imageW = image.width;
-            simphiPlayer.app.lines[i.LineId].imageH = image.height;
-            if (!simphiPlayer.lineImages.has(image)) simphiPlayer.lineImages.set(image, new LineImage(image));
-            const lineImage = simphiPlayer.lineImages.get(image);
-            simphiPlayer.app.lines[i.LineId].imageL = [
-                image,
-                await lineImage.getMP(),
-                await lineImage.getAP(),
-                await lineImage.getFC(),
-            ];
-            simphiPlayer.app.lines[i.LineId].isCustomImage = simphiPlayer.chartData.bgs.get(i.Image) ? true : false;
-            if (isFinite((i.Vert = parseFloat(i.Vert)))) {
-                //Legacy
-                simphiPlayer.app.lines[i.LineId].imageS = (Math.abs(i.Vert) * 1080) / image.height;
-                simphiPlayer.app.lines[i.LineId].imageU = i.Vert > 0;
-            }
-            if (isFinite((i.Horz = parseFloat(i.Horz)))) simphiPlayer.app.lines[i.LineId].imageA = i.Horz; //Legacy
-            if (isFinite((i.IsDark = parseFloat(i.IsDark))))
-                simphiPlayer.app.lines[i.LineId].imageD = !!i.IsDark; //Legacy
-            if (isFinite((i.Scale = parseFloat(i.Scale)))) simphiPlayer.app.lines[i.LineId].imageS = i.Scale;
-            if (isFinite((i.Aspect = parseFloat(i.Aspect)))) simphiPlayer.app.lines[i.LineId].imageA = i.Aspect;
-            if (isFinite((i.UseBackgroundDim = parseFloat(i.UseBackgroundDim))))
-                simphiPlayer.app.lines[i.LineId].imageD = !!i.UseBackgroundDim;
-            if (isFinite((i.UseLineColor = parseFloat(i.UseLineColor))))
-                simphiPlayer.app.lines[i.LineId].imageC = !!i.UseLineColor;
-            if (isFinite((i.UseLineScale = parseFloat(i.UseLineScale))))
-                simphiPlayer.app.lines[i.LineId].imageU = !!i.UseLineScale;
-        }
     }
 }
 async function qwqPause() {
