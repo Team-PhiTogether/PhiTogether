@@ -1,4 +1,4 @@
-import simphi from "./simphi";
+import simphi from "./simphi.js";
 import { audio } from "@utils/js/aup";
 import { Utils } from "@utils/js/utils";
 import {
@@ -11,18 +11,18 @@ import {
     orientation,
     FrameAnimater,
 } from "@utils/js/common.js";
-import { urls, loadJS } from "./assetsProcessor/loader";
-import { uploader, ZipReader, readFile } from "./assetsProcessor/reader";
+import { urls, loadJS } from "./assetsProcessor/loader.js";
+import { uploader, ZipReader, readFile } from "./assetsProcessor/reader.js";
 import { InteractProxy } from "@utils/js/interact";
 import shared from "@utils/js/shared";
 // import { recordMgr } from "@components/recordMgr/recordMgr";
 import { replayMgr } from "@components/recordMgr/replayMgr";
 
-import { loadModYukiOri } from "./plugins/aprfools/loadModYukiOri";
-import saveAdjustedChart from "./plugins/saveAdjustedChart";
-import videoRecorder from "./plugins/video-recorder";
-import { loadSkinFromBuffer, loadSkinFromDB } from "./plugins/skin";
-import { gauge } from "./plugins/gauge";
+import { loadModYukiOri } from "./plugins/aprfools/loadModYukiOri.js";
+import saveAdjustedChart from "./plugins/saveAdjustedChart.js";
+import videoRecorder from "./plugins/video-recorder.js";
+import { loadSkinFromBuffer, loadSkinFromDB } from "./plugins/skin.js";
+import { gauge } from "./plugins/gauge.js";
 
 import {
     imgBlur,
@@ -31,18 +31,22 @@ import {
     imgSplit,
     hex2rgba,
     rgba2hex,
-} from "./assetsProcessor/imgProcessor";
+} from "./assetsProcessor/imgProcessor.js";
 import { createCanvas, drawRoundRect } from "./utils/canvas";
 
 import ptdb from "@utils/ptdb";
 import { msgHandler } from "@utils/js/msgHandler";
-import { tween, Emitter, clip } from "./utils/simphiUtils";
+import { tween } from "./utils/simphiUtils";
+import { Emitter } from "./utils/Emitter";
+import { clip } from "./utils/clip";
 
 import { judgeManager } from "./components/JudgeManager";
 import { HitManager } from "./components/HitManager";
 import { HitEvents } from "./components/HitManager/HitEvents";
 import { HitWord } from './components/HitManager/HitWord';
 import { LineImage } from "./components/LineImage";
+
+import { drawNotes } from "./renderers/notes";
 
 const $id = query => document.getElementById(query);
 const $ = query => document.body.querySelector(query);
@@ -59,6 +63,9 @@ export const simphiPlayer = {
     filter: null,
     filterOptions: {},
     "flag{qwq}": _ => {},
+    
+    //qwq[water,demo,democlick]
+    qwq: [null, false, null, null, 0, null],
 
     res: {}, //存放资源
 
@@ -576,8 +583,6 @@ self.addEventListener("resize", () => simphiPlayer.stage.resize());
         }
     }
 }
-//qwq[water,demo,democlick]
-const qwq = [null, false, null, null, 0, null];
 //qwq end
 const specialDrag = {
     listeningEvts: new Map(),
@@ -2511,7 +2516,7 @@ function resultPageRenderer(statData) {
     simphiPlayer.app.ctxos.fillText("MISS", -1020 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 0.8 - 0.3)) + 2502, 842);
     simphiPlayer.app.ctxos.font = `28px Saira`;
     //Early, Late
-    const qwq4 = clip((qwq[3] > 0 ? simphiPlayer.animationTimer.end.second - qwq[3] : 0.2 - simphiPlayer.animationTimer.end.second - qwq[3]) * 5.0);
+    const qwq4 = clip((simphiPlayer.qwq[3] > 0 ? simphiPlayer.animationTimer.end.second - simphiPlayer.qwq[3] : 0.2 - simphiPlayer.animationTimer.end.second - simphiPlayer.qwq[3]) * 5.0);
     simphiPlayer.app.ctxos.textAlign = "left";
     simphiPlayer.app.ctxos.fillText("EARLY", -1020 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 0.8 - 0.3)) + 2610, 800);
     simphiPlayer.app.ctxos.fillText("LATE", -1020 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 0.8 - 0.3)) + 2625, 838);
@@ -2564,121 +2569,6 @@ class ScaledNote {
             /** @param {CanvasRenderingContext2D} ctx */
             this.tail = (ctx, offset) => ctx.drawImage(img, dx, offset - dh - dy, dw, dh);
         }
-    }
-}
-//绘制Note
-function drawNotes() {
-    for (const i of simphiPlayer.app.holds) drawHold(i, simphiPlayer.timeInfo.timeChart);
-    for (const i of simphiPlayer.app.dragsReversed) drawDrag(i);
-    for (const i of simphiPlayer.app.tapsReversed) drawTap(i);
-    for (const i of simphiPlayer.app.flicksReversed) drawFlick(i);
-}
-
-// function getNoteVisible(note) {
-//   if (note.line.alpha >= 0) return true;
-//   else if (note.line.alpha >= -1) return true;
-//   else if (note.line.alpha >= -2) {
-//     if (note.isAbove) return true;
-//     else return false;
-//   } else return true;
-// }
-
-function drawTap(note) {
-    if (simphiPlayer.app.pauseTime && shared.game.ptmain.gameConfig.reviewWhenResume && note.scored) return;
-    const HL = note.isMulti && shared.game.ptmain.gameConfig.highLight;
-    const nsr = simphiPlayer.app.noteScaleRatio * (note.size || 1);
-    if (!note.visible || (note.scored && !note.badtime)) return;
-    simphiPlayer.app.ctxos.setTransform(
-        nsr * note.cosr,
-        nsr * note.sinr,
-        -nsr * note.sinr,
-        nsr * note.cosr,
-        note.offsetX,
-        note.offsetY
-    );
-    if (note.badtime) {
-        simphiPlayer.app.ctxos.globalAlpha = 1 - clip((performance.now() - note.badtime) / 500);
-        simphiPlayer.noteRender.note["TapBad"].full(simphiPlayer.app.ctxos);
-    } else {
-        simphiPlayer.app.ctxos.globalAlpha =
-            note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
-        if (simphiPlayer.qwqwq) simphiPlayer.app.ctxos.globalAlpha *= Math.max(1 + (simphiPlayer.timeInfo.timeChart - note.realTime) / 1.5, 0); //过线前1.5s出现
-        simphiPlayer.noteRender.note[HL ? "TapHL" : "Tap"].full(simphiPlayer.app.ctxos);
-    }
-}
-
-function drawDrag(note) {
-    if (simphiPlayer.app.pauseTime && shared.game.ptmain.gameConfig.reviewWhenResume && note.scored) return;
-    const HL = note.isMulti && shared.game.ptmain.gameConfig.highLight;
-    const nsr = simphiPlayer.app.noteScaleRatio * (note.size || 1);
-    if (!note.visible || (note.scored && !note.badtime)) return;
-    simphiPlayer.app.ctxos.setTransform(
-        nsr * note.cosr,
-        nsr * note.sinr,
-        -nsr * note.sinr,
-        nsr * note.cosr,
-        note.offsetX,
-        note.offsetY
-    );
-    if (note.badtime);
-    else {
-        simphiPlayer.app.ctxos.globalAlpha =
-            note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
-        if (simphiPlayer.qwqwq) simphiPlayer.app.ctxos.globalAlpha *= Math.max(1 + (simphiPlayer.timeInfo.timeChart - note.realTime) / 1.5, 0);
-        simphiPlayer.noteRender.note[HL ? "DragHL" : "Drag"].full(simphiPlayer.app.ctxos);
-    }
-}
-
-function drawHold(note, realTime) {
-    if (simphiPlayer.app.pauseTime && shared.game.ptmain.gameConfig.reviewWhenResume && note.scored) return;
-    const HL = note.isMulti && shared.game.ptmain.gameConfig.highLight;
-    const nsr = simphiPlayer.app.noteScaleRatio * (note.size || 1);
-    if (!note.visible || note.realTime + note.realHoldTime < realTime) return; //qwq
-    simphiPlayer.app.ctxos.globalAlpha =
-        note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
-    if (simphiPlayer.qwqwq) simphiPlayer.app.ctxos.globalAlpha *= Math.max(1 + (simphiPlayer.timeInfo.timeChart - note.realTime) / 1.5, 0);
-    simphiPlayer.app.ctxos.setTransform(
-        nsr * note.cosr,
-        nsr * note.sinr,
-        -nsr * note.sinr,
-        nsr * note.cosr,
-        note.offsetX,
-        note.offsetY
-    );
-    const baseLength = (simphiPlayer.app.scaleY / nsr) * note.speed * simphiPlayer.app.speed;
-    const holdLength = baseLength * note.realHoldTime;
-    if (note.realTime > realTime) {
-        simphiPlayer.noteRender.note[HL ? "HoldHeadHL" : "HoldHead"].head(simphiPlayer.app.ctxos);
-        simphiPlayer.noteRender.note[HL ? "HoldHL" : "Hold"].body(simphiPlayer.app.ctxos, -holdLength, holdLength);
-    } else {
-        simphiPlayer.noteRender.note[HL ? "HoldHL" : "Hold"].body(
-            simphiPlayer.app.ctxos,
-            -holdLength,
-            holdLength - baseLength * (realTime - note.realTime)
-        );
-    }
-    simphiPlayer.noteRender.note["HoldEnd"].tail(simphiPlayer.app.ctxos, -holdLength);
-}
-
-function drawFlick(note) {
-    if (simphiPlayer.app.pauseTime && shared.game.ptmain.gameConfig.reviewWhenResume && note.scored) return;
-    const HL = note.isMulti && shared.game.ptmain.gameConfig.highLight;
-    const nsr = simphiPlayer.app.noteScaleRatio * (note.size || 1);
-    if (!note.visible || (note.scored && !note.badtime)) return;
-    simphiPlayer.app.ctxos.setTransform(
-        nsr * note.cosr,
-        nsr * note.sinr,
-        -nsr * note.sinr,
-        nsr * note.cosr,
-        note.offsetX,
-        note.offsetY
-    );
-    if (note.badtime);
-    else {
-        simphiPlayer.app.ctxos.globalAlpha =
-            note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
-        if (simphiPlayer.qwqwq) simphiPlayer.app.ctxos.globalAlpha *= Math.max(1 + (simphiPlayer.timeInfo.timeChart - note.realTime) / 1.5, 0);
-        simphiPlayer.noteRender.note[HL ? "FlickHL" : "Flick"].full(simphiPlayer.app.ctxos);
     }
 }
 //调节画面尺寸和全屏相关(返回source播放aegleseeker会出现迷之error)
@@ -3042,7 +2932,7 @@ simphiPlayer.chartsMD5 = simphiPlayer.chartData.chartsMD5;
 // shared.game.simphi.selectchart = main.selectchart;
 simphiPlayer.noteRender = simphiPlayer.noteRender;
 simphiPlayer.ZipReader = ZipReader;
-simphiPlayer.qwq = qwq;
+simphiPlayer.qwq = simphiPlayer.qwq;
 simphiPlayer.pause = () => simphiPlayer.emitter.eq("play") && qwqPause();
 shared.game.simphiPlugins = { videoRecorder };
 Object.defineProperty(simphiPlayer, "time", {

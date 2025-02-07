@@ -10,21 +10,51 @@ import { HitWord } from "../HitManager/HitWord";
 
 import { simphiPlayer } from "../../playerMain";
 
+interface JudgeTime {
+    p: number;
+    g: number;
+    AP: number;
+}
+
+interface NoteExtends {
+    scored: boolean;
+    isFake: boolean;
+    realTime: number;
+    type: number;
+    offsetX: number;
+    offsetY: number;
+    holdTapTime?: number;
+    status: number;
+    frameCount: number;
+    holdStatus: number;
+    name: string;
+    projectX: number;
+    projectY: number;
+    holdTime?: number;
+    realHoldTime?: number;
+    holdBroken?: boolean;
+    holdStart?: number;
+    nearNotes: NoteExtends[];
+    badTime?: number;
+    statOffset?: number;
+}
+
 export const judgeManager = {
     time: {
         p: 0.08,
         g: 0.16,
         AP: 0.04,
-    },
-    setJudgeTime(p = 0.08, g = 0.16, AP = 0.04) {
+    } as JudgeTime,
+
+    setJudgeTime(p: number = 0.08, g: number = 0.16, AP: number = 0.04): void {
         this.time.p = p;
         this.time.g = g;
         this.time.AP = AP;
     },
-    /**@type {JudgeEvent[]} */
-    list: [],
-    /**@param {NoteExtends[]} notes */
-    addEvent(notes, realTime) {
+
+    list: [] as JudgeEvent[],
+
+    addEvent(notes: NoteExtends[], realTime: number): void {
         const { list } = this;
         list.length = 0;
         if (simphiPlayer.app.playMode === 1) {
@@ -61,12 +91,8 @@ export const judgeManager = {
             }
         }
     },
-    /**
-     * @param {NoteExtends[]} notes
-     * @param {number} realTime
-     * @param {number} width
-     */
-    execute(notes, realTime, width) {
+
+    execute(notes: NoteExtends[], realTime: number, width: number): void {
         const { list } = this;
         for (const note of notes) {
             if (note.scored || note.isFake) continue; //跳过已判分的Note和Fakenotes

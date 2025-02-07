@@ -1,5 +1,5 @@
 import { canvasRGBA as StackBlurCanvasRGBA } from "stackblur-canvas";
-import { createCanvas } from "../utils/canvas.js";
+import { createCanvas } from "../utils/canvas";
 
 /**
  * 图片模糊(css filter或StackBlur)
