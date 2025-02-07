@@ -513,8 +513,8 @@ const specialDrag = {
             },
             update: offsetX => {
                 let progress = Math.max((offsetX - app.wlen * 0.25) / (app.wlen * 1.5), 0);
-                if (progress >= 1) progress = 0.999;
-                timeBgm = curTime = duration * progress
+                if (progress < 1) timeBgm = curTime = duration * progress;
+                else timeBgm = curTime = duration - 0.01;
             },
             del: () => {
                 const oldOffset = app.chart.offset;
