@@ -1,5 +1,4 @@
-/**@type {((pos:number)=>number)[]} */
-export const tween = [
+export const tween: (((pos: number) => number) | null)[] = [
     null,
     null,
     pos => Math.sin((pos * Math.PI) / 2), //2

@@ -1,11 +1,14 @@
 import { parse } from "./pec";
 import { parse as parseRPE } from "./rpe";
 
-//读取info.txt
-function info(text) {
+interface ChartInfo {
+    [key: string]: string;
+}
+
+function info(text: string): ChartInfo[] {
     const lines = String(text).split(/\r?\n/);
-    const result = [];
-    let current = {};
+    const result: ChartInfo[] = [];
+    let current: ChartInfo = {};
     for (const i of lines) {
         if (i.startsWith("#")) {
             if (Object.keys(current).length) result.push(current);
