@@ -67,7 +67,7 @@ export const Utils = {
         return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;");
     },
     /**@type {(familyName:string,{...options}?:{})=>Promise<void>} */
-    addFont() { },
+    addFont() {},
     throttle(func, wait) {
         let timer = null;
         return function () {
@@ -172,10 +172,10 @@ export const Utils = {
             return S % 10 === 1 && S !== 11
                 ? "st"
                 : S % 10 === 2 && S !== 12
-                    ? "nd"
-                    : S % 10 === 3 && S !== 13
-                        ? "rd"
-                        : "th";
+                  ? "nd"
+                  : S % 10 === 3 && S !== 13
+                    ? "rd"
+                    : "th";
         },
         w: function () {
             return this.getDay();
@@ -250,7 +250,7 @@ export const Utils = {
                     this.getUTCMinutes() / 60 +
                     this.getUTCSeconds() / 3600) *
                     1000) /
-                24
+                    24
             );
         },
         g: function () {
@@ -385,7 +385,7 @@ export function getQueryObject(search) {
 window.Math.standardDeviation = arr =>
     Math.sqrt(
         arr.reduce((a, b) => a + (b - arr.reduce((a, b) => a + b) / arr.length) ** 2, 0) /
-        arr.length
+            arr.length
     );
 
 const html = e => e[0];

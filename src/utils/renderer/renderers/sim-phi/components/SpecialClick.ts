@@ -24,7 +24,9 @@ export const specialClick = {
                 shared.game.exportRecord && shared.game.exportRecord();
             } else if (shared.game.ptmain.gameMode === "single") {
                 if (simphiPlayer.btnPause.value == "暂停") return; //btnPause.click();
-                simphiPlayer.selectflip.value = simphiPlayer.app.mirrorView([3 - simphiPlayer.selectflip.value]);
+                simphiPlayer.selectflip.value = simphiPlayer.app.mirrorView([
+                    3 - simphiPlayer.selectflip.value,
+                ]);
             } else {
                 shared.game.multiInstance.JITSOpen = !shared.game.multiInstance.JITSOpen;
             }
@@ -51,9 +53,15 @@ export const specialClick = {
     qwq(offsetX, offsetY) {
         const { lineScale } = simphiPlayer.app;
         if (offsetX < lineScale * 1.5 && offsetY < lineScale * 1.5) this.click(0);
-        if (offsetX > simphiPlayer.app.canvasos.width - lineScale * 1.5 && offsetY < lineScale * 1.5)
+        if (
+            offsetX > simphiPlayer.app.canvasos.width - lineScale * 1.5 &&
+            offsetY < lineScale * 1.5
+        )
             this.click(1);
-        if (offsetX < lineScale * 1.5 && offsetY > simphiPlayer.app.canvasos.height - lineScale * 1.5)
+        if (
+            offsetX < lineScale * 1.5 &&
+            offsetY > simphiPlayer.app.canvasos.height - lineScale * 1.5
+        )
             this.click(2);
         if (
             offsetX > simphiPlayer.app.canvasos.width - lineScale * 1.5 &&
@@ -61,7 +69,10 @@ export const specialClick = {
         )
             this.click(3);
         if (!simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime) {
-            if (offsetY < simphiPlayer.app.hlen + lineScale && offsetY > simphiPlayer.app.hlen - lineScale) {
+            if (
+                offsetY < simphiPlayer.app.hlen + lineScale &&
+                offsetY > simphiPlayer.app.hlen - lineScale
+            ) {
                 const imgX = n => simphiPlayer.app.wlen + lineScale * (n * 2 - 0.5);
                 const imgXs = [imgX(-1.1), imgX(0), imgX(1), imgX(1) + lineScale * 1.5];
                 if (
@@ -96,9 +107,15 @@ export const specialClick = {
                     const speedNew = Math.max(simphiPlayer.app.speed - 0.05, 0.5);
                     const deltaSpeed = simphiPlayer.app.speed / speedNew;
                     (simphiPlayer.app.speed = speedNew),
-                        (simphiPlayer.timeInfo.duration = simphiPlayer.app.bgMusic.duration / speedNew),
-                        (simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.curTime * deltaSpeed);
-                    simphiPlayer.app.prerenderChart(simphiPlayer.modify(simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value))); //fuckqwq
+                        (simphiPlayer.timeInfo.duration =
+                            simphiPlayer.app.bgMusic.duration / speedNew),
+                        (simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime =
+                            simphiPlayer.timeInfo.curTime * deltaSpeed);
+                    simphiPlayer.app.prerenderChart(
+                        simphiPlayer.modify(
+                            simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value)
+                        )
+                    ); //fuckqwq
                     simphiPlayer.stat.reset(
                         simphiPlayer.app.chart.numOfNotes,
                         simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value),
@@ -112,9 +129,15 @@ export const specialClick = {
                     const speedNew = Math.min(simphiPlayer.app.speed + 0.05, 2);
                     const deltaSpeed = simphiPlayer.app.speed / speedNew;
                     (simphiPlayer.app.speed = speedNew),
-                        (simphiPlayer.timeInfo.duration = simphiPlayer.app.bgMusic.duration / speedNew),
-                        (simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.curTime * deltaSpeed);
-                    simphiPlayer.app.prerenderChart(simphiPlayer.modify(simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value))); //fuckqwq
+                        (simphiPlayer.timeInfo.duration =
+                            simphiPlayer.app.bgMusic.duration / speedNew),
+                        (simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime =
+                            simphiPlayer.timeInfo.curTime * deltaSpeed);
+                    simphiPlayer.app.prerenderChart(
+                        simphiPlayer.modify(
+                            simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value)
+                        )
+                    ); //fuckqwq
                     simphiPlayer.stat.reset(
                         simphiPlayer.app.chart.numOfNotes,
                         simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value),
@@ -153,7 +176,8 @@ export const specialClick = {
                     btnAxis[1] < offsetY &&
                     offsetY < btnAxis[3]
                 ) {
-                    simphiPlayer.app.chart.offset = (simphiPlayer.app.chart.offset * 1e3 + i[2]) / 1e3;
+                    simphiPlayer.app.chart.offset =
+                        (simphiPlayer.app.chart.offset * 1e3 + i[2]) / 1e3;
                 }
             }
             if (
@@ -172,6 +196,10 @@ export const specialClick = {
                 simphiPlayer.app.chart.offset = simphiPlayer.app.chart.offsetBak;
             }
         }
-        if (simphiPlayer.animationTimer.end.second > 0) simphiPlayer.pressTime = simphiPlayer.pressTime > 0 ? -simphiPlayer.animationTimer.end.second : simphiPlayer.animationTimer.end.second;
+        if (simphiPlayer.animationTimer.end.second > 0)
+            simphiPlayer.pressTime =
+                simphiPlayer.pressTime > 0
+                    ? -simphiPlayer.animationTimer.end.second
+                    : simphiPlayer.animationTimer.end.second;
     },
 };

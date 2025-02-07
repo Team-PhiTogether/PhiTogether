@@ -35,7 +35,7 @@ ploading.init({
 });
 const loadHandler = ploading;
 if (spec.isPhiTogetherApp) {
-    App.addListener('appUrlOpen', (event/* : URLOpenListenerEvent */) => {
+    App.addListener("appUrlOpen", (event /* : URLOpenListenerEvent */) => {
         location.href = event.url.replace("https:", "capacitor:");
     });
 }
@@ -103,7 +103,7 @@ router.beforeEach((to, from) => {
         .toUpperCase();
     if (!["/chartSelect"].includes(to.path)) document.querySelector("#app").scrollTop = 0;
     let s;
-    console.log(to.path)
+    console.log(to.path);
     switch (to.path) {
         case "/chartUpload":
             s = document.getElementById("select2");
@@ -137,7 +137,9 @@ router.beforeEach((to, from) => {
                     );
             break;
         case "/playChart":
-            return ptmain.loadFromRedirect(new URLSearchParams(to.fullPath.slice(to.fullPath.indexOf("?") + 1)))
+            return ptmain.loadFromRedirect(
+                new URLSearchParams(to.fullPath.slice(to.fullPath.indexOf("?") + 1))
+            );
     }
     if (s) {
         s.classList.remove("out");
@@ -300,8 +302,9 @@ const ptAppInstance = createApp({
         if (!this.localeValue) this.localeValue = navigator.language.replace("-", "_") || "zh_CN";
         this.localeValue = this.localeValue.startsWith("en")
             ? "en_US"
-            : `zh_${this.localeValue.endsWith("HK") || this.localeValue.endsWith("TW") ? "TW" : "CN"
-            }`;
+            : `zh_${
+                  this.localeValue.endsWith("HK") || this.localeValue.endsWith("TW") ? "TW" : "CN"
+              }`;
 
         this.$i18n.locale = this.localeValue;
     },
@@ -425,7 +428,7 @@ const ptAppInstance = createApp({
                             const cache = await caches.open("PTv0-User");
                             await cache.delete("/PTVirtual/user/respack.zip");
                         }
-                    } catch (e) { }
+                    } catch (e) {}
                     if (newVal.startsWith("together-pack"))
                         this.currentRenderer.loadRespack("/src/respack/" + newVal);
                 } else if (newVal === "prpr-custom") {
@@ -1049,7 +1052,7 @@ const ptAppInstance = createApp({
                         try {
                             const assets = searchParams.get("assets").split(",");
                             for (const asset of assets) resources.push(asset + "?nocacahe=nocache");
-                        } catch { }
+                        } catch {}
                     }
 
                     // 清 加载完的东西
@@ -1149,8 +1152,9 @@ const ptAppInstance = createApp({
         },
         update() {
             caches.delete("PTv0-Main").then(() => {
-                const url = `/#${searchParams ? `/updateAndPlayChart?${searchParams.toString()}` : "update"
-                    }`;
+                const url = `/#${
+                    searchParams ? `/updateAndPlayChart?${searchParams.toString()}` : "update"
+                }`;
                 fetch(url, {
                     headers: {
                         Pragma: "no-cache",

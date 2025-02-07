@@ -10,7 +10,11 @@ export const specialDrag = {
     },
     reg(evt, offsetX, offsetY) {
         const { lineScale } = simphiPlayer.app;
-        if (!simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime && shared.game.ptmain.playConfig.practiseMode) {
+        if (
+            !simphiPlayer.emitter.eq("play") &&
+            !simphiPlayer.app.pauseTime &&
+            shared.game.ptmain.playConfig.practiseMode
+        ) {
             if (
                 offsetY >= simphiPlayer.app.hlen + lineScale * 2.5 &&
                 offsetX >= simphiPlayer.app.wlen * 0.25 &&
@@ -42,7 +46,11 @@ export const specialDrag = {
         {
             reg: () => {
                 const oldOffset = simphiPlayer.app.chart.offset;
-                simphiPlayer.app.prerenderChart(simphiPlayer.modify(simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value))); //fuckqwq
+                simphiPlayer.app.prerenderChart(
+                    simphiPlayer.modify(
+                        simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value)
+                    )
+                ); //fuckqwq
                 simphiPlayer.stat.reset(
                     simphiPlayer.app.chart.numOfNotes,
                     simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value),
@@ -52,14 +60,25 @@ export const specialDrag = {
                 simphiPlayer.app.chart.offset = oldOffset;
             },
             update: offsetX => {
-                let progress = Math.max((offsetX - simphiPlayer.app.wlen * 0.25) / (simphiPlayer.app.wlen * 1.5), 0);
-                if (progress < 1) simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.duration * progress;
-                else simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.duration - 0.01;
+                let progress = Math.max(
+                    (offsetX - simphiPlayer.app.wlen * 0.25) / (simphiPlayer.app.wlen * 1.5),
+                    0
+                );
+                if (progress < 1)
+                    simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime =
+                        simphiPlayer.timeInfo.duration * progress;
+                else
+                    simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime =
+                        simphiPlayer.timeInfo.duration - 0.01;
                 // if (qwqIn.second < 3) qwqIn.addTime(3 - qwqIn.second);
             },
             del: () => {
                 const oldOffset = simphiPlayer.app.chart.offset;
-                simphiPlayer.app.prerenderChart(simphiPlayer.modify(simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value))); //fuckqwq
+                simphiPlayer.app.prerenderChart(
+                    simphiPlayer.modify(
+                        simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value)
+                    )
+                ); //fuckqwq
                 simphiPlayer.stat.reset(
                     simphiPlayer.app.chart.numOfNotes,
                     simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value),
@@ -71,7 +90,11 @@ export const specialDrag = {
         },
         {
             reg: () => {
-                simphiPlayer.app.prerenderChart(simphiPlayer.modify(simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value))); //fuckqwq
+                simphiPlayer.app.prerenderChart(
+                    simphiPlayer.modify(
+                        simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value)
+                    )
+                ); //fuckqwq
                 simphiPlayer.stat.reset(
                     simphiPlayer.app.chart.numOfNotes,
                     simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value),
@@ -85,7 +108,8 @@ export const specialDrag = {
                     Math.round(
                         Math.min(
                             Math.max(
-                                (offsetX - simphiPlayer.app.wlen - simphiPlayer.app.lineScale * 4) / (simphiPlayer.app.wlen * 0.5),
+                                (offsetX - simphiPlayer.app.wlen - simphiPlayer.app.lineScale * 4) /
+                                    (simphiPlayer.app.wlen * 0.5),
                                 0
                             ),
                             1
@@ -95,10 +119,15 @@ export const specialDrag = {
                 const deltaSpeed = simphiPlayer.app.speed / speedNew;
                 (simphiPlayer.app.speed = speedNew),
                     (simphiPlayer.timeInfo.duration = simphiPlayer.app.bgMusic.duration / speedNew),
-                    (simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.curTime * deltaSpeed);
+                    (simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime =
+                        simphiPlayer.timeInfo.curTime * deltaSpeed);
             },
             del: () => {
-                simphiPlayer.app.prerenderChart(simphiPlayer.modify(simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value))); //fuckqwq
+                simphiPlayer.app.prerenderChart(
+                    simphiPlayer.modify(
+                        simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value)
+                    )
+                ); //fuckqwq
                 simphiPlayer.stat.reset(
                     simphiPlayer.app.chart.numOfNotes,
                     simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value),

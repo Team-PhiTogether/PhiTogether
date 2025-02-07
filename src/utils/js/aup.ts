@@ -23,7 +23,10 @@ interface AudioInterface {
     start(actx?: typeof AudioContext): void;
     decode(arraybuffer: ArrayBuffer): Promise<AudioBuffer>;
     mute(length: number): AudioBuffer;
-    play(res: AudioBuffer, options?: AudioParamOptions): () => AudioBufferSourceNode | IntervalBufferSource;
+    play(
+        res: AudioBuffer,
+        options?: AudioParamOptions
+    ): () => AudioBufferSourceNode | IntervalBufferSource;
     stop(): void;
     readonly actx: AudioContext;
 }
@@ -34,12 +37,12 @@ const audio: AudioInterface = {
     _started: false,
     _bfs: [],
     dest: null,
-    
+
     init(actx: typeof AudioContext): void {
         this._actx = actx || self.AudioContext || (self as any).webkitAudioContext;
         this._inited = true;
     },
-    
+
     start(actx?: typeof AudioContext): void {
         if (!this._inited) this.init(actx);
         if (!this._started) this._actx = new (this._actx as any)();
@@ -56,17 +59,20 @@ const audio: AudioInterface = {
         return actx.createBuffer(2, 44100 * length, 44100);
     },
 
-    play(res: AudioBuffer, {
-        loop = false,
-        isOut = true,
-        offset = 0,
-        playbackrate = 1,
-        gainrate = 1,
-        interval = 0,
-        singleAudioAllowed = false,
-        gainrateTo = null,
-        gainrateToTime = null,
-    }: AudioParamOptions = {}): () => AudioBufferSourceNode | IntervalBufferSource {
+    play(
+        res: AudioBuffer,
+        {
+            loop = false,
+            isOut = true,
+            offset = 0,
+            playbackrate = 1,
+            gainrate = 1,
+            interval = 0,
+            singleAudioAllowed = false,
+            gainrateTo = null,
+            gainrateToTime = null,
+        }: AudioParamOptions = {}
+    ): () => AudioBufferSourceNode | IntervalBufferSource {
         const href = String(location.href);
         const { actx, dest } = this;
         const bfs = this._bfs;
@@ -110,7 +116,7 @@ const audio: AudioInterface = {
     get actx(): AudioContext {
         if (!this._started) this.start();
         return this._actx!;
-    }
+    },
 };
 
 class IntervalBufferSource {
@@ -160,7 +166,9 @@ class IntervalBufferSource {
         bfs.loop = this.loop;
         bfs.connect(this._gain);
         bfs.playbackRate.value = this.playbackrate;
-        const currentOffset = (this.offset + (performance.now() / 1000 - this.startTime) * this.playbackrate) % this.res.duration;
+        const currentOffset =
+            (this.offset + (performance.now() / 1000 - this.startTime) * this.playbackrate) %
+            this.res.duration;
         bfs.start(this.actx.currentTime, currentOffset, this.interval);
         bfs.onended = () => {
             bfs.onended = null;
@@ -197,7 +205,7 @@ class AudioURLParam {
             const a = document.createElement("script");
             a.src = `${src}&callback=${cstr}`;
             a.onload = () => a.remove();
-            a.onerror = (err) => {
+            a.onerror = err => {
                 reject(err);
                 delete (window as any)[cstr];
             };
@@ -209,7 +217,10 @@ class AudioURLParam {
         });
     }
 
-    async loadURL(id: string, options: { actx?: AudioContext; reset?: boolean } = {}): Promise<AudioBuffer> {
+    async loadURL(
+        id: string,
+        options: { actx?: AudioContext; reset?: boolean } = {}
+    ): Promise<AudioBuffer> {
         try {
             const url = await this.getURL(id);
             const ab = await fetch(url).then(res => res.arrayBuffer());

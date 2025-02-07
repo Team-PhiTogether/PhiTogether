@@ -8,6 +8,8 @@ node_modules.nosync
 .env
 .env.*
 !.env.example
+/android/app/src/main/assets/public
+/ios/App/App/public
 
 # Ignore files for PNPM, NPM and YARN
 pnpm-lock.yaml

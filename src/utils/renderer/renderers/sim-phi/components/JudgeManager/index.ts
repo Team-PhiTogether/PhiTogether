@@ -169,8 +169,12 @@ export const judgeManager = {
                 } else if (deltaTime < 0) {
                     // Drag过线
                     if (simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime)
-                        audio.play(simphiPlayer.res["HitSong1"], { gainrate: simphiPlayer.app.soundVolume });
-                    simphiPlayer.hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
+                        audio.play(simphiPlayer.res["HitSong1"], {
+                            gainrate: simphiPlayer.app.soundVolume,
+                        });
+                    simphiPlayer.hitImageList.add(
+                        HitImage.perfect(note.projectX, note.projectY, note)
+                    );
                     simphiPlayer.stat.addCombo(4, 2);
                     note.scored = true;
                 }
@@ -227,8 +231,12 @@ export const judgeManager = {
                     }
                 } else if (deltaTime < 0) {
                     if (simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime)
-                        audio.play(simphiPlayer.res["HitSong2"], { gainrate: simphiPlayer.app.soundVolume });
-                    simphiPlayer.hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
+                        audio.play(simphiPlayer.res["HitSong2"], {
+                            gainrate: simphiPlayer.app.soundVolume,
+                        });
+                    simphiPlayer.hitImageList.add(
+                        HitImage.perfect(note.projectX, note.projectY, note)
+                    );
                     simphiPlayer.stat.addCombo(4, 4);
                     note.scored = true;
                 }
@@ -258,7 +266,9 @@ export const judgeManager = {
                                 );
                             else if (note.holdStatus % 4 === 3)
                                 // good early/late
-                                simphiPlayer.hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
+                                simphiPlayer.hitImageList.add(
+                                    HitImage.good(note.projectX, note.projectY, note)
+                                );
                             note.holdTapTime = performance.now();
                         }
                         if (deltaTime + note.realHoldTime < 0.2) {
@@ -284,17 +294,25 @@ export const judgeManager = {
                                 Math.max(deltaTime2, (-1 - note.frameCount) * this.time.AP || 0)
                             );
                             if (simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime)
-                                audio.play(simphiPlayer.res["HitSong0"], { gainrate: simphiPlayer.app.soundVolume });
+                                audio.play(simphiPlayer.res["HitSong0"], {
+                                    gainrate: simphiPlayer.app.soundVolume,
+                                });
                             if (re.a === 7) {
                                 note.holdStatus = 7; //console.log('Good(Early)', i.name);
-                                simphiPlayer.hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
-                                simphiPlayer.hitWordList.add(HitWord.early(note.projectX, note.projectY));
+                                simphiPlayer.hitImageList.add(
+                                    HitImage.good(note.projectX, note.projectY, note)
+                                );
+                                simphiPlayer.hitWordList.add(
+                                    HitWord.early(note.projectX, note.projectY)
+                                );
                             } else if (re.a === 5) {
                                 note.holdStatus = 5; //console.log('Perfect(Early)', i.name);
                                 simphiPlayer.hitImageList.add(
                                     HitImage.perfect(note.projectX, note.projectY, note)
                                 );
-                                simphiPlayer.hitWordList.add(HitWord.early(note.projectX, note.projectY));
+                                simphiPlayer.hitWordList.add(
+                                    HitWord.early(note.projectX, note.projectY)
+                                );
                             } else if (re.a === 4) {
                                 note.holdStatus = 4; //console.log('Perfect(Max)', i.name);
                                 simphiPlayer.hitImageList.add(
@@ -305,11 +323,17 @@ export const judgeManager = {
                                 simphiPlayer.hitImageList.add(
                                     HitImage.perfect(note.projectX, note.projectY, note)
                                 );
-                                simphiPlayer.hitWordList.add(HitWord.late(note.projectX, note.projectY));
+                                simphiPlayer.hitWordList.add(
+                                    HitWord.late(note.projectX, note.projectY)
+                                );
                             } else if (re.a === 3) {
                                 note.holdStatus = 3; //console.log('Good(Late)', i.name);
-                                simphiPlayer.hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
-                                simphiPlayer.hitWordList.add(HitWord.late(note.projectX, note.projectY));
+                                simphiPlayer.hitImageList.add(
+                                    HitImage.good(note.projectX, note.projectY, note)
+                                );
+                                simphiPlayer.hitWordList.add(
+                                    HitWord.late(note.projectX, note.projectY)
+                                );
                             }
                             if (note.type === 1) note.status = note.holdStatus;
                             if (note.type === 3) note.holdStart = realTime;
@@ -322,7 +346,12 @@ export const judgeManager = {
                             note.holdTapTime = performance.now();
                         }
                     }
-                    if (simphiPlayer.emitter.eq("play") && note.holdTapTime && note.holdBroken && re.q === 2) {
+                    if (
+                        simphiPlayer.emitter.eq("play") &&
+                        note.holdTapTime &&
+                        note.holdBroken &&
+                        re.q === 2
+                    ) {
                         note.status = 2; //console.log('Miss', i.name);
                         simphiPlayer.stat.addCombo(2, 3);
                         note.scored = true;
@@ -340,18 +369,25 @@ export const judgeManager = {
                         //间隔时间与bpm成反比
                         if (note.holdStatus % 4 === 0)
                             // perfect max
-                            simphiPlayer.hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
+                            simphiPlayer.hitImageList.add(
+                                HitImage.perfect(note.projectX, note.projectY, note)
+                            );
                         else if (note.holdStatus % 4 === 1)
                             // perfect early/late
-                            simphiPlayer.hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
+                            simphiPlayer.hitImageList.add(
+                                HitImage.perfect(note.projectX, note.projectY, note)
+                            );
                         else if (note.holdStatus % 4 === 3)
                             // good early/late
-                            simphiPlayer.hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
+                            simphiPlayer.hitImageList.add(
+                                HitImage.good(note.projectX, note.projectY, note)
+                            );
                         note.holdTapTime = performance.now();
                     }
                     if (deltaTime + note.realHoldTime < 0.2) {
                         if (!note.status)
-                            simphiPlayer.stat.addCombo((note.status = note.holdStatus), 3), recordMgr.add(note);
+                            simphiPlayer.stat.addCombo((note.status = note.holdStatus), 3),
+                                recordMgr.add(note);
                         if (deltaTime + note.realHoldTime < 0) note.scored = true;
                         continue;
                     }
@@ -403,26 +439,46 @@ export const judgeManager = {
                             Math.max(deltaTime2, (-1 - note.frameCount) * this.time.AP || 0)
                         );
                         if (simphiPlayer.emitter.eq("play") && !simphiPlayer.app.pauseTime)
-                            audio.play(simphiPlayer.res["HitSong0"], { gainrate: simphiPlayer.app.soundVolume });
+                            audio.play(simphiPlayer.res["HitSong0"], {
+                                gainrate: simphiPlayer.app.soundVolume,
+                            });
                         if (deltaTime2 > this.time.p) {
                             note.holdStatus = 7; //console.log('Good(Early)', i.name);
-                            simphiPlayer.hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
-                            simphiPlayer.hitWordList.add(HitWord.early(note.projectX, note.projectY));
+                            simphiPlayer.hitImageList.add(
+                                HitImage.good(note.projectX, note.projectY, note)
+                            );
+                            simphiPlayer.hitWordList.add(
+                                HitWord.early(note.projectX, note.projectY)
+                            );
                         } else if (deltaTime2 > this.time.AP) {
                             note.holdStatus = 5; //console.log('Perfect(Early)', i.name);
-                            simphiPlayer.hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
-                            simphiPlayer.hitWordList.add(HitWord.early(note.projectX, note.projectY));
+                            simphiPlayer.hitImageList.add(
+                                HitImage.perfect(note.projectX, note.projectY, note)
+                            );
+                            simphiPlayer.hitWordList.add(
+                                HitWord.early(note.projectX, note.projectY)
+                            );
                         } else if (deltaTime2 > -this.time.AP || note.frameCount < 1) {
                             note.holdStatus = 4; //console.log('Perfect(Max)', i.name);
-                            simphiPlayer.hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
+                            simphiPlayer.hitImageList.add(
+                                HitImage.perfect(note.projectX, note.projectY, note)
+                            );
                         } else if (deltaTime2 > -this.time.p || note.frameCount < 2) {
                             note.holdStatus = 1; //console.log('Perfect(Late)', i.name);
-                            simphiPlayer.hitImageList.add(HitImage.perfect(note.projectX, note.projectY, note));
-                            simphiPlayer.hitWordList.add(HitWord.late(note.projectX, note.projectY));
+                            simphiPlayer.hitImageList.add(
+                                HitImage.perfect(note.projectX, note.projectY, note)
+                            );
+                            simphiPlayer.hitWordList.add(
+                                HitWord.late(note.projectX, note.projectY)
+                            );
                         } else {
                             note.holdStatus = 3; //console.log('Good(Late)', i.name);
-                            simphiPlayer.hitImageList.add(HitImage.good(note.projectX, note.projectY, note));
-                            simphiPlayer.hitWordList.add(HitWord.late(note.projectX, note.projectY));
+                            simphiPlayer.hitImageList.add(
+                                HitImage.good(note.projectX, note.projectY, note)
+                            );
+                            simphiPlayer.hitWordList.add(
+                                HitWord.late(note.projectX, note.projectY)
+                            );
                         }
                         if (note.type === 1) note.status = note.holdStatus;
                         if (note.type === 3) note.holdStart = realTime;

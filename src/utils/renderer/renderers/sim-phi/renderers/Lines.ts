@@ -52,12 +52,18 @@ export function drawLine(bool: number, lineScale: number): void {
                 simphiPlayer.app.wlen + (i.offsetX - simphiPlayer.app.wlen) * tw,
                 i.offsetY
             ); //hiahiah
-            const imgS = ((i.imageU ? lineScale * 18.75 : simphiPlayer.app.canvasos.height) * i.imageS) / 1080;
+            const imgS =
+                ((i.imageU ? lineScale * 18.75 : simphiPlayer.app.canvasos.height) * i.imageS) /
+                1080;
             const imgW =
                 imgS *
                 i.imageW *
                 i.imageA *
-                (i.scaleX * (-0.0081 + 0.5214 * (simphiPlayer.app.canvasos.width / simphiPlayer.app.canvasos.height)) || 1); //1.5 0.774 1.78 0.92
+                (i.scaleX *
+                    (-0.0081 +
+                        0.5214 *
+                            (simphiPlayer.app.canvasos.width / simphiPlayer.app.canvasos.height)) ||
+                    1); //1.5 0.774 1.78 0.92
             const imgH = imgS * i.imageH * (i.scaleY * 1 || 1);
             // ctxos.save();
             if (!i.text) {
@@ -115,10 +121,15 @@ export function drawLine(bool: number, lineScale: number): void {
         }
     }
 }
-function getColoredLineImage(line: Line, hex: string | undefined): HTMLImageElement | Promise<ImageBitmap | HTMLCanvasElement> {
+function getColoredLineImage(
+    line: Line,
+    hex: string | undefined
+): HTMLImageElement | Promise<ImageBitmap | HTMLCanvasElement> {
     if (!hex)
         return line.imageL[
-            line.imageC && shared.game.ptmain.gameConfig.lineColor ? simphiPlayer.stat.lineStatus : 0
+            line.imageC && shared.game.ptmain.gameConfig.lineColor
+                ? simphiPlayer.stat.lineStatus
+                : 0
         ];
     hex = hex.toLowerCase();
     return (

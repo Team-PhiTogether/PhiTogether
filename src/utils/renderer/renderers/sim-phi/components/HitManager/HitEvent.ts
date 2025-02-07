@@ -1,9 +1,9 @@
 import shared from "@utils/js/shared.js";
 
 export enum HitEventType {
-    Mouse = 'mouse',
-    Keyboard = 'keyboard',
-    Touch = 'touch',
+    Mouse = "mouse",
+    Keyboard = "keyboard",
+    Touch = "touch",
 }
 
 export class HitEvent {
@@ -62,9 +62,11 @@ export class HitEvent {
         this.isMoving = true;
 
         const denominator = Math.sqrt(this.lastDeltaX ** 2 + this.lastDeltaY ** 2) * this.deltaTime;
-        const flickSpeed = denominator !== 0 
-            ? (this.nowDeltaX * this.lastDeltaX + this.nowDeltaY * this.lastDeltaY) / denominator
-            : 0;
+        const flickSpeed =
+            denominator !== 0
+                ? (this.nowDeltaX * this.lastDeltaX + this.nowDeltaY * this.lastDeltaY) /
+                  denominator
+                : 0;
 
         if (this.flicking && flickSpeed < 0.3) {
             this.flicking = false;

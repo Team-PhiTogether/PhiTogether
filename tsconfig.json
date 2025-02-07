@@ -4,7 +4,7 @@
         "paths": {
             "@/*": ["src/*"],
             "@utils/*": ["src/utils/*"],
-            "@components/*": ["src/components/*"], 
+            "@components/*": ["src/components/*"],
             "@locales/*": ["src/locales/*"],
             "@renderers/*": ["src/utils/renderer/renderers/*"]
         }

@@ -9,7 +9,8 @@ export function resultPageRenderer(statData) {
     simphiPlayer.app.ctxos.globalAlpha = 1;
     const k = 3.7320508075688776; //tan75°
 
-    const qwq0 = (simphiPlayer.app.canvasos.width - simphiPlayer.app.canvasos.height / k) / (16 - 9 / k);
+    const qwq0 =
+        (simphiPlayer.app.canvasos.width - simphiPlayer.app.canvasos.height / k) / (16 - 9 / k);
     simphiPlayer.app.ctxos.setTransform(
         qwq0 / 120,
         0,
@@ -28,7 +29,9 @@ export function resultPageRenderer(statData) {
     }
     simphiPlayer.app.ctxos.drawImage(
         simphiPlayer.app.bgImage,
-        -1920 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 1)) + 2460.5 - imgWidthAct / 2,
+        -1920 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 1)) +
+            2460.5 -
+            imgWidthAct / 2,
         208 - (imgHeightAct - 645) / 2,
         imgWidthAct,
         imgHeightAct
@@ -89,7 +92,9 @@ export function resultPageRenderer(statData) {
     simphiPlayer.app.ctxos.fillStyle = "#fff";
     simphiPlayer.app.ctxos.textAlign = "left";
     simphiPlayer.app.ctxos.font = `73.5px Saira`;
-    const dxsnm = simphiPlayer.app.ctxos.measureText(simphiPlayer.inputName.value || simphiPlayer.inputName.placeholder).width;
+    const dxsnm = simphiPlayer.app.ctxos.measureText(
+        simphiPlayer.inputName.value || simphiPlayer.inputName.placeholder
+    ).width;
     if (dxsnm > 600) simphiPlayer.app.ctxos.font = `${(73.5 / dxsnm) * 600}px Saira`;
     simphiPlayer.app.ctxos.fillText(
         simphiPlayer.inputName.value || simphiPlayer.inputName.placeholder,
@@ -107,11 +112,20 @@ export function resultPageRenderer(statData) {
     );
     simphiPlayer.app.ctxos.textAlign = "left";
     //Rank图标
-    simphiPlayer.app.ctxos.globalAlpha = clip((simphiPlayer.animationTimer.end.second - 1.3) * 3.75);
+    simphiPlayer.app.ctxos.globalAlpha = clip(
+        (simphiPlayer.animationTimer.end.second - 1.3) * 3.75
+    );
     const qwq2 = 293 + clip((simphiPlayer.animationTimer.end.second - 1.3) * 3.75) * 100;
-    const qwq3 = 410 - tween.ease15(clip((simphiPlayer.animationTimer.end.second - 1.3) * 1.5)) * 164;
+    const qwq3 =
+        410 - tween.ease15(clip((simphiPlayer.animationTimer.end.second - 1.3) * 1.5)) * 164;
     if (simphiPlayer.stat.lineStatus == 3)
-        simphiPlayer.app.ctxos.drawImage(simphiPlayer.res["FCV"], 1685 - qwq3, 373 - qwq3, qwq3 * 2, qwq3 * 2);
+        simphiPlayer.app.ctxos.drawImage(
+            simphiPlayer.res["FCV"],
+            1685 - qwq3,
+            373 - qwq3,
+            qwq3 * 2,
+            qwq3 * 2
+        );
     else
         simphiPlayer.app.ctxos.drawImage(
             simphiPlayer.res["Ranks"][simphiPlayer.stat.rankStatus],
@@ -154,12 +168,18 @@ export function resultPageRenderer(statData) {
     simphiPlayer.app.ctxos.textAlign = "left";
     simphiPlayer.app.ctxos.font = `86px Saira`;
     simphiPlayer.app.ctxos.globalAlpha = clip((simphiPlayer.animationTimer.end.second - 0.4) * 2.0);
-    simphiPlayer.app.ctxos.fillText(simphiPlayer.stat.scoreStr, -1720 * tween.ease10(clip(simphiPlayer.animationTimer.end.second - 0.1)) + 2795, 415);
+    simphiPlayer.app.ctxos.fillText(
+        simphiPlayer.stat.scoreStr,
+        -1720 * tween.ease10(clip(simphiPlayer.animationTimer.end.second - 0.1)) + 2795,
+        415
+    );
     simphiPlayer.app.ctxos.textAlign = "right";
     simphiPlayer.app.ctxos.font = `25px Saira`;
     simphiPlayer.app.ctxos.fillStyle = "#83e691";
     simphiPlayer.app.ctxos.fillText(
-        simphiPlayer.app.speed === 1 ? "" : statData.textAboveStr.replace("{SPEED}", simphiPlayer.app.speed.toFixed(2)),
+        simphiPlayer.app.speed === 1
+            ? ""
+            : statData.textAboveStr.replace("{SPEED}", simphiPlayer.app.speed.toFixed(2)),
         -1920 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 1)) + 2860,
         792
     );
@@ -193,7 +213,9 @@ export function resultPageRenderer(statData) {
     simphiPlayer.app.ctxos.fillStyle = "#fff";
     simphiPlayer.app.ctxos.font = `45px Saira`;
     simphiPlayer.app.ctxos.textAlign = "center";
-    simphiPlayer.app.ctxos.globalAlpha = clip((simphiPlayer.animationTimer.end.second - 1.25) * 2.5);
+    simphiPlayer.app.ctxos.globalAlpha = clip(
+        (simphiPlayer.animationTimer.end.second - 1.25) * 2.5
+    );
     simphiPlayer.app.ctxos.fillText(
         simphiPlayer.stat.perfect,
         -1020 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 0.8 - 0.3)) + 2140,
@@ -220,15 +242,39 @@ export function resultPageRenderer(statData) {
         -1020 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 0.8 - 0.3)) + 2140,
         842
     );
-    simphiPlayer.app.ctxos.fillText("GOOD", -1020 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 0.8 - 0.3)) + 2288, 842);
-    simphiPlayer.app.ctxos.fillText("BAD", -1020 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 0.8 - 0.3)) + 2395, 842);
-    simphiPlayer.app.ctxos.fillText("MISS", -1020 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 0.8 - 0.3)) + 2502, 842);
+    simphiPlayer.app.ctxos.fillText(
+        "GOOD",
+        -1020 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 0.8 - 0.3)) + 2288,
+        842
+    );
+    simphiPlayer.app.ctxos.fillText(
+        "BAD",
+        -1020 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 0.8 - 0.3)) + 2395,
+        842
+    );
+    simphiPlayer.app.ctxos.fillText(
+        "MISS",
+        -1020 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 0.8 - 0.3)) + 2502,
+        842
+    );
     simphiPlayer.app.ctxos.font = `28px Saira`;
     //Early, Late
-    const qwq4 = clip((simphiPlayer.qwq[3] > 0 ? simphiPlayer.animationTimer.end.second - simphiPlayer.qwq[3] : 0.2 - simphiPlayer.animationTimer.end.second - simphiPlayer.qwq[3]) * 5.0);
+    const qwq4 = clip(
+        (simphiPlayer.qwq[3] > 0
+            ? simphiPlayer.animationTimer.end.second - simphiPlayer.qwq[3]
+            : 0.2 - simphiPlayer.animationTimer.end.second - simphiPlayer.qwq[3]) * 5.0
+    );
     simphiPlayer.app.ctxos.textAlign = "left";
-    simphiPlayer.app.ctxos.fillText("EARLY", -1020 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 0.8 - 0.3)) + 2610, 800);
-    simphiPlayer.app.ctxos.fillText("LATE", -1020 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 0.8 - 0.3)) + 2625, 838);
+    simphiPlayer.app.ctxos.fillText(
+        "EARLY",
+        -1020 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 0.8 - 0.3)) + 2610,
+        800
+    );
+    simphiPlayer.app.ctxos.fillText(
+        "LATE",
+        -1020 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 0.8 - 0.3)) + 2625,
+        838
+    );
     simphiPlayer.app.ctxos.textAlign = "right";
     simphiPlayer.app.ctxos.fillText(
         simphiPlayer.stat.noteRank[7],

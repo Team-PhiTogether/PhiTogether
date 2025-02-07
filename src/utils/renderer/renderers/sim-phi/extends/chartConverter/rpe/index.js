@@ -46,7 +46,7 @@ function parse(pec, filename) {
             warnings.push(
                 `检测到bpmfactor=${i.bpmfactor}(将被应用)\n位于${i.LineId}号判定线\n来自${filename}`
             );
-        
+
         const bpmList = new BpmList(data.BPMList[0].bpm / i.bpmfactor);
         for (const bpm of data.BPMList) {
             bpm.time = bpm.startTime[0] + bpm.startTime[1] / bpm.startTime[2];

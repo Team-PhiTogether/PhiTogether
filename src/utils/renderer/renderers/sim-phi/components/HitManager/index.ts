@@ -1,4 +1,4 @@
-import { HitEvent, HitEventType } from './HitEvent';
+import { HitEvent, HitEventType } from "./HitEvent";
 
 export class HitManager {
     list: HitEvent[];

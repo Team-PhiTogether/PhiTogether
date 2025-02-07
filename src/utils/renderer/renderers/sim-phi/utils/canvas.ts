@@ -1,7 +1,7 @@
 export function createCanvas(width: number, height: number): HTMLCanvasElement {
     const canvas = document.createElement("canvas");
     return Object.assign(canvas, { width, height });
-};
+}
 
 export function drawRoundRect(
     ctx: CanvasRenderingContext2D,
