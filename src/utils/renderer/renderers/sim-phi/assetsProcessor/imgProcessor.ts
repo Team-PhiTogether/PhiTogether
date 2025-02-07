@@ -1,35 +1,33 @@
 import { canvasRGBA as StackBlurCanvasRGBA } from "stackblur-canvas";
 import { createCanvas } from "../utils/canvas";
 
-/**
- * 图片模糊(css filter或StackBlur)
- * @param {ImageBitmap} img
- */
-function imgBlur(img) {
+type RGBAArray = [number, number, number, number];
+
+async function imgBlur(img: ImageBitmap): Promise<ImageBitmap> {
     const canvas = createCanvas(img.width * 0.9, img.height * 0.9);
     canvas.style.cssText += ";overflow:hidden;";
-    const ctx = canvas.getContext("2d");
-    if (typeof ctx.filter == "string") {
+    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+    if (typeof ctx.filter === "string") {
         ctx.filter = "blur(60px)";
         ctx.drawImage(img, -img.width * 0.05, -img.height * 0.05);
     } else {
         const w = canvas.width;
         const h = canvas.height;
         ctx.drawImage(img, -img.width * 0.05, -img.height * 0.05);
-
         StackBlurCanvasRGBA(canvas, 0, 0, w, h, Math.ceil(Math.min(w, h) * 0.1));
     }
     return createImageBitmap(canvas);
 }
 
-/**
- * 给图片上色(limit用于解决iOS的InvalidStateError)
- * @param {ImageBitmap} img
- */
-function imgShader(img, color, returnCanvas = false, limit = 512) {
+async function imgShader(
+    img: ImageBitmap,
+    color: string,
+    returnCanvas: boolean = false,
+    limit: number = 512
+): Promise<ImageBitmap | HTMLCanvasElement> {
     const dataRGBA = hex2rgba(color);
     const canvas = createCanvas(img.width, img.height);
-    const ctx = canvas.getContext("2d", { willReadFrequently: true }); //warning
+    const ctx = canvas.getContext("2d", { willReadFrequently: true }) as CanvasRenderingContext2D;
     ctx.drawImage(img, 0, 0);
     for (let dy = 0; dy < img.height; dy += limit) {
         for (let dx = 0; dx < img.width; dx += limit) {
@@ -47,14 +45,14 @@ function imgShader(img, color, returnCanvas = false, limit = 512) {
     return createImageBitmap(canvas);
 }
 
-/**
- * 给图片纯色(limit用于解决iOS的InvalidStateError)
- * @param {ImageBitmap} img
- */
-function imgPainter(img, color, limit = 512) {
+async function imgPainter(
+    img: ImageBitmap,
+    color: string,
+    limit: number = 512
+): Promise<ImageBitmap> {
     const dataRGBA = hex2rgba(color);
     const canvas = createCanvas(img.width, img.height);
-    const ctx = canvas.getContext("2d", { willReadFrequently: true }); //warning
+    const ctx = canvas.getContext("2d", { willReadFrequently: true }) as CanvasRenderingContext2D;
     ctx.drawImage(img, 0, 0);
     for (let dy = 0; dy < img.height; dy += limit) {
         for (let dx = 0; dx < img.width; dx += limit) {
@@ -71,16 +69,14 @@ function imgPainter(img, color, limit = 512) {
     return createImageBitmap(canvas);
 }
 
-/**
- * 切割图片
- * @param {ImageBitmap} img
- * @param {number} [limitX]
- * @param {number} [limitY]
- */
-function imgSplit(img, limitX, limitY) {
-    limitX = Math.floor(limitX) || Math.min(img.width, img.height);
-    limitY = Math.floor(limitY) || limitX;
-    const arr = [];
+async function imgSplit(
+    img: ImageBitmap,
+    limitX?: number,
+    limitY?: number
+): Promise<ImageBitmap[]> {
+    limitX = Math.floor(limitX || Math.min(img.width, img.height));
+    limitY = Math.floor(limitY || limitX);
+    const arr: Promise<ImageBitmap>[] = [];
     for (let dy = 0; dy < img.height; dy += limitY) {
         for (let dx = 0; dx < img.width; dx += limitX) {
             arr.push(createImageBitmap(img, dx, dy, limitX, limitY));
@@ -89,16 +85,14 @@ function imgSplit(img, limitX, limitY) {
     return Promise.all(arr);
 }
 
-//十六进制color转rgba数组
-function hex2rgba(color) {
-    const ctx = createCanvas(1, 1).getContext("2d");
+function hex2rgba(color: string): Uint8ClampedArray {
+    const ctx = createCanvas(1, 1).getContext("2d") as CanvasRenderingContext2D;
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, 1, 1);
     return ctx.getImageData(0, 0, 1, 1).data;
 }
 
-//rgba数组(0-1)转十六进制
-function rgba2hex(...rgba) {
+function rgba2hex(...rgba: number[]): string {
     return (
         "#" +
         rgba.map(i => ("00" + Math.round(Number(i) * 255 || 0).toString(16)).slice(-2)).join("")

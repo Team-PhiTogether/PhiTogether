@@ -10,8 +10,8 @@ import {
     time2Str,
     orientation,
     FrameAnimater,
-} from "@utils/js/common.js";
-import { urls, loadJS } from "./assetsProcessor/loader.js";
+} from "@utils/js/common";
+import { checkSupport } from "./utils/checkSupport";
 import { uploader, ZipReader, readFile } from "./assetsProcessor/reader.js";
 import { InteractProxy } from "@utils/js/interact";
 import shared from "@utils/js/shared";
@@ -31,7 +31,7 @@ import {
     imgSplit,
     hex2rgba,
     rgba2hex,
-} from "./assetsProcessor/imgProcessor.js";
+} from "./assetsProcessor/imgProcessor";
 import { createCanvas, drawRoundRect } from "./utils/canvas";
 
 import ptdb from "@utils/ptdb";
@@ -46,6 +46,7 @@ import { HitWord } from './components/HitManager/HitWord';
 import { LineImage } from "./components/LineImage";
 
 import { drawNotes } from "./renderers/Notes";
+import { drawLine } from "./renderers/Lines";
 import { resultPageRenderer } from "./renderers/ResultPage";
 
 const $id = query => document.getElementById(query);
@@ -328,70 +329,6 @@ document.oncontextmenu = e => e.preventDefault(); //qwq
 shared.game.simphi = simphiPlayer.app;
 
 simphiPlayer.now.set("gauge", gauge.calc);
-
-async function checkSupport() {
-    const loadLib = async (name, urls, check) => {
-        if (!check()) return true;
-        const errmsg1 = shared.game.i18n.t("simphi.loadLib.err.msg1", { name });
-        const errmsg2 = shared.game.i18n.t("simphi.loadLib.err.msg2", { name });
-        const errmsg3 = shared.game.i18n.t("simphi.loadLib.err.msg3", { name });
-        if (
-            !(await loadJS(urls).catch(e =>
-                msgHandler.sendError(errmsg1, e.message.replace(/.+/, errmsg2), true)
-            ))
-        )
-            return false;
-        if (!check()) return true;
-        return msgHandler.sendError(errmsg1, errmsg3, true);
-    };
-    await Utils.addFont("Cairo", { alt: "Custom" });
-    // await Utils.addFont('Saira', { alt: 'Custom' });
-    //兼容性检测
-    const isMobile =
-        navigator["standalone"] !== undefined ||
-        (navigator.platform.indexOf("Linux") > -1 && navigator.maxTouchPoints === 5);
-    if (isMobile) $id("uploader-select").style.display = "none";
-    if (navigator.userAgent.indexOf("MiuiBrowser") > -1) {
-        //实测 v17.1.8 问题仍然存在，v17.4.80113 问题已修复
-        const version = navigator.userAgent.match(/MiuiBrowser\/(\d+\.\d+)/);
-        if (!version || parseFloat(version[1]) < 17.4)
-            msgHandler.sendWarning(shared.game.i18n.t("simphi.compatibilityWarning.miBrowser"));
-    }
-    if (
-        !(await loadLib(
-            shared.game.i18n.t("simphi.loadLib.libNames.createImageBitmap"),
-            urls.bitmap,
-            () => isUndefined("createImageBitmap")
-        ))
-    )
-        return -1;
-    const oggCompatible = !!new Audio().canPlayType("audio/ogg");
-    if (
-        !(await loadLib(
-            shared.game.i18n.t("simphi.loadLib.libNames.oggmentedBundle"),
-            "/src/oggmented-bundle.js",
-            () => !oggCompatible && isUndefined("oggmented")
-        ))
-    )
-        return -4;
-    audio.init(
-        oggCompatible
-            ? self.AudioContext || self["webkitAudioContext"]
-            : self["oggmented"].OggmentedAudioContext
-    ); //兼容Safari
-    const webpCompatible = document
-        .createElement("canvas")
-        .toDataURL("image/webp")
-        .includes("data:image/webp");
-    if (
-        !(await loadLib(
-            shared.game.i18n.t("simphi.loadLib.libNames.webp"),
-            urls.webp,
-            () => !webpCompatible && isUndefined("webp")
-        ))
-    )
-        return -5;
-}
 //自动填写歌曲信息
 function adjustInfo() {
     for (const i of simphiPlayer.chartData.chartInfoData) {
@@ -2208,105 +2145,6 @@ function loopCanvas() {
         simphiPlayer.app.ctxos.textBaseline = "middle";
         simphiPlayer.app.ctxos.fillText(simphiPlayer.app.pauseTime, simphiPlayer.app.canvasos.width / 2, simphiPlayer.app.canvasos.height / 2);
     }
-}
-//判定线函数，undefined/0:默认,1:非,2:恒成立
-function drawLine(bool, lineScale) {
-    simphiPlayer.app.ctxos.globalAlpha = 1;
-    const tw = 1 - tween.easeOutSine(simphiPlayer.animationTimer.out.second * 1.5);
-    for (const i of simphiPlayer.app.linesReversed) {
-        if (bool ^ Number(i.imageD) && simphiPlayer.animationTimer.out.second < 0.67) {
-            if (i.alpha < 0) continue;
-            if (i.attachUI) {
-                simphiPlayer.tmps.statStatus[i.attachUI] = {
-                    show: true,
-                    offsetX: i.offsetX - simphiPlayer.app.wlen,
-                    offsetY: i.offsetY - simphiPlayer.app.hlen,
-                    alpha: i.alpha,
-                };
-
-                continue;
-            }
-            simphiPlayer.app.ctxos.globalAlpha = i.alpha;
-            simphiPlayer.app.ctxos.setTransform(
-                i.cosr * tw,
-                i.sinr,
-                -i.sinr * tw,
-                i.cosr,
-                simphiPlayer.app.wlen + (i.offsetX - simphiPlayer.app.wlen) * tw,
-                i.offsetY
-            ); //hiahiah
-            const imgS = ((i.imageU ? lineScale * 18.75 : simphiPlayer.app.canvasos.height) * i.imageS) / 1080;
-            const imgW =
-                imgS *
-                i.imageW *
-                i.imageA *
-                (i.scaleX * (-0.0081 + 0.5214 * (simphiPlayer.app.canvasos.width / simphiPlayer.app.canvasos.height)) || 1); //1.5 0.774 1.78 0.92
-            const imgH = imgS * i.imageH * (i.scaleY * 1 || 1);
-            // ctxos.save();
-            if (!i.text) {
-                // const lineImage = i.imageL[i.imageC && shared.game.ptmain.gameConfig.lineColor ? stat.lineStatus : 0];
-                // if (i.scaleX) ctxos.scale(-1, 1);
-                try {
-                    if (i.color && i.color != "#fff" && i.color != "#ffffff") {
-                        if (!i.isCustomImage) {
-                            simphiPlayer.app.ctxos.fillStyle = i.color || "#fff";
-                            simphiPlayer.app.ctxos.fillRect(-imgW / 2, -imgH / 2, imgW, imgH);
-                            simphiPlayer.app.ctxos.fillStyle = "#fff";
-                        } else {
-                            simphiPlayer.app.ctxos.drawImage(
-                                getColoredLineImage(i, i.color),
-                                -imgW / 2,
-                                -imgH / 2,
-                                imgW,
-                                imgH
-                            );
-                        }
-                    } else {
-                        simphiPlayer.app.ctxos.drawImage(
-                            i.imageL[
-                                i.imageC && shared.game.ptmain.gameConfig.lineColor
-                                    ? simphiPlayer.stat.lineStatus
-                                    : 0
-                            ],
-                            -imgW / 2,
-                            -imgH / 2,
-                            imgW,
-                            imgH
-                        );
-                    }
-                } catch (err) {
-                    simphiPlayer.app.ctxos.drawImage(
-                        i.imageL[
-                            i.imageC && shared.game.ptmain.gameConfig.lineColor
-                                ? simphiPlayer.stat.lineStatus
-                                : 0
-                        ],
-                        -imgW / 2,
-                        -imgH / 2,
-                        imgW,
-                        imgH
-                    );
-                }
-            } else {
-                simphiPlayer.app.ctxos.fillStyle = i.color || "#fff";
-                simphiPlayer.app.ctxos.textAlign = "center";
-                simphiPlayer.app.ctxos.textBaseline = "middle";
-                simphiPlayer.app.ctxos.font = `${lineScale * (i.scaleY || 1)}px Saira`;
-                simphiPlayer.app.ctxos.fillText(i.text, 0, 0);
-            }
-            // ctxos.restore();
-        }
-    }
-}
-function getColoredLineImage(line, hex) {
-    if (!hex)
-        return line.imageL[
-            line.imageC && shared.game.ptmain.gameConfig.lineColor ? simphiPlayer.stat.lineStatus : 0
-        ];
-    hex = hex.toLowerCase();
-    return (
-        line.imagesColored[hex] || (line.imagesColored[hex] = imgShader(line.imageL[0], hex, true))
-    );
 }
 
 class ScaledNote {

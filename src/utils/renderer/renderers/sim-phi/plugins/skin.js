@@ -1,5 +1,5 @@
 import { audio } from "@utils/js/aup";
-import { imgShader, hex2rgba } from "../assetsProcessor/imgProcessor.js";
+import { imgShader, hex2rgba } from "../assetsProcessor/imgProcessor";
 import ptdb from "@utils/ptdb";
 
 //plugin(skin)
