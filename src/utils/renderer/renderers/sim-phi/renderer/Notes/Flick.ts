@@ -1,5 +1,6 @@
 import { simphiPlayer } from "@/utils/renderer/renderers/sim-phi/playerMain";
 import shared from "@utils/js/shared";
+import { noteRender } from "./render";
 
 export function drawFlick(note) {
     if (simphiPlayer.app.pauseTime && shared.game.ptmain.gameConfig.reviewWhenResume && note.scored)
@@ -23,6 +24,6 @@ export function drawFlick(note) {
                 1 + (simphiPlayer.timeInfo.timeChart - note.realTime) / 1.5,
                 0
             );
-        simphiPlayer.noteRender.note[HL ? "FlickHL" : "Flick"].full(simphiPlayer.app.ctxos);
+        noteRender.note[HL ? "FlickHL" : "Flick"].full(simphiPlayer.app.ctxos);
     }
 }

@@ -26,10 +26,7 @@ import { gauge } from "./plugins/gauge.js";
 import {
     imgBlur,
     imgShader,
-    imgPainter,
     imgSplit,
-    hex2rgba,
-    rgba2hex,
 } from "./assetsProcessor/imgProcessor";
 import { createCanvas } from "./utils/canvas";
 
@@ -49,6 +46,7 @@ import { specialClick } from "./components/specialClick";
 import { loadLineData } from "./components/LoadLineData";
 
 import { mainLoop } from "./renderer";
+import { noteRender } from "./renderer/Notes/render";
 
 const $id = query => document.getElementById(query);
 const $ = query => document.body.querySelector(query);
@@ -201,64 +199,6 @@ export const simphiPlayer = {
             return shared.game.ptmain.gameMode !== "multi";
         },
         hitFxRotate: false,
-    },
-
-    /**
-     * @typedef {Object} HitFX
-     * @property {ScaledNote[]} effects
-     * @property {number} numOfParts
-     * @property {number} duration
-     */
-    noteRender: {
-        /** @type {Object<string,ScaledNote>} */
-        note: {},
-        /** @type {Object<string,HitFX>} */
-        hitFX: {},
-        /**
-         * @param {string} name
-         * @param {ImageBitmap} img
-         * @param {number} scale
-         */
-        async update(name, img, scale, compacted = false) {
-            this.note[name] = new ScaledNote(img, scale, compacted);
-            if (name === "Tap")
-                this.note["TapBad"] = new ScaledNote(await imgPainter(img, "#6c4343"), scale);
-        },
-        async updateFX(img, scale, limitX, limitY, hideParts, duration) {
-            const hitRaw = await imgSplit(img, limitX, limitY);
-            const hitPerfect = hitRaw.map(
-                async img =>
-                    new ScaledNote(
-                        await imgShader(
-                            img,
-                            simphiPlayer.tmps.hitPerfectColor || "rgba(255,236,160,0.8823529)"
-                        ),
-                        scale
-                    )
-            ); //#fce491,#ffeca0e1
-            const hitGood = hitRaw.map(
-                async img =>
-                    new ScaledNote(
-                        await imgShader(
-                            img,
-                            simphiPlayer.tmps.hitGoodColor || "rgba(180,225,255,0.9215686)"
-                        ),
-                        scale
-                    )
-            ); //#9ed5f3,#b4e1ffeb
-            img.close();
-            this.hitFX["Perfect"] = {
-                effects: await Promise.all(hitPerfect),
-                numOfParts: hideParts ? 0 : 4,
-                duration: duration | 0 || 500,
-            };
-            this.hitFX["Good"] = {
-                effects: await Promise.all(hitGood),
-                numOfParts: hideParts ? 0 : 3,
-                duration: duration | 0 || 500,
-            };
-            hitRaw.forEach(img => img.close());
-        },
     },
 
     hitFeedbackList: new HitEvents({
@@ -777,7 +717,7 @@ const loadRes = (shared.game.simphi.reloadRes = async (
             "FlickHL",
             "HitFXRaw",
         ];
-        for (const i of entries) await simphiPlayer.noteRender.update(i, simphiPlayer.res[i], 1);
+        for (const i of entries) await noteRender.update(i, simphiPlayer.res[i], 1);
         simphiPlayer.res["JudgeLineMP"] = await imgShader(simphiPlayer.res["JudgeLine"], "#feffa9");
         simphiPlayer.res["JudgeLineFC"] = await imgShader(simphiPlayer.res["JudgeLine"], "#a2eeff");
         simphiPlayer.tmps.hitPerfectColor = simphiPlayer.tmps.hitGoodColor = null;
@@ -904,46 +844,46 @@ async function updateRes(resources, manual = false) {
             const [bottom, top] = simphiPlayer.customResourceMeta["holdAtlas"] || [1, 1];
             const compacted = simphiPlayer.customResourceMeta["holdType"] === "prpr-compacted";
             if (i === "Hold") {
-                simphiPlayer.noteRender.update(
+                noteRender.update(
                     "HoldEnd",
                     await createImageBitmap(img, 0, 0, img.width, bottom),
                     noteScale,
                     compacted
                 );
-                simphiPlayer.noteRender.update(
+                noteRender.update(
                     "Hold",
                     await createImageBitmap(img, 0, bottom, img.width, img.height - bottom - top),
                     noteScale,
                     compacted
                 );
-                simphiPlayer.noteRender.update(
+                noteRender.update(
                     "HoldHead",
                     await createImageBitmap(img, 0, img.height - top, img.width, top),
                     noteScale,
                     compacted
                 );
             } else if (i === "HoldHL") {
-                simphiPlayer.noteRender.update(
+                noteRender.update(
                     "HoldEndHL",
                     await createImageBitmap(img, 0, 0, img.width, bottom),
                     noteScale,
                     compacted
                 );
-                simphiPlayer.noteRender.update(
+                noteRender.update(
                     "HoldHL",
                     await createImageBitmap(img, 0, bottom, img.width, img.height - bottom - top),
                     noteScale,
                     compacted
                 );
-                simphiPlayer.noteRender.update(
+                noteRender.update(
                     "HoldHeadHL",
                     await createImageBitmap(img, 0, img.height - top, img.width, top),
                     noteScale,
                     compacted
                 );
-            } else await simphiPlayer.noteRender.update(i, resources[i], 1);
+            } else await noteRender.update(i, resources[i], 1);
         } else {
-            await simphiPlayer.noteRender.update(
+            await noteRender.update(
                 i.replaceAll(/\.(jpg|png)/gi, ""),
                 resources[i],
                 ["HoldHL", "HoldHeadHL"].includes(i) ? 8080 / 7875 : 1
@@ -951,7 +891,7 @@ async function updateRes(resources, manual = false) {
             if (manual) simphiPlayer.res[i.replaceAll(/\.(jpg|png)/gi, "")] = resources[i];
         }
     }
-    if (resources["HitFXRaw"]) await simphiPlayer.noteRender.updateFX(resources["HitFXRaw"], 1);
+    if (resources["HitFXRaw"]) await noteRender.updateFX(resources["HitFXRaw"], 1);
     for (let i = 0; i < 3; i++) {
         const str = `HitSong${i}`;
         if (resources[str]) simphiPlayer.res[str] = resources[str];
@@ -1135,33 +1075,6 @@ document.addEventListener("visibilitychange", onPageVisibilityChange);
 document.addEventListener("pagehide", onPageVisibilityChange); //兼容Safari
 
 simphiPlayer.stage.resize(); //qwq
-//作图
-
-
-class ScaledNote {
-    constructor(img, scale, compacted) {
-        this.img = img;
-        this.scale = scale;
-        const dx = (-img.width / 2) * scale;
-        const dy = (-img.height / 2) * scale;
-        const dw = img.width * scale;
-        const dh = img.height * scale;
-        /** @param {CanvasRenderingContext2D} ctx */
-        this.full = ctx => ctx.drawImage(img, dx, dy, dw, dh);
-        /** @param {CanvasRenderingContext2D} ctx */
-        this.head = ctx => ctx.drawImage(img, dx, 0, dw, dh);
-        /** @param {CanvasRenderingContext2D} ctx */
-        this.body = (ctx, offset, length) => ctx.drawImage(img, dx, offset, dw, length);
-        /** @param {CanvasRenderingContext2D} ctx */
-        this.tail = (ctx, offset) => ctx.drawImage(img, dx, offset - dh, dw, dh);
-        if (compacted) {
-            /** @param {CanvasRenderingContext2D} ctx */
-            this.head = ctx => ctx.drawImage(img, dx, dy, dw, dh);
-            /** @param {CanvasRenderingContext2D} ctx */
-            this.tail = (ctx, offset) => ctx.drawImage(img, dx, offset - dh - dy, dw, dh);
-        }
-    }
-}
 
 //html交互(WIP)
 $id("select-note-scale").addEventListener("change", evt =>
@@ -1411,7 +1324,6 @@ simphiPlayer.selectchart = simphiPlayer.selectchart;
 simphiPlayer.chartsMD5 = simphiPlayer.chartData.chartsMD5;
 // shared.game.simphi.chartsMD5 = main.chartsMD5;
 // shared.game.simphi.selectchart = main.selectchart;
-simphiPlayer.noteRender = simphiPlayer.noteRender;
 simphiPlayer.ZipReader = ZipReader;
 simphiPlayer.qwq = simphiPlayer.qwq;
 simphiPlayer.pauseHook = () => simphiPlayer.emitter.eq("play") && simphiPlayer.pause();

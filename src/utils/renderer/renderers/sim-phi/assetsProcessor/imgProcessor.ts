@@ -1,8 +1,6 @@
 import { canvasRGBA as StackBlurCanvasRGBA } from "stackblur-canvas";
 import { createCanvas } from "../utils/canvas";
 
-type RGBAArray = [number, number, number, number];
-
 async function imgBlur(img: ImageBitmap): Promise<ImageBitmap> {
     const canvas = createCanvas(img.width * 0.9, img.height * 0.9);
     canvas.style.cssText += ";overflow:hidden;";

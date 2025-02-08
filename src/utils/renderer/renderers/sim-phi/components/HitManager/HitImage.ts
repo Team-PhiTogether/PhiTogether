@@ -1,4 +1,5 @@
 import { simphiPlayer } from "../../playerMain";
+import { noteRender } from "../../renderer/Notes/render";
 
 export class HitImage {
     public offsetX: number;
@@ -17,7 +18,7 @@ export class HitImage {
         n3: string,
         rotation: number | string
     ) {
-        const packs = simphiPlayer.noteRender.hitFX[n1];
+        const packs = noteRender.hitFX[n1];
         this.offsetX = Number(offsetX) || 0;
         this.offsetY = Number(offsetY) || 0;
         this.rotation = simphiPlayer.tmps.hitFxRotate ? Number(rotation) || 0 : 0;

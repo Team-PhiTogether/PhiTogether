@@ -1,5 +1,6 @@
 import { simphiPlayer } from "@/utils/renderer/renderers/sim-phi/playerMain";
 import shared from "@utils/js/shared";
+import { noteRender } from "./render";
 
 export function drawHold(note, realTime) {
     if (simphiPlayer.app.pauseTime && shared.game.ptmain.gameConfig.reviewWhenResume && note.scored)
@@ -25,18 +26,18 @@ export function drawHold(note, realTime) {
     const baseLength = (simphiPlayer.app.scaleY / nsr) * note.speed * simphiPlayer.app.speed;
     const holdLength = baseLength * note.realHoldTime;
     if (note.realTime > realTime) {
-        simphiPlayer.noteRender.note[HL ? "HoldHeadHL" : "HoldHead"].head(simphiPlayer.app.ctxos);
-        simphiPlayer.noteRender.note[HL ? "HoldHL" : "Hold"].body(
+        noteRender.note[HL ? "HoldHeadHL" : "HoldHead"].head(simphiPlayer.app.ctxos);
+        noteRender.note[HL ? "HoldHL" : "Hold"].body(
             simphiPlayer.app.ctxos,
             -holdLength,
             holdLength
         );
     } else {
-        simphiPlayer.noteRender.note[HL ? "HoldHL" : "Hold"].body(
+        noteRender.note[HL ? "HoldHL" : "Hold"].body(
             simphiPlayer.app.ctxos,
             -holdLength,
             holdLength - baseLength * (realTime - note.realTime)
         );
     }
-    simphiPlayer.noteRender.note["HoldEnd"].tail(simphiPlayer.app.ctxos, -holdLength);
+    noteRender.note["HoldEnd"].tail(simphiPlayer.app.ctxos, -holdLength);
 }

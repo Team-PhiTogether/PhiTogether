@@ -1,5 +1,5 @@
 //调节画面尺寸和全屏相关(返回source播放aegleseeker会出现迷之error)
-export function adjustSize(source: HTMLCanvasElement, dest: HTMLCanvasElement, scale: number): [number, number, number, number] {
+export function adjustSize(source: HTMLCanvasElement | CanvasElementLike, dest: HTMLCanvasElement | CanvasElementLike, scale: number): [number, number, number, number] {
     const { width: sw, height: sh } = source;
     const { width: dw, height: dh } = dest;
     if (dw * sh > dh * sw)
@@ -15,4 +15,9 @@ export function adjustSize(source: HTMLCanvasElement, dest: HTMLCanvasElement, s
         ((dh * sw) / sh) * scale,
         dh * scale,
     ];
+}
+
+interface CanvasElementLike {
+    width: number;
+    height: number;
 }
