@@ -5,7 +5,7 @@
     import shared from "../utils/js/shared.js";
     import { checkLocalChart } from "../utils/ptdb/charts";
     import ploading from "@utils/js/ploading.js";
-    import { simphiPlayer } from "@renderers/simphiPlayer";
+    import { simphiPlayer } from "@renderers/sim-phi/playerMain";
     export default {
         name: "chartupload",
         data() {
