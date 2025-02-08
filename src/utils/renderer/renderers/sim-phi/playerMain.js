@@ -15,10 +15,10 @@ import { uploader, ZipReader, readFile } from "./assetsProcessor/reader";
 import { InteractProxy } from "@utils/js/interact";
 import shared from "@utils/js/shared";
 // import { recordMgr } from "@components/recordMgr/recordMgr";
-import { replayMgr } from "@components/recordMgr/replayMgr";
+// import { replayMgr } from "@components/recordMgr/replayMgr";
 
 import { loadModYukiOri } from "./plugins/aprfools/loadModYukiOri";
-import saveAdjustedChart from "./plugins/saveAdjustedChart";
+// import saveAdjustedChart from "./plugins/saveAdjustedChart";
 import videoRecorder from "./plugins/video-recorder";
 import { loadSkinFromBuffer, loadSkinFromDB } from "./plugins/skin";
 import { gauge } from "./plugins/gauge.js";
@@ -31,25 +31,24 @@ import {
     hex2rgba,
     rgba2hex,
 } from "./assetsProcessor/imgProcessor";
-import { createCanvas, drawRoundRect } from "./utils/canvas";
+import { createCanvas } from "./utils/canvas";
 
 import ptdb from "@utils/ptdb";
 import { msgHandler } from "@utils/js/msgHandler";
-import { tween } from "./utils/tween";
 import { Emitter } from "./utils/Emitter";
+import { playBgm, playVideo } from "./utils/mediaPlayer";
 
 import { judgeManager } from "./components/JudgeManager";
 import { HitManager } from "./components/HitManager";
 import { HitEvents } from "./components/HitManager/HitEvents";
 import { HitWord } from "./components/HitManager/HitWord";
+import { HitFeedback } from "./components/HitManager/HitFeedback";
 import { LineImage } from "./components/LineImage";
 import { specialDrag } from "./components/specialDrag";
 import { specialClick } from "./components/specialClick";
 import { loadLineData } from "./components/LoadLineData";
 
-import { drawNotes } from "./renderers/Notes";
-import { drawLine } from "./renderers/Lines";
-import { resultPageRenderer } from "./renderers/ResultPage";
+import { mainLoop } from "./renderer";
 
 const $id = query => document.getElementById(query);
 const $ = query => document.body.querySelector(query);
@@ -70,6 +69,7 @@ export const simphiPlayer = {
     //qwq[water,demo,democlick]
     qwq: [null, false, null, null, 0, null],
     fucktemp2: null,
+    resultPageData: false,
 
     res: {}, //存放资源
 
@@ -91,6 +91,7 @@ export const simphiPlayer = {
     inputIllustrator: $id("input-illustrator"),
     selectDifficulty: $id("select-difficulty"),
     selectLevel: $id("select-level"),
+    showTransition: $id("showTransition"),
 
     stage: {
         resize(forced) {
@@ -336,10 +337,101 @@ export const simphiPlayer = {
         },
     }),
     hitManager: new HitManager(),
+
+    async pause() {
+        if (simphiPlayer.btnPause.classList.contains("disabled") || !simphiPlayer.tmps.canPause) return;
+        if (simphiPlayer.emitter.eq("stop") || simphiPlayer.resultPageData) return;
+        simphiPlayer.btnPause.classList.add("disabled");
+        if (simphiPlayer.emitter.eq("play")) {
+            if (simphiPlayer.app.bgVideo) simphiPlayer.app.bgVideo.pause();
+            simphiPlayer.app.pauseBackgroundDimPara1 = null;
+            simphiPlayer.animationTimer.in.pause();
+            if (simphiPlayer.showTransition.checked && simphiPlayer.animationInfo.isOutStart)
+                simphiPlayer.animationTimer.out.pause();
+            simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.timeBgm;
+            audio.stop();
+            simphiPlayer.emitter.emit("pause");
+            simphiPlayer.btnPause.classList.remove("disabled");
+        } else {
+            if (shared.game.ptmain.playConfig.mode === "preview") {
+                clearInterval(simphiPlayer.app.pauseNextTick);
+                if (simphiPlayer.app.bgVideo)
+                    await playVideo(
+                        simphiPlayer.app.bgVideo,
+                        simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
+                    );
+                simphiPlayer.animationTimer.in.play();
+                if (simphiPlayer.showTransition.checked && simphiPlayer.animationInfo.isOutStart)
+                    simphiPlayer.animationTimer.out.play();
+                if (simphiPlayer.animationInfo.isInEnd && !simphiPlayer.animationInfo.isOutStart)
+                    playBgm(
+                        simphiPlayer.app.bgMusic,
+                        simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
+                    );
+                simphiPlayer.emitter.emit("play");
+                simphiPlayer.btnPause.classList.remove("disabled");
+                return;
+            }
+            simphiPlayer.app.pauseTime = 3;
+            simphiPlayer.app.pauseBackgroundDimPara1 = performance.now();
+            simphiPlayer.app.pauseNextTick = setInterval(async () => {
+                simphiPlayer.app.pauseTime--;
+                if (simphiPlayer.app.pauseTime <= 0) {
+                    simphiPlayer.app.pauseTime = 0;
+                    clearInterval(simphiPlayer.app.pauseNextTick);
+                    simphiPlayer.app.pauseNextTick = null;
+                    simphiPlayer.app.pauseBackgroundDimPara1 = Infinity;
+                    if (
+                        !shared.game.ptmain.gameConfig.reviewWhenResume ||
+                        simphiPlayer.timeInfo.curTime <= 3
+                    ) {
+                        if (simphiPlayer.app.bgVideo)
+                            await playVideo(
+                                simphiPlayer.app.bgVideo,
+                                simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
+                            );
+                        simphiPlayer.animationTimer.in.play();
+                        if (simphiPlayer.showTransition.checked && simphiPlayer.animationInfo.isOutStart)
+                            simphiPlayer.animationTimer.out.play();
+                        if (
+                            simphiPlayer.animationInfo.isInEnd &&
+                            !simphiPlayer.animationInfo.isOutStart
+                        )
+                            playBgm(
+                                simphiPlayer.app.bgMusic,
+                                simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
+                            );
+                        simphiPlayer.emitter.emit("play");
+                    }
+                    simphiPlayer.btnPause.classList.remove("disabled");
+                }
+            }, 1000);
+            if (shared.game.ptmain.gameConfig.reviewWhenResume && simphiPlayer.timeInfo.curTime > 3) {
+                if (simphiPlayer.timeInfo.curTime > 3)
+                    simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime -= 3;
+                if (simphiPlayer.app.bgVideo)
+                    await playVideo(
+                        simphiPlayer.app.bgVideo,
+                        simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
+                    );
+                simphiPlayer.animationTimer.in.play();
+                if (simphiPlayer.showTransition.checked && simphiPlayer.animationInfo.isOutStart)
+                    simphiPlayer.animationTimer.out.play();
+                if (simphiPlayer.animationInfo.isInEnd && !simphiPlayer.animationInfo.isOutStart)
+                    playBgm(
+                        simphiPlayer.app.bgMusic,
+                        simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
+                    );
+                simphiPlayer.emitter.emit("play");
+                simphiPlayer.btnPause.classList.add("disabled");
+            }
+        }
+    },
 };
 document.oncontextmenu = e => e.preventDefault(); //qwq
 
 shared.game.simphi = simphiPlayer.app;
+shared.game.player = simphiPlayer;
 
 simphiPlayer.now.set("gauge", gauge.calc);
 //自动填写歌曲信息
@@ -547,60 +639,6 @@ self.addEventListener("resize", () => simphiPlayer.stage.resize());
         }
     }
 }
-//qwq end
-//hit start
-
-class HitFeedback {
-    constructor(offsetX, offsetY, n1, n2) {
-        this.offsetX = Number(offsetX);
-        this.offsetY = Number(offsetY);
-        this.color = String(n1);
-        this.text = String(n2);
-        this.time = 0;
-    }
-    static tap(offsetX, offsetY) {
-        return new HitFeedback(offsetX, offsetY, "cyan", "");
-    }
-    static hold(offsetX, offsetY) {
-        return new HitFeedback(offsetX, offsetY, "lime", "");
-    }
-    static move(offsetX, offsetY) {
-        return new HitFeedback(offsetX, offsetY, "violet", "");
-    }
-}
-// class HitImage {
-//     constructor(offsetX, offsetY, n1, n3, rotation) {
-//         const packs = simphiPlayer.noteRender.hitFX[n1];
-//         this.offsetX = Number(offsetX) || 0;
-//         this.offsetY = Number(offsetY) || 0;
-//         this.rotation = simphiPlayer.tmps.hitFxRotate ? Number(rotation) || 0 : 0;
-//         this.time = performance.now();
-//         this.duration = packs.duration;
-//         this.effects = packs.effects;
-//         this.direction = Array(packs.numOfParts || 0)
-//             .fill()
-//             .map(() => [Math.random() * 80 + 185, Math.random() * 2 * Math.PI]);
-//         this.color = String(n3);
-//     }
-//     static perfect(offsetX, offsetY, note) {
-//         return new HitImage(
-//             offsetX,
-//             offsetY,
-//             "Perfect",
-//             simphiPlayer.tmps.hitPerfectColor || "#ffeca0",
-//             note.line.rotation
-//         );
-//     }
-//     static good(offsetX, offsetY, note) {
-//         return new HitImage(
-//             offsetX,
-//             offsetY,
-//             "Good",
-//             simphiPlayer.tmps.hitGoodColor || "#b4e1ff",
-//             note.line.rotation
-//         );
-//     }
-// }
 const interact = new InteractProxy(simphiPlayer.app.canvas);
 //兼容PC鼠标
 interact.setMouseEvent({
@@ -946,7 +984,7 @@ window.addEventListener(
             doFullScreen: simphiPlayer.stage.doFullScreen,
             adjustInfo,
             qwqStop,
-            qwqPause,
+            qwqPause: simphiPlayer.pause,
             frameAnimater: simphiPlayer.frameAnimater,
         };
         await shared.game.requestFullscreen();
@@ -1084,7 +1122,7 @@ window.addEventListener(
 simphiPlayer.frameAnimater.setCallback(mainLoop);
 function onPageVisibilityChange() {
     if (document.visibilityState === "hidden")
-        if (simphiPlayer.emitter.eq("play")) qwqPause();
+        if (simphiPlayer.emitter.eq("play")) simphiPlayer.pause();
         else {
             if (!audio._actx) return;
             audio._actx.suspend();
@@ -1095,1015 +1133,10 @@ function onPageVisibilityChange() {
 }
 document.addEventListener("visibilitychange", onPageVisibilityChange);
 document.addEventListener("pagehide", onPageVisibilityChange); //兼容Safari
-/**
- * 播放bgm
- * @param {AudioBuffer} data
- * @param {number} [offset]
- */
-function playBgm(data, offset) {
-    if (!offset) offset = 0;
-    simphiPlayer.timeInfo.curTime_ms = performance.now();
-    simphiPlayer.tmps.bgMusic = audio.play(data, {
-        offset: offset,
-        playbackrate: simphiPlayer.app.speed,
-        gainrate: simphiPlayer.app.musicVolume,
-        interval: shared.game.ptmain.gameConfig.autoDelay ? 1 : 0,
-    });
-}
-/**
- * @param {HTMLVideoElement} data
- * @param {number} [offset]
- */
-function playVideo(data, offset) {
-    if (!offset) offset = 0;
-    data.currentTime = offset;
-    data.playbackRate = simphiPlayer.app.speed;
-    data.muted = true;
-    return data.play();
-}
-let resultPageData = false;
+
 simphiPlayer.stage.resize(); //qwq
 //作图
-function mainLoop() {
-    frameTimer.addTick(); //计算fps
-    const { lineScale } = simphiPlayer.app;
-    simphiPlayer.timeInfo.nowTime_ms = performance.now();
-    simphiPlayer.app.resizeCanvas();
-    //计算时间
-    if (simphiPlayer.animationTimer.out.second < 0.67) {
-        loopNoCanvas();
-        // main["flag{qwq}"](timeBgm);
-        for (const i of simphiPlayer.now.values())
-            i(simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed);
-        loopCanvas();
-    } else if (!resultPageData) {
-        resultPageData = true;
-        audio.stop();
-        simphiPlayer.btnPause.classList.add("disabled"); //qwq
-        simphiPlayer.app.ctxos.globalCompositeOperation = "source-over";
-        simphiPlayer.app.ctxos.resetTransform();
-        simphiPlayer.app.ctxos.globalAlpha = 1;
-        if (shared.game.ptmain.gameConfig.imageBlur)
-            simphiPlayer.app.ctxos.drawImage(
-                simphiPlayer.app.bgImageBlur,
-                ...adjustSize(simphiPlayer.app.bgImageBlur, simphiPlayer.app.canvasos, 1)
-            );
-        else
-            simphiPlayer.app.ctxos.drawImage(
-                simphiPlayer.app.bgImage,
-                ...adjustSize(simphiPlayer.app.bgImage, simphiPlayer.app.canvasos, 1)
-            );
-        simphiPlayer.app.ctxos.fillStyle = "#000"; //背景变暗
-        simphiPlayer.app.ctxos.globalAlpha = 0.2;
-        simphiPlayer.app.ctxos.fillRect(
-            0,
-            0,
-            simphiPlayer.app.canvasos.width,
-            simphiPlayer.app.canvasos.height
-        );
-        setTimeout(() => {
-            if (!resultPageData) return; //避免快速重开后直接结算
-            const difficulty = ["ez", "hd", "in", "at"].indexOf(
-                simphiPlayer.chartData.levelText.slice(0, 2).toLocaleLowerCase()
-            );
-            audio.play(
-                simphiPlayer.res[
-                    `LevelOver${
-                        !shared.game.ptmain.gameConfig.usekwlevelOverbgm
-                            ? difficulty < 0
-                                ? 2
-                                : difficulty
-                            : "0"
-                    }${!shared.game.ptmain.gameConfig.usekwlevelOverbgm ? "_v2" : ""}`
-                ],
-                { loop: true }
-            );
-            simphiPlayer.animationTimer.end.reset();
-            simphiPlayer.animationTimer.end.play();
-            simphiPlayer.stat.level = Number(simphiPlayer.chartData.levelText.match(/\d+$/));
-            simphiPlayer.fucktemp2 = simphiPlayer.stat.getData(
-                simphiPlayer.app.playMode === 1,
-                simphiPlayer.selectspeed.value
-            );
-        }, 1e3);
-        shared.game.ptmain.playFinished();
-        if (shared.game.ptmain.playConfig.adjustOffset)
-            saveAdjustedChart(simphiPlayer.app, simphiPlayer.fucktemp2);
-        simphiPlayer.app.stage.style.zIndex = 0;
-        simphiPlayer.stage.resize(true);
-    } //只让它执行一次
-    if (simphiPlayer.fucktemp2) {
-        resultPageRenderer(simphiPlayer.fucktemp2);
-        simphiPlayer.app.ctxos.globalAlpha = 0.5;
-        simphiPlayer.app.ctxos.drawImage(
-            simphiPlayer.res["Retry"],
-            simphiPlayer.app.canvasos.width - simphiPlayer.app.lineScale * 1,
-            simphiPlayer.app.canvasos.height - simphiPlayer.app.lineScale * 1,
-            simphiPlayer.app.lineScale * 0.75,
-            simphiPlayer.app.lineScale * 0.75
-        );
-        simphiPlayer.app.ctxos.textAlign = "left";
-        // if (shared.game.ptmain.playConfig.mode !== "preview") {
-        // drawRoundRect(
-        //   ctxos,
-        //   -lineScale * 7.5,
-        //   canvasos.height - lineScale * 5,
-        //   lineScale * 7.5,
-        //   lineScale * 5,
-        //   lineScale * 0.25
-        // ).fill();
-        //   ctxos.fillText(
-        //     "下载游玩回放",
-        //     20,
-        //     50
-        //   )
-        // };
-        simphiPlayer.app.ctxos.textAlign = null;
-    }
-    if (
-        !simphiPlayer.emitter.eq("play") &&
-        !simphiPlayer.app.pauseTime &&
-        !simphiPlayer.fucktemp2
-    ) {
-        simphiPlayer.app.ctxos.globalAlpha = 0.5;
-        simphiPlayer.app.ctxos.drawImage(
-            simphiPlayer.res["Loop"],
-            simphiPlayer.app.lineScale * 0.25,
-            simphiPlayer.app.canvasos.height - simphiPlayer.app.lineScale * 1,
-            simphiPlayer.app.lineScale * 0.75,
-            simphiPlayer.app.lineScale * 0.75
-        );
-    }
-    if (
-        simphiPlayer.app.canvas.width > simphiPlayer.app.canvasos.width ||
-        simphiPlayer.app.canvas.height > simphiPlayer.app.canvasos.height ||
-        simphiPlayer.fucktemp2
-    ) {
-        simphiPlayer.app.ctx.globalAlpha = 1;
-        if (shared.game.ptmain.gameConfig.imageBlur || simphiPlayer.fucktemp2)
-            simphiPlayer.app.ctx.drawImage(
-                simphiPlayer.app.bgImageBlur,
-                ...adjustSize(simphiPlayer.app.bgImageBlur, simphiPlayer.app.canvas, 1.1)
-            );
-        else
-            simphiPlayer.app.ctx.drawImage(
-                simphiPlayer.app.bgImage,
-                ...adjustSize(simphiPlayer.app.bgImage, simphiPlayer.app.canvas, 1.1)
-            );
-        simphiPlayer.app.ctx.fillStyle = "#000";
-        simphiPlayer.app.ctx.globalAlpha = 0.2;
-        simphiPlayer.app.ctx.fillRect(
-            0,
-            0,
-            simphiPlayer.app.canvas.width,
-            simphiPlayer.app.canvas.height
-        );
-    }
-    simphiPlayer.app.ctx.globalAlpha = 1;
-    simphiPlayer.app.ctx.drawImage(
-        simphiPlayer.app.canvasos,
-        (simphiPlayer.app.canvas.width - simphiPlayer.app.canvasos.width) / 2,
-        (simphiPlayer.app.canvas.height - simphiPlayer.app.canvasos.height) / 2
-    );
-    //Copyright
-    simphiPlayer.app.ctx.font = `${lineScale * 0.3}px Saira`;
-    simphiPlayer.app.ctx.fillStyle = "#FFF";
-    simphiPlayer.app.ctx.globalAlpha = 0.25;
-    simphiPlayer.app.ctx.textAlign = "center";
-    simphiPlayer.app.ctx.textBaseline = "middle";
-    simphiPlayer.app.ctx.fillText(
-        simphiPlayer.app.playMode === 1
-            ? `PhiTogether Preview (Respack by ${simphiPlayer.customResourceMeta["author"]})`
-            : `${replayMgr.replaying ? `[ ·REC ${replayMgr.playerInfo.username || replayMgr.playerInfo.userName} (ID ${replayMgr.playerInfo.id}) ] ` : ""}PhiTogether ${
-                  spec.thisVersion
-              } @ sim-phi - P${judgeManager.time.p * 1000} G${
-                  judgeManager.time.g * 1000
-              } S${simphiPlayer.app.speed.toFixed(2)}${shared.game.ptmain.gameConfig.fullScreenJudge ? " F" : ""} - ${
-                  shared.game.ptmain.noAccountMode ? "OFFLINE" : "ONLINE"
-              } - RES ${simphiPlayer.customResourceMeta["author"]}`,
-        simphiPlayer.app.canvas.width / 2 - lineScale * 0,
-        simphiPlayer.app.canvas.height -
-            lineScale * 0.3 -
-            (simphiPlayer.app.canvas.height - simphiPlayer.app.canvasos.height) / 2
-    );
-}
 
-function loopNoCanvas() {
-    if (
-        !simphiPlayer.animationInfo.isInEnd &&
-        (simphiPlayer.animationTimer.in.second >= 3 || simphiPlayer.timeInfo.timeBgm > 0)
-    ) {
-        simphiPlayer.animationInfo.isInEnd = true;
-        if (simphiPlayer.emitter.eq("play")) {
-            playBgm(simphiPlayer.app.bgMusic);
-            if (simphiPlayer.app.bgVideo) playVideo(simphiPlayer.app.bgVideo);
-        }
-    }
-    if (
-        simphiPlayer.emitter.eq("play") &&
-        simphiPlayer.animationInfo.isInEnd &&
-        !simphiPlayer.animationInfo.isOutStart
-    )
-        simphiPlayer.timeInfo.timeBgm =
-            simphiPlayer.timeInfo.curTime +
-            (simphiPlayer.timeInfo.nowTime_ms - simphiPlayer.timeInfo.curTime_ms) / 1e3;
-    if (simphiPlayer.timeInfo.timeBgm >= simphiPlayer.timeInfo.duration)
-        if (
-            shared.game.ptmain.playConfig.practiseMode &&
-            !(
-                shared.game.ptmain.playConfig.previewMode &&
-                !shared.game.ptmain.playConfig.adjustOffset
-            )
-        )
-            simphiPlayer.emitter.eq("play") && qwqPause();
-        else simphiPlayer.animationInfo.isOutStart = true;
-    if (
-        showTransition.checked &&
-        simphiPlayer.animationInfo.isOutStart &&
-        !simphiPlayer.animationInfo.isOutEnd
-    ) {
-        simphiPlayer.animationInfo.isOutEnd = true;
-        simphiPlayer.animationTimer.out.play();
-    }
-    simphiPlayer.timeInfo.timeChart = Math.max(
-        simphiPlayer.timeInfo.timeBgm -
-            (simphiPlayer.app.chart.offset +
-                Number(shared.game.ptmain.gameConfig.inputOffset) / 1e3 || 0) /
-                simphiPlayer.app.speed,
-        0
-    );
-    //遍历判定线events和Note
-    simphiPlayer.app.updateByTime(simphiPlayer.timeInfo.timeChart);
-    //更新打击特效和触摸点动画
-    simphiPlayer.hitFeedbackList.update();
-    simphiPlayer.hitImageList.update();
-    simphiPlayer.hitWordList.update();
-    for (const i of simphiPlayer.hitManager.list) {
-        if (i.type === "keyboard") continue;
-        if (!i.isTapped) simphiPlayer.hitFeedbackList.add(HitFeedback.tap(i.offsetX, i.offsetY));
-        else if (i.isMoving)
-            simphiPlayer.hitFeedbackList.add(HitFeedback.move(i.offsetX, i.offsetY)); //qwq
-        else if (i.isActive)
-            simphiPlayer.hitFeedbackList.add(HitFeedback.hold(i.offsetX, i.offsetY));
-    }
-    //触发判定和播放打击音效
-    if (simphiPlayer.animationInfo.isInEnd && !simphiPlayer.app.pauseTime) {
-        const judgeWidth = simphiPlayer.app.canvasos.width * 0.118125;
-        if (!replayMgr.replaying)
-            judgeManager.addEvent(simphiPlayer.app.notes, simphiPlayer.timeInfo.timeChart);
-        judgeManager.execute(simphiPlayer.app.drags, simphiPlayer.timeInfo.timeChart, judgeWidth);
-        judgeManager.execute(simphiPlayer.app.flicks, simphiPlayer.timeInfo.timeChart, judgeWidth);
-        judgeManager.execute(
-            simphiPlayer.app.tapholds,
-            simphiPlayer.timeInfo.timeChart,
-            judgeWidth
-        );
-    }
-    //更新判定
-    simphiPlayer.hitManager.update();
-    simphiPlayer.tmps.bgImage = shared.game.ptmain.gameConfig.imageBlur
-        ? simphiPlayer.app.bgImageBlur
-        : simphiPlayer.app.bgImage;
-    simphiPlayer.tmps.bgVideo = simphiPlayer.app.bgVideo;
-    simphiPlayer.tmps.progress =
-        (simphiPlayer.qwqwq
-            ? simphiPlayer.timeInfo.duration - simphiPlayer.timeInfo.timeBgm
-            : simphiPlayer.timeInfo.timeBgm) / simphiPlayer.timeInfo.duration;
-    simphiPlayer.tmps.name = simphiPlayer.inputName.value || simphiPlayer.inputName.placeholder;
-    simphiPlayer.tmps.artist = simphiPlayer.inputArtist.value;
-    simphiPlayer.tmps.illustrator =
-        simphiPlayer.inputIllustrator.value || simphiPlayer.inputIllustrator.placeholder;
-    simphiPlayer.tmps.charter =
-        simphiPlayer.inputCharter.value || simphiPlayer.inputCharter.placeholder;
-    simphiPlayer.tmps.level = simphiPlayer.chartData.levelText;
-    if (simphiPlayer.stat.combo > 2) {
-        simphiPlayer.tmps.combo = `${simphiPlayer.stat.combo}`;
-        simphiPlayer.tmps.combo2 =
-            shared.game.ptmain.playConfig.mode === "preview" ? "PREVIEW" : "COMBO";
-    } else simphiPlayer.tmps.combo = simphiPlayer.tmps.combo2 = "";
-    simphiPlayer.tmps.showStat = true;
-    simphiPlayer.tmps.statStatus = {
-        pause: { show: true, offsetX: 0, offsetY: 0, alpha: 1 },
-        combonumber: { show: true, offsetX: 0, offsetY: 0, alpha: 1 },
-        combo: { show: true, offsetX: 0, offsetY: 0, alpha: 1 },
-        score: { show: true, offsetX: 0, offsetY: 0, alpha: 1 },
-        bar: { show: true, offsetX: 0, offsetY: 0, alpha: 1 }, // 血量
-        name: { show: true, offsetX: 0, offsetY: 0, alpha: 1 },
-        level: { show: true, offsetX: 0, offsetY: 0, alpha: 1 },
-    };
-    simphiPlayer.tmps.customForeDraw = null;
-    simphiPlayer.tmps.customBackDraw = null;
-    if (replayMgr.replaying)
-        simphiPlayer.tmps.combo2 = `REPLAY (${replayMgr.playerInfo.username || replayMgr.playerInfo.userName})`;
-}
-function loopCanvas() {
-    //尽量不要在这里出现app
-    const { lineScale } = simphiPlayer.app;
-    simphiPlayer.app.ctxos.clearRect(
-        0,
-        0,
-        simphiPlayer.app.canvasos.width,
-        simphiPlayer.app.canvasos.height
-    ); //重置画面
-    simphiPlayer.app.ctxos.globalAlpha = 1;
-    //绘制背景
-    simphiPlayer.app.ctxos.globalAlpha = 1;
-    simphiPlayer.app.ctxos.drawImage(
-        simphiPlayer.tmps.bgImage,
-        ...adjustSize(simphiPlayer.tmps.bgImage, simphiPlayer.app.canvasos, 1)
-    );
-    if (simphiPlayer.animationInfo.isInEnd && simphiPlayer.tmps.bgVideo && !simphiPlayer.qwqwq) {
-        const { videoWidth: width, videoHeight: height } = simphiPlayer.tmps.bgVideo;
-        simphiPlayer.app.ctxos.drawImage(
-            simphiPlayer.tmps.bgVideo,
-            ...adjustSize({ width, height }, simphiPlayer.app.canvasos, 1)
-        );
-    }
-    // if (qwq[4]) ctxos.filter = `hue-rotate(${stat.combo*360/7}deg)`;
-    if (
-        (simphiPlayer.animationInfo.isInEnd || simphiPlayer.animationTimer.in.second >= 2.5) &&
-        !simphiPlayer.stat.lineStatus
-    )
-        drawLine(0, lineScale); //绘制判定线(背景后0)
-    // if (qwq[4]) ctxos.filter = 'none';
-    simphiPlayer.app.ctxos.resetTransform();
-    simphiPlayer.app.ctxos.fillStyle = "#000"; //背景变暗
-    if (!simphiPlayer.animationInfo.isInEnd && simphiPlayer.animationTimer.in.second < 0.67)
-        simphiPlayer.app.ctxos.globalAlpha =
-            tween.easeOutSine(simphiPlayer.animationTimer.in.second * 1.5) *
-            shared.game.ptmain.gameConfig.backgroundDim;
-    else
-        simphiPlayer.app.ctxos.globalAlpha =
-            shared.game.ptmain.gameConfig.backgroundDim -
-            tween.easeOutSine(simphiPlayer.animationTimer.out.second * 1.5) *
-                (shared.game.ptmain.gameConfig.backgroundDim - 0.2);
-    simphiPlayer.app.ctxos.fillRect(
-        0,
-        0,
-        simphiPlayer.app.canvasos.width,
-        simphiPlayer.app.canvasos.height
-    );
-    if (
-        (simphiPlayer.animationInfo.isInEnd || simphiPlayer.animationTimer.in.second >= 2.5) &&
-        simphiPlayer.tmps.customBackDraw != null
-    )
-        simphiPlayer.tmps.customBackDraw(simphiPlayer.app.ctxos); // 自定义背景
-    // if (qwq[4]) ctxos.filter = `hue-rotate(${stat.combo*360/7}deg)`;
-    if (simphiPlayer.animationInfo.isInEnd || simphiPlayer.animationTimer.in.second >= 2.5)
-        drawLine(simphiPlayer.stat.lineStatus ? 2 : 1, lineScale); //绘制判定线(背景前1)
-    // if (qwq[4]) ctxos.filter = 'none';
-    simphiPlayer.app.ctxos.resetTransform();
-    if (simphiPlayer.animationInfo.isInEnd && simphiPlayer.animationTimer.out.second === 0) {
-        //绘制note
-        drawNotes();
-        if (shared.game.ptmain.gameConfig.showPoint) {
-            //绘制定位点
-            simphiPlayer.app.ctxos.font = `${lineScale}px Saira`;
-            simphiPlayer.app.ctxos.textAlign = "center";
-            for (const i of simphiPlayer.app.linesReversed) {
-                simphiPlayer.app.ctxos.setTransform(
-                    i.cosr,
-                    i.sinr,
-                    -i.sinr,
-                    i.cosr,
-                    i.offsetX,
-                    i.offsetY
-                );
-                simphiPlayer.app.ctxos.globalAlpha = 1;
-                simphiPlayer.app.ctxos.fillStyle = "violet";
-                simphiPlayer.app.ctxos.fillRect(
-                    -lineScale * 0.2,
-                    -lineScale * 0.2,
-                    lineScale * 0.4,
-                    lineScale * 0.4
-                );
-                simphiPlayer.app.ctxos.fillStyle = "yellow";
-                simphiPlayer.app.ctxos.globalAlpha = (i.alpha + 0.5) / 1.5;
-                simphiPlayer.app.ctxos.fillText(`${i.lineId.toString()}`, 0, -lineScale * 0.3);
-            }
-            for (const i of simphiPlayer.app.notesReversed) {
-                if (!i.visible) continue;
-                simphiPlayer.app.ctxos.setTransform(
-                    i.cosr,
-                    i.sinr,
-                    -i.sinr,
-                    i.cosr,
-                    i.offsetX,
-                    i.offsetY
-                );
-                simphiPlayer.app.ctxos.globalAlpha = 1;
-                simphiPlayer.app.ctxos.fillStyle = "lime";
-                simphiPlayer.app.ctxos.fillRect(
-                    -lineScale * 0.2,
-                    -lineScale * 0.2,
-                    lineScale * 0.4,
-                    lineScale * 0.4
-                );
-                simphiPlayer.app.ctxos.fillStyle = "cyan";
-                simphiPlayer.app.ctxos.globalAlpha =
-                    i.realTime > simphiPlayer.timeInfo.timeChart ? 1 : 0.5;
-                simphiPlayer.app.ctxos.fillText(`${i.name}:${i.line.speed}`, 0, -lineScale * 0.3);
-            }
-        }
-    }
-    // if (qwq[4]) ctxos.filter = `hue-rotate(${stat.combo*360/7}deg)`;
-    simphiPlayer.hitImageList.animate(); //绘制打击特效1
-    // if (qwq[4]) ctxos.filter = 'none';
-    if (shared.game.ptmain.gameConfig.showCE2) simphiPlayer.hitWordList.animate(); //绘制打击特效2
-    simphiPlayer.app.ctxos.globalAlpha = 1;
-    //绘制进度条
-    simphiPlayer.app.ctxos.setTransform(
-        simphiPlayer.app.canvasos.width / 1920,
-        0,
-        0,
-        simphiPlayer.app.canvasos.width / 1920,
-        0,
-        lineScale *
-            (!simphiPlayer.animationInfo.isInEnd && simphiPlayer.animationTimer.in.second < 0.67
-                ? tween.easeOutSine(simphiPlayer.animationTimer.in.second * 1.5) - 1
-                : -tween.easeOutSine(simphiPlayer.animationTimer.out.second * 1.5)) *
-            1.75
-    );
-    simphiPlayer.app.ctxos.drawImage(
-        simphiPlayer.res["ProgressBar"],
-        simphiPlayer.tmps.progress * 1920 - 1920,
-        0
-    );
-    //绘制文字
-    simphiPlayer.app.ctxos.resetTransform();
-    for (const i of simphiPlayer.after.values()) i();
-    simphiPlayer.app.ctxos.fillStyle = "#fff";
-    //开头过渡动画
-    if (!simphiPlayer.animationInfo.isInEnd) {
-        if (simphiPlayer.animationTimer.in.second < 0.67)
-            simphiPlayer.app.ctxos.globalAlpha = tween.easeOutSine(
-                simphiPlayer.animationTimer.in.second * 1.5
-            );
-        else if (simphiPlayer.animationTimer.in.second >= 2.5)
-            simphiPlayer.app.ctxos.globalAlpha = tween.easeOutSine(
-                6 - simphiPlayer.animationTimer.in.second * 2
-            );
-        const name = simphiPlayer.tmps.name;
-        const artist = simphiPlayer.tmps.artist;
-        const illustrator = `Illustration designed by ${simphiPlayer.tmps.illustrator}`;
-        const charter = `Level designed by ${simphiPlayer.tmps.charter}`;
-        const theme = `Resource Pack ${simphiPlayer.customResourceMeta["name"]} designed by ${simphiPlayer.customResourceMeta["author"]}`;
-        simphiPlayer.app.ctxos.textAlign = "center";
-        //曲名
-        simphiPlayer.app.ctxos.textBaseline = "alphabetic";
-        simphiPlayer.app.ctxos.font = `${lineScale * 1.1}px Saira`;
-        const dxsnm = simphiPlayer.app.ctxos.measureText(name).width;
-        if (dxsnm > simphiPlayer.app.canvasos.width - lineScale * 1.5)
-            simphiPlayer.app.ctxos.font = `${
-                ((lineScale * 1.1) / dxsnm) * (simphiPlayer.app.canvasos.width - lineScale * 1.5)
-            }px Saira`;
-        simphiPlayer.app.ctxos.fillText(name, simphiPlayer.app.wlen, simphiPlayer.app.hlen * 0.75);
-        //曲师、曲绘和谱师
-        simphiPlayer.app.ctxos.textBaseline = "top";
-        simphiPlayer.app.ctxos.font = `${lineScale * 0.55}px Saira`;
-        const dxa = simphiPlayer.app.ctxos.measureText(artist).width;
-        if (dxa > simphiPlayer.app.canvasos.width - lineScale * 1.5)
-            simphiPlayer.app.ctxos.font = `${
-                ((lineScale * 0.55) / dxa) * (simphiPlayer.app.canvasos.width - lineScale * 1.5)
-            }px Saira`;
-        simphiPlayer.app.ctxos.fillText(
-            artist,
-            simphiPlayer.app.wlen,
-            simphiPlayer.app.hlen * 0.75 + lineScale * 0.85
-        );
-        simphiPlayer.app.ctxos.font = `${lineScale * 0.55}px Saira`;
-        const dxi = simphiPlayer.app.ctxos.measureText(illustrator).width;
-        if (dxi > simphiPlayer.app.canvasos.width - lineScale * 1.5)
-            simphiPlayer.app.ctxos.font = `${
-                ((lineScale * 0.55) / dxi) * (simphiPlayer.app.canvasos.width - lineScale * 1.5)
-            }px Saira`;
-        simphiPlayer.app.ctxos.fillText(
-            illustrator,
-            simphiPlayer.app.wlen,
-            simphiPlayer.app.hlen * 1.25 + lineScale * 0.15
-        );
-        simphiPlayer.app.ctxos.font = `${lineScale * 0.55}px Saira`;
-        const dxc = simphiPlayer.app.ctxos.measureText(charter).width;
-        if (dxc > simphiPlayer.app.canvasos.width - lineScale * 1.5)
-            simphiPlayer.app.ctxos.font = `${
-                ((lineScale * 0.55) / dxc) * (simphiPlayer.app.canvasos.width - lineScale * 1.5)
-            }px Saira`;
-        simphiPlayer.app.ctxos.fillText(
-            charter,
-            simphiPlayer.app.wlen,
-            simphiPlayer.app.hlen * 1.25 + lineScale * 1.0
-        );
-        simphiPlayer.app.ctxos.font = `${lineScale * 0.55}px Saira`;
-        const dxt = simphiPlayer.app.ctxos.measureText(theme).width;
-        if (dxt > simphiPlayer.app.canvasos.width - lineScale * 1.5)
-            simphiPlayer.app.ctxos.font = `${
-                ((lineScale * 0.55) / dxt) * (simphiPlayer.app.canvasos.width - lineScale * 1.5)
-            }px Saira`;
-        simphiPlayer.app.ctxos.fillText(
-            theme,
-            simphiPlayer.app.wlen,
-            simphiPlayer.app.hlen * 1.25 + lineScale * 1.75
-        );
-        //判定线(装饰用)
-        simphiPlayer.app.ctxos.globalAlpha = 1;
-        simphiPlayer.app.ctxos.setTransform(
-            1,
-            0,
-            0,
-            1,
-            simphiPlayer.app.wlen,
-            simphiPlayer.app.hlen
-        );
-        const imgW =
-            lineScale *
-            48 *
-            (simphiPlayer.animationTimer.in.second < 0.67
-                ? tween.easeInCubic(simphiPlayer.animationTimer.in.second * 1.5)
-                : 1);
-        const imgH = lineScale * 0.15; //0.1333...
-        if (simphiPlayer.animationTimer.in.second >= 2.5)
-            simphiPlayer.app.ctxos.globalAlpha = tween.easeOutSine(
-                6 - simphiPlayer.animationTimer.in.second * 2
-            );
-        simphiPlayer.app.ctxos.drawImage(
-            shared.game.ptmain.gameConfig.lineColor
-                ? simphiPlayer.res["JudgeLineMP"]
-                : simphiPlayer.res["JudgeLine"],
-            -imgW / 2,
-            -imgH / 2,
-            imgW,
-            imgH
-        );
-    }
-
-    simphiPlayer.app.ctxos.globalAlpha = 1;
-    simphiPlayer.app.ctxos.resetTransform();
-    simphiPlayer.app.ctxos.fillStyle = "#fff";
-    //绘制分数和combo以及暂停按钮
-    simphiPlayer.app.ctxos.globalAlpha = 1;
-    simphiPlayer.app.ctxos.setTransform(
-        1,
-        0,
-        0,
-        1,
-        0,
-        lineScale *
-            (!simphiPlayer.animationInfo.isInEnd && simphiPlayer.animationTimer.in.second < 0.67
-                ? tween.easeIOCubic(simphiPlayer.animationTimer.in.second * 1.5) - 1
-                : -tween.easeIOCubic(simphiPlayer.animationTimer.out.second * 1.5)) *
-            1.75
-    );
-    simphiPlayer.app.ctxos.textBaseline = "alphabetic";
-    if (simphiPlayer.tmps.showStat) {
-        // 绘制分数
-        simphiPlayer.app.ctxos.font = `${lineScale * 0.95}px Saira`;
-        simphiPlayer.app.ctxos.textAlign = "right";
-        simphiPlayer.app.ctxos.globalAlpha = simphiPlayer.tmps.statStatus.score.alpha;
-        simphiPlayer.app.ctxos.fillText(
-            simphiPlayer.stat.scoreStr,
-            simphiPlayer.app.canvasos.width -
-                lineScale * 0.65 +
-                simphiPlayer.tmps.statStatus.score.offsetX,
-            lineScale * 1.375 + simphiPlayer.tmps.statStatus.score.offsetY
-        );
-        if (
-            shared.game.ptmain.gameConfig.showAcc &&
-            shared.game.ptmain.playConfig.mode !== "preview"
-        ) {
-            simphiPlayer.app.ctxos.font = `${lineScale * 0.66}px Saira`;
-            simphiPlayer.app.ctxos.fillText(
-                simphiPlayer.stat.accStr,
-                simphiPlayer.app.canvasos.width -
-                    lineScale * 0.65 +
-                    simphiPlayer.tmps.statStatus.score.offsetX,
-                lineScale * 2.05 + simphiPlayer.tmps.statStatus.score.offsetY
-            );
-        }
-        shared.game.ptmain.playConfig.mode !== "preview" ? gauge.draw() : null;
-    }
-    simphiPlayer.app.ctxos.fillStyle = "#fff";
-    simphiPlayer.app.ctxos.textAlign = "center";
-    simphiPlayer.app.ctxos.font = `${lineScale * 1.32}px Saira`;
-    simphiPlayer.app.ctxos.globalAlpha = simphiPlayer.tmps.statStatus.combonumber.alpha;
-    simphiPlayer.app.ctxos.fillText(
-        simphiPlayer.tmps.combo,
-        simphiPlayer.app.wlen + simphiPlayer.tmps.statStatus.combonumber.offsetX,
-        lineScale * 1.375 + simphiPlayer.tmps.statStatus.combonumber.offsetY
-    );
-    simphiPlayer.app.ctxos.globalAlpha =
-        !simphiPlayer.animationInfo.isInEnd && simphiPlayer.animationTimer.in.second < 0.67
-            ? tween.easeOutSine(simphiPlayer.animationTimer.in.second * 1.5)
-            : 1 - tween.easeOutSine(simphiPlayer.animationTimer.out.second * 1.5);
-    simphiPlayer.app.ctxos.globalAlpha *= simphiPlayer.tmps.statStatus.combo.alpha;
-    simphiPlayer.app.ctxos.font = `${lineScale * 0.5}px Saira`;
-    simphiPlayer.app.ctxos.fillText(
-        simphiPlayer.tmps.combo2,
-        simphiPlayer.app.wlen + simphiPlayer.tmps.statStatus.combo.offsetX,
-        lineScale * 1.95 + simphiPlayer.tmps.statStatus.combo.offsetY
-    );
-    //绘制曲名和等级
-    simphiPlayer.app.ctxos.setTransform(
-        1,
-        0,
-        0,
-        1,
-        0,
-        lineScale *
-            (!simphiPlayer.animationInfo.isInEnd && simphiPlayer.animationTimer.in.second < 0.67
-                ? 1 - tween.easeIOCubic(simphiPlayer.animationTimer.in.second * 1.5)
-                : tween.easeIOCubic(simphiPlayer.animationTimer.out.second * 1.5)) *
-            1.75
-    );
-    simphiPlayer.app.ctxos.textBaseline = "alphabetic";
-    simphiPlayer.app.ctxos.textAlign = "right";
-    simphiPlayer.app.ctxos.font = `${lineScale * 0.63}px Saira`;
-    const dxlvl = simphiPlayer.app.ctxos.measureText(simphiPlayer.chartData.levelText).width;
-    if (dxlvl > simphiPlayer.app.wlen - lineScale)
-        simphiPlayer.app.ctxos.font = `${((lineScale * 0.63) / dxlvl) * (simphiPlayer.app.wlen - lineScale)}px Saira`;
-    simphiPlayer.app.ctxos.globalAlpha = simphiPlayer.tmps.statStatus.level.alpha;
-    simphiPlayer.app.ctxos.fillText(
-        simphiPlayer.tmps.level,
-        simphiPlayer.app.canvasos.width -
-            lineScale * 0.75 +
-            simphiPlayer.tmps.statStatus.level.offsetX,
-        simphiPlayer.app.canvasos.height -
-            lineScale * 0.66 +
-            simphiPlayer.tmps.statStatus.level.offsetY
-    );
-    simphiPlayer.app.ctxos.textAlign = "left";
-    // ctxos.textBaseline = "middle";
-    simphiPlayer.app.ctxos.font = `${lineScale * 0.63}px Saira`;
-    const dxsnm = simphiPlayer.app.ctxos.measureText(
-        simphiPlayer.inputName.value || simphiPlayer.inputName.placeholder
-    ).width;
-    if (dxsnm > simphiPlayer.app.wlen - lineScale)
-        simphiPlayer.app.ctxos.font = `${((lineScale * 0.63) / dxsnm) * (simphiPlayer.app.wlen - lineScale)}px Saira`;
-    simphiPlayer.app.ctxos.globalAlpha = simphiPlayer.tmps.statStatus.name.alpha;
-    simphiPlayer.app.ctxos.fillText(
-        simphiPlayer.inputName.value || simphiPlayer.inputName.placeholder,
-        lineScale * 0.65 + simphiPlayer.tmps.statStatus.name.offsetX,
-        simphiPlayer.app.canvasos.height -
-            lineScale * 0.66 +
-            simphiPlayer.tmps.statStatus.name.offsetY
-    );
-    simphiPlayer.app.ctxos.globalAlpha = 1;
-    simphiPlayer.app.ctxos.resetTransform();
-    if (
-        (simphiPlayer.animationInfo.isInEnd || simphiPlayer.animationTimer.in.second >= 2.5) &&
-        simphiPlayer.tmps.customForeDraw != null
-    )
-        simphiPlayer.tmps.customForeDraw(simphiPlayer.app.ctxos); // 自定义前景
-    if (simphiPlayer.animationInfo.isInEnd && simphiPlayer.filter)
-        simphiPlayer.filter(
-            simphiPlayer.app.ctxos,
-            simphiPlayer.timeInfo.timeBgm,
-            simphiPlayer.timeInfo.nowTime_ms / 1e3
-        ); //滤镜处理
-    if (shared.game.ptmain.gameConfig.feedback) simphiPlayer.hitFeedbackList.animate(); //绘制打击特效0
-    simphiPlayer.app.ctxos.resetTransform();
-    try {
-        shared.game.graphicHandler.whilePlayingHook(
-            simphiPlayer.app.ctx,
-            simphiPlayer.app.ctxos,
-            lineScale
-        );
-    } catch (e) {
-        console.warn(e);
-    }
-    //绘制时间和帧率以及note打击数
-    simphiPlayer.app.ctxos.fillStyle = "#fff";
-    if (!simphiPlayer.animationInfo.isInEnd && simphiPlayer.animationTimer.in.second < 0.67)
-        simphiPlayer.app.ctxos.globalAlpha = tween.easeOutSine(
-            simphiPlayer.animationTimer.in.second * 1.5
-        );
-    else
-        simphiPlayer.app.ctxos.globalAlpha =
-            1 - tween.easeOutSine(simphiPlayer.animationTimer.out.second * 1.5);
-    simphiPlayer.app.ctxos.font = `${lineScale * 0.4}px Saira`;
-    simphiPlayer.app.ctxos.textBaseline = "middle";
-    simphiPlayer.app.ctxos.textAlign = "right";
-    simphiPlayer.app.ctxos.globalAlpha = 0.5;
-    simphiPlayer.app.ctxos.fillText(
-        frameTimer.fpsStr,
-        simphiPlayer.app.canvasos.width - lineScale * 0.05,
-        lineScale * 0.5
-    );
-    simphiPlayer.app.ctxos.font = `${lineScale * 0.25}px Saira`;
-    simphiPlayer.app.ctxos.fillText(
-        "FPS",
-        simphiPlayer.app.canvasos.width - lineScale * 0.05,
-        lineScale * 0.8
-    );
-    simphiPlayer.app.ctxos.textBaseline = "alphabetic";
-    simphiPlayer.app.ctxos.globalAlpha = 1;
-    simphiPlayer.app.ctxos.resetTransform();
-    simphiPlayer.app.ctxos.globalAlpha = simphiPlayer.tmps.canPause
-        ? simphiPlayer.tmps.statStatus.pause.alpha
-        : 0.5;
-    if (simphiPlayer.tmps.showStat)
-        simphiPlayer.app.ctxos.drawImage(
-            simphiPlayer.res["Pause"],
-            lineScale * 0.6 + simphiPlayer.tmps.statStatus.pause.offsetX,
-            lineScale * 0.7 + simphiPlayer.tmps.statStatus.pause.offsetY,
-            lineScale * 0.63,
-            lineScale * 0.7
-        );
-    if (shared.game.ptmain.playConfig.adjustOffset) {
-        simphiPlayer.app.ctxos.fillStyle = "gray";
-        simphiPlayer.app.ctxos.globalAlpha = 0.75;
-        drawRoundRect(
-            simphiPlayer.app.ctxos,
-            simphiPlayer.app.canvasos.width - lineScale * 7.5,
-            simphiPlayer.app.canvasos.height - lineScale * 5,
-            lineScale * 7.5,
-            lineScale * 5,
-            lineScale * 0.25
-        ).fill();
-        simphiPlayer.app.ctxos.globalAlpha = 1;
-        simphiPlayer.app.ctxos.fillStyle = "#fff";
-        simphiPlayer.app.ctxos.textBaseline = "middle";
-        simphiPlayer.app.ctxos.textAlign = "center";
-        simphiPlayer.app.ctxos.font = `${lineScale * 0.75}px Saira`;
-        simphiPlayer.app.ctxos.fillText(
-            shared.game.i18n.t("simphi.adjustOffset.title"),
-            simphiPlayer.app.canvasos.width - lineScale * 3.75,
-            simphiPlayer.app.canvasos.height - lineScale * 4.25
-        );
-        simphiPlayer.app.ctxos.font = `${lineScale * 0.65}px Saira`;
-        simphiPlayer.app.ctxos.fillText(
-            `${(simphiPlayer.app.chart.offset * 1e3).toFixed(0)}ms`,
-            simphiPlayer.app.canvasos.width - lineScale * 3.75,
-            simphiPlayer.app.canvasos.height - lineScale * 2.5
-        );
-        simphiPlayer.app.ctxos.font = `${lineScale * 0.5}px Saira`;
-        const drawIcon = (p, ps) => {
-            const h = lineScale * 0.5 - lineScale * Math.abs(p) * 0.1;
-            simphiPlayer.app.ctxos.fillStyle = "#fff";
-            drawRoundRect(
-                simphiPlayer.app.ctxos,
-                simphiPlayer.app.canvasos.width - 3.75 * lineScale + lineScale * ps,
-                simphiPlayer.app.canvasos.height - lineScale * 2.5 - h,
-                h * 2,
-                h * 2,
-                lineScale * 0.1
-            ).fill();
-            simphiPlayer.app.ctxos.fillStyle = "#000";
-            simphiPlayer.app.ctxos.fillText(
-                p > 0 ? "+" : "-",
-                simphiPlayer.app.canvasos.width - 3.75 * lineScale + lineScale * ps + h,
-                simphiPlayer.app.canvasos.height - lineScale * 2.5
-            );
-        };
-        drawIcon(-3, -3.5);
-        drawIcon(-2, -3);
-        drawIcon(-1, -2.25);
-        drawIcon(1, 1.5);
-        drawIcon(2, 2.45);
-        drawIcon(3, 3.15);
-        simphiPlayer.app.ctxos.fillStyle = "#fff";
-        drawRoundRect(
-            simphiPlayer.app.ctxos,
-            simphiPlayer.app.canvasos.width - 7 * lineScale,
-            simphiPlayer.app.canvasos.height - lineScale * 1.25,
-            lineScale * 3,
-            lineScale,
-            lineScale * 0.1
-        ).fill();
-        drawRoundRect(
-            simphiPlayer.app.ctxos,
-            simphiPlayer.app.canvasos.width - 3.5 * lineScale,
-            simphiPlayer.app.canvasos.height - lineScale * 1.25,
-            lineScale * 3,
-            lineScale,
-            lineScale * 0.1
-        ).fill();
-        simphiPlayer.app.ctxos.fillStyle = "#000";
-        simphiPlayer.app.ctxos.font = `${lineScale * 0.65}px Saira`;
-        simphiPlayer.app.ctxos.fillText(
-            shared.game.i18n.t("simphi.adjustOffset.reset"),
-            simphiPlayer.app.canvasos.width - 5.5 * lineScale,
-            simphiPlayer.app.canvasos.height - lineScale * 0.75
-        );
-        simphiPlayer.app.ctxos.fillText(
-            shared.game.i18n.t("simphi.adjustOffset.save"),
-            simphiPlayer.app.canvasos.width - 2 * lineScale,
-            simphiPlayer.app.canvasos.height - lineScale * 0.75
-        );
-    }
-    simphiPlayer.app.ctxos.fillStyle = "#fff";
-    if (!simphiPlayer.emitter.eq("play")) {
-        simphiPlayer.app.ctxos.fillStyle = "#000"; //背景变暗
-        simphiPlayer.app.ctxos.globalAlpha = simphiPlayer.app.pauseBackgroundDimPara1
-            ? Math.max(
-                  0.6 -
-                      0.6 *
-                          tween.easeOutCubic(
-                              (performance.now() - simphiPlayer.app.pauseBackgroundDimPara1) / 2000
-                          ),
-                  0
-              )
-            : 0.6; //背景不透明度
-        simphiPlayer.app.ctxos.fillRect(
-            0,
-            0,
-            simphiPlayer.app.canvasos.width,
-            simphiPlayer.app.canvasos.height
-        );
-        simphiPlayer.app.ctxos.globalAlpha = 0.5;
-        if (!simphiPlayer.app.pauseTime) {
-            simphiPlayer.app.ctxos.globalAlpha = 1;
-            simphiPlayer.app.ctxos.fillStyle = "#fff";
-            simphiPlayer.app.ctxos.textBaseline = "middle";
-            simphiPlayer.app.ctxos.font = `${lineScale * 0.4}px Saira`;
-            simphiPlayer.app.ctxos.textAlign = "left";
-            simphiPlayer.app.ctxos.fillText(
-                `${time2Str(simphiPlayer.qwqwq ? simphiPlayer.timeInfo.duration - simphiPlayer.timeInfo.timeBgm : simphiPlayer.timeInfo.timeBgm)}/${time2Str(
-                    simphiPlayer.timeInfo.duration
-                )}${simphiPlayer.status2.text}`,
-                lineScale * 0.05,
-                lineScale * 0.35
-            );
-            // ctxos.textAlign = "right";
-            [
-                simphiPlayer.stat.noteRank[5] +
-                    simphiPlayer.stat.noteRank[4] +
-                    simphiPlayer.stat.noteRank[1], // Perfect
-                simphiPlayer.stat.noteRank[7] + simphiPlayer.stat.noteRank[3], // Good
-                simphiPlayer.stat.noteRank[7], // GoodEarly
-                simphiPlayer.stat.noteRank[3], // GoodLate
-                simphiPlayer.stat.noteRank[6], // Bad
-                simphiPlayer.stat.noteRank[2], // Miss
-                // stat.maxcombo,     // 肉眼可见
-            ].forEach((val, idx) => {
-                const comboColor = ["#f0ed69", "#0ac3ff", "#0ac3ff", "#0ac3ff", "#fe7b93", "#999"];
-                const comboText = ["Perfect:", "Good:", "Early:", "Late:", "Bad:", "Miss:"];
-                simphiPlayer.app.ctxos.fillStyle = comboColor[idx];
-                simphiPlayer.app.ctxos.fillText(
-                    comboText[idx],
-                    lineScale * 0.05,
-                    simphiPlayer.app.canvasos.height / 2 + lineScale * (idx - 2.8) * 0.5
-                );
-                simphiPlayer.app.ctxos.fillText(
-                    val.toString(),
-                    lineScale * 1.75,
-                    simphiPlayer.app.canvasos.height / 2 + lineScale * (idx - 2.8) * 0.5
-                );
-            });
-            simphiPlayer.app.ctxos.fillStyle = "#fff";
-            simphiPlayer.app.ctxos.fillText(
-                `DSP:  ${simphiPlayer.stat.curDispStr}`,
-                lineScale * 0.05,
-                simphiPlayer.app.canvasos.height / 2 + lineScale * 2.6
-            );
-            simphiPlayer.app.ctxos.fillText(
-                `AVG:  ${simphiPlayer.stat.avgDispStr}`,
-                lineScale * 0.05,
-                simphiPlayer.app.canvasos.height / 2 + lineScale * 3.1
-            );
-            // ctxos.textBaseline = "alphabetic";
-            // ctxos.textAlign = "center";
-            // stat.combos.forEach((val, idx) => {
-            //   const comboColor = ["#fff", "#0ac3ff", "#f0ed69", "#a0e9fd", "#fe4365"];
-            //   ctxos.fillStyle = comboColor[idx];
-            //   ctxos.fillText(
-            //     val.toString(),
-            //     lineScale * (idx + 0.55) * 1.1,
-            //     canvasos.height - lineScale * 0.1
-            //   );
-            // });
-            const imgBaseLine = n => simphiPlayer.app.hlen - (lineScale * n) / 2;
-            const imgX = n => simphiPlayer.app.wlen + lineScale * (n * 2 - 0.5);
-            simphiPlayer.app.ctxos.drawImage(
-                simphiPlayer.res["Back"],
-                imgX(-1.1),
-                imgBaseLine(1.5),
-                lineScale * 1.5,
-                lineScale * 1.5
-            );
-            simphiPlayer.app.ctxos.drawImage(
-                simphiPlayer.res["Retry"],
-                imgX(0),
-                imgBaseLine(1.25),
-                lineScale * 1.25,
-                lineScale * 1.25
-            );
-            simphiPlayer.app.ctxos.drawImage(
-                simphiPlayer.res["Resume"],
-                imgX(1),
-                imgBaseLine(1.5),
-                lineScale * 1.5,
-                lineScale * 1.5
-            );
-            if (shared.game.ptmain.playConfig.practiseMode) {
-                simphiPlayer.app.ctxos.font = `${lineScale * 0.5}px Saira`;
-                simphiPlayer.app.ctxos.fillStyle = "#fff";
-                simphiPlayer.app.ctxos.textAlign = "center";
-                simphiPlayer.app.ctxos.textBaseline = "middle";
-                simphiPlayer.app.ctxos.fillText(
-                    "00:00.000",
-                    simphiPlayer.app.wlen * 0.25,
-                    simphiPlayer.app.hlen + lineScale * 4.25
-                );
-                simphiPlayer.app.ctxos.fillText(
-                    time2Str(simphiPlayer.timeInfo.duration, true),
-                    simphiPlayer.app.wlen * 1.75,
-                    simphiPlayer.app.hlen + lineScale * 4.25
-                );
-                const progress =
-                    (simphiPlayer.qwqwq
-                        ? simphiPlayer.timeInfo.duration - simphiPlayer.timeInfo.timeBgm
-                        : simphiPlayer.timeInfo.timeBgm) / simphiPlayer.timeInfo.duration;
-                simphiPlayer.app.ctxos.fillText(
-                    time2Str(
-                        simphiPlayer.qwqwq
-                            ? simphiPlayer.timeInfo.duration - simphiPlayer.timeInfo.timeBgm
-                            : simphiPlayer.timeInfo.timeBgm,
-                        true
-                    ),
-                    simphiPlayer.app.wlen * (0.25 + 1.5 * progress),
-                    simphiPlayer.app.hlen + lineScale * 2
-                );
-                drawRoundRect(
-                    simphiPlayer.app.ctxos,
-                    simphiPlayer.app.wlen * 1.5 + lineScale * 2.5,
-                    simphiPlayer.app.hlen - lineScale * 0.5,
-                    lineScale * 0.6,
-                    lineScale * 0.6,
-                    lineScale * 0.1
-                ).fill();
-                drawRoundRect(
-                    simphiPlayer.app.ctxos,
-                    simphiPlayer.app.wlen * 1.5 + lineScale * 3.4,
-                    simphiPlayer.app.hlen - lineScale * 0.5,
-                    lineScale * 0.6,
-                    lineScale * 0.6,
-                    lineScale * 0.1
-                ).fill();
-                simphiPlayer.app.ctxos.textAlign = "left";
-                simphiPlayer.app.ctxos.fillText(
-                    `Speed: ${simphiPlayer.app.speed.toFixed(3)}`,
-                    simphiPlayer.app.wlen + lineScale * 4,
-                    simphiPlayer.app.hlen - lineScale * 0.25
-                );
-                simphiPlayer.app.ctxos.fillRect(
-                    simphiPlayer.app.wlen + lineScale * 4,
-                    simphiPlayer.app.hlen + lineScale * 0.25,
-                    simphiPlayer.app.wlen * 0.5,
-                    lineScale * 0.1
-                );
-                simphiPlayer.app.ctxos.fillStyle = "#000";
-                simphiPlayer.app.ctxos.textAlign = "center";
-                simphiPlayer.app.ctxos.fillText(
-                    "-",
-                    simphiPlayer.app.wlen * 1.5 + lineScale * 2.8,
-                    simphiPlayer.app.hlen - lineScale * 0.25
-                );
-                simphiPlayer.app.ctxos.fillText(
-                    "+",
-                    simphiPlayer.app.wlen * 1.5 + lineScale * 3.7,
-                    simphiPlayer.app.hlen - lineScale * 0.2
-                );
-                simphiPlayer.app.ctxos.fillStyle = "#a9a9a9";
-                simphiPlayer.app.ctxos.fillRect(
-                    simphiPlayer.app.wlen * 0.25,
-                    simphiPlayer.app.hlen + lineScale * 2.5,
-                    simphiPlayer.app.wlen * 1.5,
-                    lineScale * 1.25
-                );
-                simphiPlayer.app.ctxos.fillStyle = "deepskyblue";
-                simphiPlayer.app.ctxos.fillRect(
-                    simphiPlayer.app.wlen * (0.25 + 1.5 * progress),
-                    simphiPlayer.app.hlen + lineScale * 2.25,
-                    lineScale * 0.1,
-                    lineScale * 1.5
-                );
-                simphiPlayer.app.ctxos.fillRect(
-                    simphiPlayer.app.wlen +
-                        lineScale * 3.9 +
-                        simphiPlayer.app.wlen *
-                            0.5 *
-                            Math.min((simphiPlayer.app.speed - 0.5) / 1.5, 1),
-                    simphiPlayer.app.hlen + lineScale * 0.15,
-                    lineScale * 0.1,
-                    lineScale * 0.3
-                );
-            }
-        }
-    }
-    simphiPlayer.app.ctxos.fillStyle = "#fff";
-    if (simphiPlayer.app.pauseTime) {
-        simphiPlayer.app.ctxos.font = `${lineScale * 2}px Saira`;
-        simphiPlayer.app.ctxos.fillStyle = "#FFF";
-        simphiPlayer.app.ctxos.globalAlpha = 1;
-        simphiPlayer.app.ctxos.textAlign = "center";
-        simphiPlayer.app.ctxos.textBaseline = "middle";
-        simphiPlayer.app.ctxos.fillText(
-            simphiPlayer.app.pauseTime,
-            simphiPlayer.app.canvasos.width / 2,
-            simphiPlayer.app.canvasos.height / 2
-        );
-    }
-}
 
 class ScaledNote {
     constructor(img, scale, compacted) {
@@ -2128,24 +1161,6 @@ class ScaledNote {
             this.tail = (ctx, offset) => ctx.drawImage(img, dx, offset - dh - dy, dw, dh);
         }
     }
-}
-//调节画面尺寸和全屏相关(返回source播放aegleseeker会出现迷之error)
-function adjustSize(source, dest, scale) {
-    const { width: sw, height: sh } = source;
-    const { width: dw, height: dh } = dest;
-    if (dw * sh > dh * sw)
-        return [
-            (dw * (1 - scale)) / 2,
-            (dh - ((dw * sh) / sw) * scale) / 2,
-            dw * scale,
-            ((dw * sh) / sw) * scale,
-        ];
-    return [
-        (dw - ((dh * sw) / sh) * scale) / 2,
-        (dh * (1 - scale)) / 2,
-        ((dh * sw) / sh) * scale,
-        dh * scale,
-    ];
 }
 
 //html交互(WIP)
@@ -2188,7 +1203,7 @@ $id("select-volume").addEventListener("change", evt => {
     const volume = Number(evt.target.value);
     simphiPlayer.app.musicVolume = Math.min(1, 1 / volume);
     simphiPlayer.app.soundVolume = Math.min(1, volume);
-    Promise.resolve().then(qwqPause).then(qwqPause);
+    Promise.resolve().then(simphiPlayer.pause).then(simphiPlayer.pause);
 });
 // TODO
 const lowRes = $id("lowRes");
@@ -2200,7 +1215,6 @@ const enableFR = $id("enableFR");
 enableVP.addEventListener("change", evt => (simphiPlayer.app.enableVP = evt.target.checked));
 enableFR.addEventListener("change", evt => (simphiPlayer.app.enableFR = evt.target.checked));
 simphiPlayer.app.playMode = 0;
-const showTransition = $id("showTransition");
 lowRes.addEventListener("change", evt => {
     simphiPlayer.app.setLowResFactor(
         evt.target.checked ? (window.devicePixelRatio < 2 ? 0.85 : 0.5) : 1
@@ -2257,7 +1271,7 @@ simphiPlayer.btnPlay.addEventListener("click", async function () {
 });
 simphiPlayer.btnPause.addEventListener("click", async function () {
     if (this.classList.contains("disabled")) return;
-    await qwqPause();
+    await simphiPlayer.pause();
 });
 simphiPlayer.status2.reg(simphiPlayer.emitter, "change", _ =>
     simphiPlayer.qwqwq ? "Reversed" : ""
@@ -2305,7 +1319,7 @@ async function qwqStop() {
         simphiPlayer.animationInfo.isOutStart = false;
         simphiPlayer.animationInfo.isOutEnd = false;
         simphiPlayer.timeInfo.timeBgm = 0;
-        if (!showTransition.checked) simphiPlayer.animationTimer.in.addTime(3e3);
+        if (!simphiPlayer.showTransition.checked) simphiPlayer.animationTimer.in.addTime(3e3);
         simphiPlayer.stage.resize();
         simphiPlayer.frameAnimater.start();
         simphiPlayer.animationTimer.in.play();
@@ -2317,7 +1331,7 @@ async function qwqStop() {
         audio.stop();
         simphiPlayer.frameAnimater.stop();
         //清除原有数据
-        resultPageData = false;
+        simphiPlayer.resultPageData = false;
         simphiPlayer.fucktemp2 = null;
         if (simphiPlayer.app.pauseNextTick)
             clearInterval(simphiPlayer.app.pauseNextTick),
@@ -2333,95 +1347,6 @@ async function qwqStop() {
         simphiPlayer.timeInfo.curTime_ms = 0;
         simphiPlayer.timeInfo.duration = 0;
         for (const i of simphiPlayer.end.values()) await i();
-    }
-}
-async function qwqPause() {
-    if (simphiPlayer.btnPause.classList.contains("disabled") || !simphiPlayer.tmps.canPause) return;
-    if (simphiPlayer.emitter.eq("stop") || resultPageData) return;
-    simphiPlayer.btnPause.classList.add("disabled");
-    if (simphiPlayer.emitter.eq("play")) {
-        if (simphiPlayer.app.bgVideo) simphiPlayer.app.bgVideo.pause();
-        simphiPlayer.app.pauseBackgroundDimPara1 = null;
-        simphiPlayer.animationTimer.in.pause();
-        if (showTransition.checked && simphiPlayer.animationInfo.isOutStart)
-            simphiPlayer.animationTimer.out.pause();
-        simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.timeBgm;
-        audio.stop();
-        simphiPlayer.emitter.emit("pause");
-        simphiPlayer.btnPause.classList.remove("disabled");
-    } else {
-        if (shared.game.ptmain.playConfig.mode === "preview") {
-            clearInterval(simphiPlayer.app.pauseNextTick);
-            if (simphiPlayer.app.bgVideo)
-                await playVideo(
-                    simphiPlayer.app.bgVideo,
-                    simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
-                );
-            simphiPlayer.animationTimer.in.play();
-            if (showTransition.checked && simphiPlayer.animationInfo.isOutStart)
-                simphiPlayer.animationTimer.out.play();
-            if (simphiPlayer.animationInfo.isInEnd && !simphiPlayer.animationInfo.isOutStart)
-                playBgm(
-                    simphiPlayer.app.bgMusic,
-                    simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
-                );
-            simphiPlayer.emitter.emit("play");
-            simphiPlayer.btnPause.classList.remove("disabled");
-            return;
-        }
-        simphiPlayer.app.pauseTime = 3;
-        simphiPlayer.app.pauseBackgroundDimPara1 = performance.now();
-        simphiPlayer.app.pauseNextTick = setInterval(async () => {
-            simphiPlayer.app.pauseTime--;
-            if (simphiPlayer.app.pauseTime <= 0) {
-                simphiPlayer.app.pauseTime = 0;
-                clearInterval(simphiPlayer.app.pauseNextTick);
-                simphiPlayer.app.pauseNextTick = null;
-                simphiPlayer.app.pauseBackgroundDimPara1 = Infinity;
-                if (
-                    !shared.game.ptmain.gameConfig.reviewWhenResume ||
-                    simphiPlayer.timeInfo.curTime <= 3
-                ) {
-                    if (simphiPlayer.app.bgVideo)
-                        await playVideo(
-                            simphiPlayer.app.bgVideo,
-                            simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
-                        );
-                    simphiPlayer.animationTimer.in.play();
-                    if (showTransition.checked && simphiPlayer.animationInfo.isOutStart)
-                        simphiPlayer.animationTimer.out.play();
-                    if (
-                        simphiPlayer.animationInfo.isInEnd &&
-                        !simphiPlayer.animationInfo.isOutStart
-                    )
-                        playBgm(
-                            simphiPlayer.app.bgMusic,
-                            simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
-                        );
-                    simphiPlayer.emitter.emit("play");
-                }
-                simphiPlayer.btnPause.classList.remove("disabled");
-            }
-        }, 1000);
-        if (shared.game.ptmain.gameConfig.reviewWhenResume && simphiPlayer.timeInfo.curTime > 3) {
-            if (simphiPlayer.timeInfo.curTime > 3)
-                simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime -= 3;
-            if (simphiPlayer.app.bgVideo)
-                await playVideo(
-                    simphiPlayer.app.bgVideo,
-                    simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
-                );
-            simphiPlayer.animationTimer.in.play();
-            if (showTransition.checked && simphiPlayer.animationInfo.isOutStart)
-                simphiPlayer.animationTimer.out.play();
-            if (simphiPlayer.animationInfo.isInEnd && !simphiPlayer.animationInfo.isOutStart)
-                playBgm(
-                    simphiPlayer.app.bgMusic,
-                    simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
-                );
-            simphiPlayer.emitter.emit("play");
-            simphiPlayer.btnPause.classList.add("disabled");
-        }
     }
 }
 simphiPlayer.stat = simphiPlayer.stat;
@@ -2489,19 +1414,19 @@ simphiPlayer.chartsMD5 = simphiPlayer.chartData.chartsMD5;
 simphiPlayer.noteRender = simphiPlayer.noteRender;
 simphiPlayer.ZipReader = ZipReader;
 simphiPlayer.qwq = simphiPlayer.qwq;
-simphiPlayer.pause = () => simphiPlayer.emitter.eq("play") && qwqPause();
+simphiPlayer.pauseHook = () => simphiPlayer.emitter.eq("play") && simphiPlayer.pause();
 shared.game.simphiPlugins = { videoRecorder };
 Object.defineProperty(simphiPlayer, "time", {
     get: () => simphiPlayer.timeInfo.timeBgm,
     set: async v => {
-        if (simphiPlayer.emitter.eq("stop") || resultPageData) return;
+        if (simphiPlayer.emitter.eq("stop") || simphiPlayer.resultPageData) return;
         const isPlaying = simphiPlayer.emitter.eq("play");
-        if (isPlaying) await qwqPause();
+        if (isPlaying) await simphiPlayer.pause();
         simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.timeBgm = v;
         // app.notes.forEach(a => { a.status = 0;
         // 	a.scored = 0;
         // 	a.holdStatus = 1; });
         // stat.reset();
-        if (isPlaying) await qwqPause();
+        if (isPlaying) await simphiPlayer.pause();
     },
 });

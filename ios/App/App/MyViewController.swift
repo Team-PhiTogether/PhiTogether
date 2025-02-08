@@ -26,7 +26,7 @@ class MyViewController: CAPBridgeViewController {
     @objc func applicationWillResignActive(notification: NSNotification) {
         if(self.isViewLoaded && (self.view.window != nil) && (self.webView != nil)) {
 //            if ((self.webView?.url?.absoluteString ??  "").contains("phitogether.fun")) {
-                self.webView?.evaluateJavaScript("hook.pause('exited')", completionHandler: nil)
+                self.webView?.evaluateJavaScript("hook.pauseHook('exited')", completionHandler: nil)
 //            }
         }
         }

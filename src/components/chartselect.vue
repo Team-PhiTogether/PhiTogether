@@ -1095,10 +1095,7 @@
                                                 @click="toRank(chart)" :value="$t('chartSelect.rankings')"> -->
                                                 <input
                                                     type="button"
-                                                    @click="
-                                                        loadChart(chart);
-                                                        console.log(chart);
-                                                    "
+                                                    @click="loadChart(chart)"
                                                     :value="$t('chartSelect.select')"
                                                     style="margin-right: 8px"
                                                 />

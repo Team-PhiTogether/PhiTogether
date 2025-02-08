@@ -56,7 +56,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onPause() {
         super.onPause();
-        webView.evaluateJavascript("javascript:hook.pause();", null);
+        webView.evaluateJavascript("javascript:hook.pauseHook();", null);
     }
 
     @Override

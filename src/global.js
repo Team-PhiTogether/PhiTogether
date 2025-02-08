@@ -103,7 +103,6 @@ router.beforeEach((to, from) => {
         .toUpperCase();
     if (!["/chartSelect"].includes(to.path)) document.querySelector("#app").scrollTop = 0;
     let s;
-    console.log(to.path);
     switch (to.path) {
         case "/chartUpload":
             s = document.getElementById("select2");
@@ -810,7 +809,7 @@ const ptAppInstance = createApp({
         },
         async playerLoaded() {
             // add lchzh pause
-            self.hook.pause = this.ptAppPause;
+            self.hook.pauseHook = this.ptAppPause;
             // 恢复保存的设置并使其生效
             await ptdb.gameConfig
                 .get()
@@ -1281,15 +1280,6 @@ const ptAppInstance = createApp({
             this.externalHooks.chartLoaded && this.externalHooks.chartLoaded(songInfo, chartInfo);
         },
         loadChart(songInfo, chartInfo, callback) {
-            console.log(
-                "songInfo: ",
-                songInfo,
-                "chartInfo: ",
-                chartInfo,
-                "callback: ",
-                callback,
-                "-> loadChart"
-            );
             if (!this.afterSimphiLoadedHook) {
                 loadHandler.l(this.$t("loadChart.simphiLoading"), "simphiloading");
                 return (this.afterSimphiLoadedHook = () =>
