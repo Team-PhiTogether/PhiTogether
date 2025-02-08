@@ -11,7 +11,7 @@ export default function () {
         import("./reverse.js");
     })();
     simphiPlayer.before.set(flag0, () => {
-        const md5 = simphiPlayer.chartsMD5.get(simphiPlayer.selectchart.value);
+        const md5 = simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value);
         // console.log(simphiPlayer.tmps.name);
         const hashDF = [
             "cdb5987ad81b70e3dc96153af2efaa61",

@@ -14,13 +14,13 @@ export default async function saveAdjustedChart(app, fucktemp2) {
     const loadedChartMeta = JSON.parse(sessionStorage.getItem("loadedChart"));
     if (!loadedChartMeta || loadedChartMeta.isFromURL) downloadRPE(app);
     else {
-        if (typeof app.chart.offset !== "number" || !simphiPlayer.chartsMD5.get(simphiPlayer.selectchart.value))
+        if (typeof app.chart.offset !== "number" || !simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value))
             shared.game.msgHandler.sendMessage(
                 shared.game.ptmain.$t("simphi.adjustOffset.errorWhenSavingOffset"),
                 "error"
             );
         const savedChartOffsets = await ptdb.gameConfig.get("savedChartOffsets", {});
-        savedChartOffsets[simphiPlayer.chartsMD5.get(simphiPlayer.selectchart.value)] = app.chart.offset;
+        savedChartOffsets[simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value)] = app.chart.offset;
         await ptdb.gameConfig.save(savedChartOffsets, "savedChartOffsets");
         shared.game.msgHandler.sendMessage(
             shared.game.ptmain.$t("simphi.adjustOffset.offsetSaved"),

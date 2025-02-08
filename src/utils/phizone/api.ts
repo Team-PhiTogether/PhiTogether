@@ -4,7 +4,7 @@ import { PZUserBasicInfo, PZUserTokenInfo, PZPlayConfig } from "./userInfo.type"
 import { SongMeta, SongMetav2, ChartMeta, ChartMetav2 } from "../ptmain/types/SongAndChartMeta";
 import { ChartAsset } from "../ptdb/charts";
 import * as apiErrProcessor from "./apiErrProcessor";
-import { TmodifiedMeta, TmodifiedWindow } from "../ptmain/types/modifiedWindow";
+import { TmodifiedWindow } from "../ptmain/types/modifiedWindow";
 import { simphiPlayer } from "@renderers/sim-phi/playerMain";
 
 enum API_PATH {

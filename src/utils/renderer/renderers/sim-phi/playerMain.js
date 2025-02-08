@@ -1260,7 +1260,7 @@ simphiPlayer.stat = simphiPlayer.stat;
 self.hook = simphiPlayer;
 const flag0 = "flag{\x71w\x71}";
 simphiPlayer.before.set(flag0, () => {
-    const md5 = simphiPlayer.chartsMD5.get(simphiPlayer.selectchart.value);
+    const md5 = simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value);
     const hashDF = [
         "cdb5987ad81b70e3dc96153af2efaa61",
         "86d23af0cc595a703241536a2d29ee4b",
@@ -1305,14 +1305,9 @@ const enableFilter = $id("enableFilter");
     enableFilter.dispatchEvent(new Event("change"));
 })();
 
-simphiPlayer.res = simphiPlayer.res;
-simphiPlayer.audio = audio;
-simphiPlayer.msgHandler = msgHandler;
-
 simphiPlayer.qwqEnd = simphiPlayer.animationTimer.end;
 simphiPlayer.bgms = simphiPlayer.chartData.bgms;
 simphiPlayer.oriBuffers = simphiPlayer.chartData.oriBuffers;
 simphiPlayer.selectbgm = simphiPlayer.selectbgm;
 simphiPlayer.selectchart = simphiPlayer.selectchart;
-simphiPlayer.chartsMD5 = simphiPlayer.chartData.chartsMD5;
 simphiPlayer.pauseHook = () => simphiPlayer.emitter.eq("play") && simphiPlayer.pause();
