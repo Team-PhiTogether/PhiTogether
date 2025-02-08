@@ -1,6 +1,7 @@
 import shared from "@utils/js/shared.js";
 import ptdb from "@utils/ptdb";
 import { downloadText } from "@utils/js/fileSaver.js";
+import { simphiPlayer } from "../playerMain";
 
 export default async function saveAdjustedChart(app, fucktemp2) {
     if (
@@ -13,13 +14,13 @@ export default async function saveAdjustedChart(app, fucktemp2) {
     const loadedChartMeta = JSON.parse(sessionStorage.getItem("loadedChart"));
     if (!loadedChartMeta || loadedChartMeta.isFromURL) downloadRPE(app);
     else {
-        if (typeof app.chart.offset !== "number" || !hook.chartsMD5.get(hook.selectchart.value))
+        if (typeof app.chart.offset !== "number" || !simphiPlayer.chartsMD5.get(simphiPlayer.selectchart.value))
             shared.game.msgHandler.sendMessage(
                 shared.game.ptmain.$t("simphi.adjustOffset.errorWhenSavingOffset"),
                 "error"
             );
         const savedChartOffsets = await ptdb.gameConfig.get("savedChartOffsets", {});
-        savedChartOffsets[hook.chartsMD5.get(hook.selectchart.value)] = app.chart.offset;
+        savedChartOffsets[simphiPlayer.chartsMD5.get(simphiPlayer.selectchart.value)] = app.chart.offset;
         await ptdb.gameConfig.save(savedChartOffsets, "savedChartOffsets");
         shared.game.msgHandler.sendMessage(
             shared.game.ptmain.$t("simphi.adjustOffset.offsetSaved"),
@@ -35,7 +36,7 @@ function downloadRPE(app) {
         dlfilename = `${app.chart.chartRPE.META.id}_adjusted.json`;
     } else if (app.chart.chartPec) {
         text4dl = modifyFirstLine(app.chart.chartPec, (app.chart.offset * 1e3 + 175).toFixed(0));
-        dlfilename = `Chart_${inputName.value}_adjusted.pec`;
+        dlfilename = `Chart_${simphiPlayer.inputName.value}_adjusted.pec`;
     } else
         return shared.game.msgHandler.sendMessage(
             shared.game.ptmain.$t("simphi.adjustOffset.onlyRPESupport"),

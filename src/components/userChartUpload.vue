@@ -5,6 +5,7 @@
     import shared from "../utils/js/shared.js";
     import { checkLocalChart } from "../utils/ptdb/charts";
     import ploading from "@utils/js/ploading.js";
+    import { simphiPlayer } from "@renderers/simphiPlayer";
     export default {
         name: "chartupload",
         data() {
@@ -64,7 +65,7 @@
                 selectDifficulty.value = this.$route.query.level || "";
                 selectLevel.value = this.$route.query.difficulty || "";
                 shared.game.clearStat();
-                hook.uploader.reset();
+                simphiPlayer.uploader.reset();
                 $id("extraResource").value = "";
                 this.extraResource = null;
             },
@@ -79,7 +80,7 @@
                 const inputIllustrator = $id("input-illustrator");
                 const selectDifficulty = $id("select-difficulty");
                 const selectLevel = $id("select-level");
-                if (hook.chartsMD5.size > 1) {
+                if (simphiPlayer.chartsMD5.size > 1) {
                     shared.game.msgHandler.sendMessage(
                         this.$t("userChartUpload.err.haveMultipleCharts"),
                         "error"
@@ -135,7 +136,7 @@
                 }
 
                 // 拼接url
-                const md5 = hook.chartsMD5.get(hook.selectchart.value);
+                const md5 = simphiPlayer.chartsMD5.get(simphiPlayer.selectchart.value);
 
                 // 校验
                 if (this.target && md5 !== this.target) {
@@ -155,9 +156,9 @@
                     return;
                 }
 
-                const selectedChart = hook.oriBuffers.get(selectchart.value);
-                const selectedBg = hook.oriBuffers.get(selectbg.value);
-                const selectedBgm = hook.oriBuffers.get(selectbgm.value);
+                const selectedChart = simphiPlayer.oriBuffers.get(selectchart.value);
+                const selectedBg = simphiPlayer.oriBuffers.get(selectbg.value);
+                const selectedBgm = simphiPlayer.oriBuffers.get(selectbgm.value);
 
                 const mimeTable = {
                     mp3: "audio/mpeg",
@@ -226,7 +227,7 @@
                             };
                             if (this.extraResource) {
                                 shared.game.userChartUploaded = goNext;
-                                hook.uploader.fireLoad({ name: "assets.zip" }, this.extraResource);
+                                simphiPlayer.uploader.fireLoad({ name: "assets.zip" }, this.extraResource);
                             } else goNext();
                         }
                     });

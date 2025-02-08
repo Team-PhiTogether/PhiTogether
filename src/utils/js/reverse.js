@@ -1,3 +1,5 @@
+import { simphiPlayer } from "@renderers/sim-phi/playerMain";
+
 // 规范判定线事件
 function arrangeLineEvent(events) {
     const oldEvents = JSON.parse(JSON.stringify(events)); // 深拷贝
@@ -182,12 +184,12 @@ class Chart {
 }
 /** @type {Map<AudioBuffer,boolean>|null} */
 let kfcFkXqsVw50 = null;
-hook.before.set("kfcFkXqsVw50", () => {
+simphiPlayer.before.set("kfcFkXqsVw50", () => {
     if (!(kfcFkXqsVw50 instanceof Map)) return;
-    const /** @type {AudioBuffer} */ bgm = hook.bgms.get(hook.selectbgm.value).audio;
+    const /** @type {AudioBuffer} */ bgm = simphiPlayer.bgms.get(simphiPlayer.selectbgm.value).audio;
     for (let i = 0; i < bgm.numberOfChannels; i++) bgm.getChannelData(i).reverse();
-    kfcFkXqsVw50.set(bgm, (hook.awawa = !kfcFkXqsVw50.get(bgm)));
-    hook.modify = hook.awawa ? a => reverse(a, bgm.duration) : a => a;
+    kfcFkXqsVw50.set(bgm, (simphiPlayer.awawa = !kfcFkXqsVw50.get(bgm)));
+    simphiPlayer.modify = simphiPlayer.awawa ? a => reverse(a, bgm.duration) : a => a;
 });
 /**
  *
@@ -315,7 +317,7 @@ function longPress(elem, activeFn, doneFn, failFn) {
         tt,
         revolveWorld,
         () => {
-            hook.fireModal("<p>Tip</p>", "<p>Reverse Mode is on...</p>");
+            simphiPlayer.fireModal("<p>Tip</p>", "<p>Reverse Mode is on...</p>");
             kfcFkXqsVw50 = new Map();
             setInterval(revolveWorld, 20);
         },

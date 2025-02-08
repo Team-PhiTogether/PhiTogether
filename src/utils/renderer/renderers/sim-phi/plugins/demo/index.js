@@ -1,4 +1,6 @@
 import { decodeAlt } from "@utils/imgAny";
+import { simphiPlayer } from "../../playerMain.js";
+import { audio } from "@utils/js/aup"
 const $id = query => document.getElementById(query);
 const $ = query => document.body.querySelector(query);
 const flag0 = "flag{\x71w\x71}";
@@ -8,20 +10,20 @@ export default function () {
         if (t.getDate() !== 1 || t.getMonth() !== 3) return;
         import("./reverse.js");
     })();
-    hook.before.set(flag0, () => {
-        const md5 = hook.chartsMD5.get(hook.selectchart.value);
-        // console.log(hook.tmps.name);
+    simphiPlayer.before.set(flag0, () => {
+        const md5 = simphiPlayer.chartsMD5.get(simphiPlayer.selectchart.value);
+        // console.log(simphiPlayer.tmps.name);
         const hashDF = [
             "cdb5987ad81b70e3dc96153af2efaa61",
             "86d23af0cc595a703241536a2d29ee4b",
             "f5f8c244d317006103b67e1cdf6eb85b",
             "0e8ff64e65bf35382e30f980b5eec041",
         ];
-        if (md5 === "ab9d2cc3eb569236ead459ad4caba109") hook.now.set(flag0, loadModYukiOri());
-        else if (hashDF.includes(md5) && hook.inputName.value === "Distorted Fate ")
-            import("./DFLevelEffect.js").then(({ loadMod }) => hook.now.set(flag0, loadMod()));
-        // else import('./321LevelEffect.js').then(({ loadMod }) => hook.now.set(flag0, loadMod()));
-        else hook.now.delete(flag0);
+        if (md5 === "ab9d2cc3eb569236ead459ad4caba109") simphiPlayer.now.set(flag0, loadModYukiOri());
+        else if (hashDF.includes(md5) && simphiPlayer.inputName.value === "Distorted Fate ")
+            import("./DFLevelEffect.js").then(({ loadMod }) => simphiPlayer.now.set(flag0, loadMod()));
+        // else import('./321LevelEffect.js').then(({ loadMod }) => simphiPlayer.now.set(flag0, loadMod()));
+        else simphiPlayer.now.delete(flag0);
     });
     const id = setInterval(() => {
         if (!$(".title>small")) return;
@@ -38,11 +40,11 @@ export default function () {
                     btn.onclick = null;
                     btn.remove();
                     const handler = img =>
-                        hook.uploader.fireLoad({ name: "demo.zip" }, decodeAlt(img));
+                        simphiPlayer.uploader.fireLoad({ name: "demo.zip" }, decodeAlt(img));
                     const xhr = new XMLHttpRequest();
                     xhr.open("GET", "//i0.hdslb.com/bfs/music/1682346166.jpg", true);
                     xhr.responseType = "blob";
-                    xhr.onprogress = evt => hook.uploader.fireProgress(evt.loaded, evt.total);
+                    xhr.onprogress = evt => simphiPlayer.uploader.fireProgress(evt.loaded, evt.total);
                     xhr.onloadend = () => createImageBitmap(xhr.response).then(handler);
                     setNoReferrer(() => xhr.send());
                 };
@@ -59,7 +61,7 @@ export default function () {
 }
 function loadModYukiOri() {
     // console.log("好耶");
-    const analyser = hook.audio.actx.createAnalyser();
+    const analyser = audio.actx.createAnalyser();
     analyser.fftSize = 4096;
     // analyser.minDecibels = -180;
     const getFreq = () => {
@@ -83,28 +85,28 @@ function loadModYukiOri() {
     };
     return time => {
         const time1 = time * 1.95;
-        const bgMusic = hook.tmps.bgMusicHack();
+        const bgMusic = simphiPlayer.tmps.bgMusicHack();
         if (bgMusic && bgMusic !== flagMusic) {
             bgMusic.connect(analyser); // ?
             flagMusic = bgMusic;
         }
         if (time1 < 168) {
-            hook.stat.numOfNotes = 305;
-            hook.tmps.level = "lN\u2002Lv.I2";
-            hook.tmps.progress = time1 / 218;
+            simphiPlayer.stat.numOfNotes = 305;
+            simphiPlayer.tmps.level = "lN\u2002Lv.I2";
+            simphiPlayer.tmps.progress = time1 / 218;
         } else if (time1 < 169) {
             const progress = 1 - (169 - time1) ** 3; // easeCubicOut
-            hook.stat.numOfNotes = (305 + 2195 * progress) | 0;
-            hook.tmps.progress = getFreq();
+            simphiPlayer.stat.numOfNotes = (305 + 2195 * progress) | 0;
+            simphiPlayer.tmps.progress = getFreq();
         } else {
-            hook.stat.numOfNotes = 2500;
-            hook.tmps.progress = getFreq();
+            simphiPlayer.stat.numOfNotes = 2500;
+            simphiPlayer.tmps.progress = getFreq();
         }
         if (time1 > 325 && time1 < 358) {
             // 监听判定变化
-            const statusP = hook.stat.perfect;
-            const statusG = hook.stat.good;
-            const statusB = hook.stat.bad;
+            const statusP = simphiPlayer.stat.perfect;
+            const statusG = simphiPlayer.stat.good;
+            const statusB = simphiPlayer.stat.bad;
             if (isNaN(flagPerfect)) flagPerfect = statusP;
             if (isNaN(flagGood)) flagGood = statusG;
             if (isNaN(flagBad)) flagBad = statusB;
@@ -119,7 +121,7 @@ function loadModYukiOri() {
             else if (time1 > 342 && time1 < 343) setFlag(null, "(\u2299o\u2299)", false);
             else if (time1 > 350 && time1 < 351) setFlag(null, "(\u2299o\u2299)", false);
             else if (!flagN) flagEm = "(\u2299ω\u2299)";
-            hook.tmps.combo = flagEm;
+            simphiPlayer.tmps.combo = flagEm;
         }
     };
 }
