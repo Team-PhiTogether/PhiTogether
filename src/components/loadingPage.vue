@@ -1,5 +1,6 @@
 <script>
     import shared from "../utils/js/shared";
+    import ploading from "@utils/js/ploading.js";
 
     export default {
         name: "loadingPage",
@@ -19,7 +20,7 @@
                     this.animated = true;
                     if (this.loaded) {
                         if (this.$route.path === "/loading") this.$router.replace("/startPage");
-                    } else shared.game.loadHandler.l(this.$t("loadingPage.loadingRes"), "loadRes");
+                    } else ploading.l(this.$t("loadingPage.loadingRes"), "loadRes");
                     return;
                 }
 
@@ -46,7 +47,7 @@
                             () => window.nativeApi && window.nativeApi.antiAddiction_start()
                         );
                 if (this.animated) {
-                    shared.game.loadHandler.r("loadRes");
+                    ploading.r("loadRes");
                     if (this.$route.path === "/loading") this.$router.replace("/startPage");
                 }
             };

@@ -4,6 +4,7 @@
     import { partyMgr } from "@utils/js/partyMgr";
     import ptdb from "@utils/ptdb";
     import { PhiZoneAPI as phizoneApi } from "@utils/phizone";
+    import ploading from "@utils/js/ploading.js";
     export default {
         name: "chartSelect",
         data() {
@@ -163,8 +164,8 @@
         },
         deactivated() {
             audio.stop();
-            shared.game.loadHandler.r();
-            shared.game.loadHandler.r("loadChart");
+            ploading.r();
+            ploading.r("loadChart");
         },
         beforeRouteLeave(to, from, next) {
             this.scrolledTop = document.querySelector("#songSelectList")
@@ -338,7 +339,7 @@
                 }
             },
             async loadPage(url, renew = false) {
-                shared.game.loadHandler.l(this.$t("chartSelect.loadingChartList"));
+                ploading.l(this.$t("chartSelect.loadingChartList"));
                 if (renew) this.page = 1;
                 try {
                     const chartList = await (await fetch(url)).json();
@@ -355,30 +356,30 @@
                     this.beforePagination = this.beforeSearch;
                     this.updatePagination();
                     document.querySelector("#app").scrollTop = 0;
-                    shared.game.loadHandler.r();
+                    ploading.r();
                 } catch {
                     shared.game.msgHandler.sendMessage(this.$t("chartSelect.loadFailed"), "error"),
-                        shared.game.loadHandler.r();
+                        ploading.r();
                     return;
                 }
             },
             async loadPagePZv2(page, renew = false, search) {
-                shared.game.loadHandler.l(this.$t("chartSelect.loadingChartList"));
+                ploading.l(this.$t("chartSelect.loadingChartList"));
                 if (renew) this.page = page = 1;
                 try {
                     const chartList = await phizoneApi.getAllSongsAndChartsAsv1(page, search);
                     this.page = page;
                     this.chartList = chartList;
                     document.querySelector("#app").scrollTop = 0;
-                    shared.game.loadHandler.r();
+                    ploading.r();
                 } catch {
                     shared.game.msgHandler.sendMessage(this.$t("chartSelect.loadFailed"), "error"),
-                        shared.game.loadHandler.r();
+                        ploading.r();
                     return;
                 }
             },
             async loadChapters(url) {
-                shared.game.loadHandler.l(this.$t("chartSelect.loadingChapterList"));
+                ploading.l(this.$t("chartSelect.loadingChapterList"));
                 try {
                     const chapterList = await (
                         await fetch(
@@ -392,10 +393,10 @@
                     document.querySelector("#app").scrollTop = 0;
                     this.selectChapter = 0;
                     this.loadPage(this.chapterList[0].songsListUrls[0], true);
-                    shared.game.loadHandler.r();
+                    ploading.r();
                 } catch {
                     shared.game.msgHandler.sendMessage(this.$t("chartSelect.loadFailed"), "error"),
-                        shared.game.loadHandler.r();
+                        ploading.r();
                     return;
                 }
             },
@@ -415,7 +416,7 @@
                 }
             },
             async loadFavouriteSongs() {
-                shared.game.loadHandler.l(this.$t("chartSelect.loadingChartList"));
+                ploading.l(this.$t("chartSelect.loadingChartList"));
                 this.page = 1;
                 const chartList = {
                     total: 0,
@@ -432,7 +433,7 @@
                     );
                 this.chartList = chartList;
                 document.querySelector("#app").scrollTop = 0;
-                shared.game.loadHandler.r();
+                ploading.r();
             },
             toRank(chart) {
                 if (this.previewAbortController)
@@ -571,14 +572,14 @@
                         shared.game.ptmain.playConfig.mode = "preview";
                     } else shared.game.ptmain.playConfig.mode = "play";
                 } else shared.game.ptmain.playConfig = {};
-                shared.game.loadHandler.l(this.$t("chartSelect.loadingChart"), "loadChart");
+                ploading.l(this.$t("chartSelect.loadingChart"), "loadChart");
                 shared.game.ptmain.loadChart(this.selectedSongData, ct, this.chartLoaded);
             },
             chartLoaded(songInfo, chartInfo) {
                 if (this.$route.path !== "/chartSelect") return;
                 if (shared.game.ptmain.gameMode !== "multi") {
                     this.toSyncOrPlay = 1;
-                    shared.game.loadHandler.r("loadChart");
+                    ploading.r("loadChart");
                     audio.stop();
                     if (this.selectedSongData.unlockVideo)
                         this.showUnlockVideo().then(this.playChart);
@@ -633,7 +634,7 @@
             },
             async multiSyncChart() {
                 try {
-                    shared.game.loadHandler.l(
+                    ploading.l(
                         this.$t("chartSelect.multiSyncChart.sync"),
                         "syncChart"
                     );
@@ -644,7 +645,7 @@
                     );
                     this.toSyncOrPlay = 3;
                 } catch (e) {
-                    shared.game.loadHandler.r("syncChart");
+                    ploading.r("syncChart");
                     shared.game.msgHandler.sendMessage(
                         this.$t("chartSelect.multiSyncChart.failed"),
                         "error"

@@ -1,6 +1,10 @@
 import { audio } from "@utils/js/aup";
 import { imgShader, hex2rgba } from "../assetsProcessor/imgProcessor";
 import ptdb from "@utils/ptdb";
+import { ZipReader } from "../assetsProcessor/reader";
+import { noteRender } from "../renderer/Notes/render";
+import { simphiPlayer } from "../playerMain";
+import ploading from "@utils/js/ploading.js";
 
 //plugin(skin)
 export function loadSkinFromBuffer(buffer, init = false, callback) {
@@ -8,7 +12,7 @@ export function loadSkinFromBuffer(buffer, init = false, callback) {
         try {
             const id = `skin`;
             const files = [];
-            const zip = new hook.ZipReader({
+            const zip = new ZipReader({
                 handler: async data => files.push(data),
             });
             zip.addEventListener("loadstart", () => {});
@@ -46,29 +50,29 @@ export function loadSkinFromBuffer(buffer, init = false, callback) {
                 if (entries.has("Tap")) {
                     const img = await createImageBitmap(new Blob([entries.get("Tap").buffer]));
                     const noteScale = 1089 / img.width;
-                    hook.noteRender.update("Tap", img, noteScale);
+                    noteRender.update("Tap", img, noteScale);
                     if (entries.has("TapHL")) {
-                        hook.noteRender.update(
+                        noteRender.update(
                             "TapHL",
                             await createImageBitmap(new Blob([entries.get("TapHL").buffer])),
                             noteScale
                         );
                     } else {
-                        hook.noteRender.update("TapHL", img, noteScale);
+                        noteRender.update("TapHL", img, noteScale);
                     }
                 }
                 if (entries.has("Drag")) {
                     const img = await createImageBitmap(new Blob([entries.get("Drag").buffer]));
                     const noteScale = 1089 / img.width;
-                    hook.noteRender.update("Drag", img, noteScale);
+                    noteRender.update("Drag", img, noteScale);
                     if (entries.has("DragHL")) {
-                        hook.noteRender.update(
+                        noteRender.update(
                             "DragHL",
                             await createImageBitmap(new Blob([entries.get("DragHL").buffer])),
                             noteScale
                         );
                     } else {
-                        hook.noteRender.update("DragHL", img, noteScale);
+                        noteRender.update("DragHL", img, noteScale);
                     }
                 }
                 if (entries.has("Hold")) {
@@ -76,13 +80,13 @@ export function loadSkinFromBuffer(buffer, init = false, callback) {
                     const noteScale = 1089 / img.width;
                     const [bottom, top] = config.holdAtlas;
                     const compacted = config.holdCompact;
-                    hook.noteRender.update(
+                    noteRender.update(
                         "HoldEnd",
                         await createImageBitmap(img, 0, 0, img.width, bottom),
                         noteScale,
                         compacted
                     );
-                    hook.noteRender.update(
+                    noteRender.update(
                         "Hold",
                         await createImageBitmap(
                             img,
@@ -94,7 +98,7 @@ export function loadSkinFromBuffer(buffer, init = false, callback) {
                         noteScale,
                         compacted
                     );
-                    hook.noteRender.update(
+                    noteRender.update(
                         "HoldHead",
                         await createImageBitmap(img, 0, img.height - top, img.width, top),
                         noteScale,
@@ -106,13 +110,13 @@ export function loadSkinFromBuffer(buffer, init = false, callback) {
                         );
                         const [bottom2, top2] =
                             config.holdAtlasHL || config.holdAtlasMH || config.holdAtlas;
-                        hook.noteRender.update(
+                        noteRender.update(
                             "HoldEndHL",
                             await createImageBitmap(img2, 0, 0, img2.width, bottom2),
                             noteScale,
                             compacted
                         );
-                        hook.noteRender.update(
+                        noteRender.update(
                             "HoldHL",
                             await createImageBitmap(
                                 img2,
@@ -124,20 +128,20 @@ export function loadSkinFromBuffer(buffer, init = false, callback) {
                             noteScale,
                             compacted
                         );
-                        hook.noteRender.update(
+                        noteRender.update(
                             "HoldHeadHL",
                             await createImageBitmap(img2, 0, img2.height - top2, img2.width, top2),
                             noteScale,
                             compacted
                         );
                     } else {
-                        hook.noteRender.update(
+                        noteRender.update(
                             "HoldEndHL",
                             await createImageBitmap(img, 0, 0, img.width, bottom),
                             noteScale,
                             compacted
                         );
-                        hook.noteRender.update(
+                        noteRender.update(
                             "HoldHL",
                             await createImageBitmap(
                                 img,
@@ -149,7 +153,7 @@ export function loadSkinFromBuffer(buffer, init = false, callback) {
                             noteScale,
                             compacted
                         );
-                        hook.noteRender.update(
+                        noteRender.update(
                             "HoldHeadHL",
                             await createImageBitmap(img, 0, img.height - top, img.width, top),
                             noteScale,
@@ -160,15 +164,15 @@ export function loadSkinFromBuffer(buffer, init = false, callback) {
                 if (entries.has("Flick")) {
                     const img = await createImageBitmap(new Blob([entries.get("Flick").buffer]));
                     const noteScale = 1089 / img.width;
-                    hook.noteRender.update("Flick", img, noteScale);
+                    noteRender.update("Flick", img, noteScale);
                     if (entries.has("FlickHL")) {
-                        hook.noteRender.update(
+                        noteRender.update(
                             "FlickHL",
                             await createImageBitmap(new Blob([entries.get("FlickHL").buffer])),
                             noteScale
                         );
                     } else {
-                        hook.noteRender.update("FlickHL", img, noteScale);
+                        noteRender.update("FlickHL", img, noteScale);
                     }
                 }
                 if (entries.has("HitFX")) {
@@ -177,7 +181,7 @@ export function loadSkinFromBuffer(buffer, init = false, callback) {
                     const scale = (config.hitFxScale || 1.0) / (img.width / x / 256);
                     const hideParts = config.hideParticles || false;
                     const duration = config.hitFxDuration * 1000 || 500;
-                    hook.noteRender.updateFX(
+                    noteRender.updateFX(
                         img,
                         scale,
                         img.width / x,
@@ -188,34 +192,34 @@ export function loadSkinFromBuffer(buffer, init = false, callback) {
                 }
                 // 读取音频
                 if (entries.has("HitSong0"))
-                    hook.res.HitSong0 = await audio.decode(entries.get("HitSong0").buffer.slice(0));
+                    simphiPlayer.res.HitSong0 = await audio.decode(entries.get("HitSong0").buffer.slice(0));
                 if (entries.has("HitSong1"))
-                    hook.res.HitSong1 = await audio.decode(entries.get("HitSong1").buffer.slice(0));
+                    simphiPlayer.res.HitSong1 = await audio.decode(entries.get("HitSong1").buffer.slice(0));
                 if (entries.has("HitSong2"))
-                    hook.res.HitSong2 = await audio.decode(entries.get("HitSong2").buffer.slice(0));
+                    simphiPlayer.res.HitSong2 = await audio.decode(entries.get("HitSong2").buffer.slice(0));
                 if (typeof config.colorPerfect === "string" && config.colorPerfect.startsWith("0x"))
                     config.colorPerfect = `#${config.colorPerfect.slice(2)}`;
                 if (typeof config.colorGood === "string" && config.colorGood.startsWith("0x"))
                     config.colorGood = `#${config.colorGood.slice(2)}`;
-                hook.res["JudgeLineMP"] = await imgShader(
-                    hook.res["JudgeLine"],
+                simphiPlayer.res["JudgeLineMP"] = await imgShader(
+                    simphiPlayer.res["JudgeLine"],
                     config.colorPerfect || "#feffa9"
                 );
-                hook.res["JudgeLineFC"] = await imgShader(
-                    hook.res["JudgeLine"],
+                simphiPlayer.res["JudgeLineFC"] = await imgShader(
+                    simphiPlayer.res["JudgeLine"],
                     config.colorGood || "#a2eeff"
                 );
-                hook.tmps.hitPerfectColor = config.hitFxTinted
+                simphiPlayer.tmps.hitPerfectColor = config.hitFxTinted
                     ? hex2rgba(config.colorPerfect) || null
                     : null;
-                hook.tmps.hitGoodColor = config.hitFxTinted
+                simphiPlayer.tmps.hitGoodColor = config.hitFxTinted
                     ? hex2rgba(config.colorGood) || null
                     : null;
-                hook.tmps.hitFxRotate = config.hitFxRotate;
+                simphiPlayer.tmps.hitFxRotate = config.hitFxRotate;
                 hook.customResourceMeta.author = config.author || "unknown";
                 hook.customResourceMeta.name = config.name || "unknown";
                 hook.customResourceMeta.loaded = true;
-                shared.game.loadHandler.r("loadChart");
+                ploading.r("loadChart");
                 const allConfig = {};
                 for (const i in config) allConfig[i] = config[i];
                 resolve(
@@ -278,21 +282,21 @@ export async function loadSkinFromDB(id) {
     if (skin.files.has("Tap")) {
         const img = await skin.files.get("Tap").file;
         const noteScale = 1089 / img.width;
-        hook.noteRender.update("Tap", img, noteScale);
+        noteRender.update("Tap", img, noteScale);
         if (skin.files.has("TapHL")) {
-            hook.noteRender.update("TapHL", await skin.files.get("TapHL").file, noteScale);
+            noteRender.update("TapHL", await skin.files.get("TapHL").file, noteScale);
         } else {
-            hook.noteRender.update("TapHL", img, noteScale);
+            noteRender.update("TapHL", img, noteScale);
         }
     }
     if (skin.files.has("Drag")) {
         const img = await skin.files.get("Drag").file;
         const noteScale = 1089 / img.width;
-        hook.noteRender.update("Drag", img, noteScale);
+        noteRender.update("Drag", img, noteScale);
         if (skin.files.has("DragHL")) {
-            hook.noteRender.update("DragHL", await skin.files.get("DragHL").file, noteScale);
+            noteRender.update("DragHL", await skin.files.get("DragHL").file, noteScale);
         } else {
-            hook.noteRender.update("DragHL", img, noteScale);
+            noteRender.update("DragHL", img, noteScale);
         }
     }
     if (skin.files.has("Hold")) {
@@ -300,19 +304,19 @@ export async function loadSkinFromDB(id) {
         const noteScale = 1089 / img.width;
         const [bottom, top] = skin.config.holdAtlas;
         const compacted = skin.config.holdCompact;
-        hook.noteRender.update(
+        noteRender.update(
             "HoldEnd",
             await createImageBitmap(img, 0, 0, img.width, bottom),
             noteScale,
             compacted
         );
-        hook.noteRender.update(
+        noteRender.update(
             "Hold",
             await createImageBitmap(img, 0, bottom, img.width, img.height - bottom - top),
             noteScale,
             compacted
         );
-        hook.noteRender.update(
+        noteRender.update(
             "HoldHead",
             await createImageBitmap(img, 0, img.height - top, img.width, top),
             noteScale,
@@ -322,38 +326,38 @@ export async function loadSkinFromDB(id) {
             const img2 = await skin.files.get("HoldHL").file;
             const [bottom2, top2] =
                 skin.config.holdAtlasHL || skin.config.holdAtlasMH || skin.config.holdAtlas;
-            hook.noteRender.update(
+            noteRender.update(
                 "HoldEndHL",
                 await createImageBitmap(img2, 0, 0, img2.width, bottom2),
                 noteScale,
                 compacted
             );
-            hook.noteRender.update(
+            noteRender.update(
                 "HoldHL",
                 await createImageBitmap(img2, 0, bottom2, img2.width, img2.height - bottom2 - top2),
                 noteScale,
                 compacted
             );
-            hook.noteRender.update(
+            noteRender.update(
                 "HoldHeadHL",
                 await createImageBitmap(img2, 0, img2.height - top2, img2.width, top2),
                 noteScale,
                 compacted
             );
         } else {
-            hook.noteRender.update(
+            noteRender.update(
                 "HoldEndHL",
                 await createImageBitmap(img, 0, 0, img.width, bottom),
                 noteScale,
                 compacted
             );
-            hook.noteRender.update(
+            noteRender.update(
                 "HoldHL",
                 await createImageBitmap(img, 0, bottom, img.width, img.height - bottom - top),
                 noteScale,
                 compacted
             );
-            hook.noteRender.update(
+            noteRender.update(
                 "HoldHeadHL",
                 await createImageBitmap(img, 0, img.height - top, img.width, top),
                 noteScale,
@@ -364,11 +368,11 @@ export async function loadSkinFromDB(id) {
     if (skin.files.has("Flick")) {
         const img = await skin.files.get("Flick").file;
         const noteScale = 1089 / img.width;
-        hook.noteRender.update("Flick", img, noteScale);
+        noteRender.update("Flick", img, noteScale);
         if (skin.files.has("FlickHL")) {
-            hook.noteRender.update("FlickHL", await skin.files.get("FlickHL").file, noteScale);
+            noteRender.update("FlickHL", await skin.files.get("FlickHL").file, noteScale);
         } else {
-            hook.noteRender.update("FlickHL", img, noteScale);
+            noteRender.update("FlickHL", img, noteScale);
         }
     }
     if (skin.files.has("HitFX")) {
@@ -377,39 +381,39 @@ export async function loadSkinFromDB(id) {
         const scale = (skin.config.hitFxScale || 1.0) / (img.width / x / 256);
         const hideParts = skin.config.hideParticles || false;
         const duration = skin.config.hitFxDuration * 1000 || 500;
-        hook.noteRender.updateFX(img, scale, img.width / x, img.height / y, hideParts, duration);
+        noteRender.updateFX(img, scale, img.width / x, img.height / y, hideParts, duration);
     }
     // 读取音频
     if (skin.files.has("HitSong0"))
-        hook.res.HitSong0 = await audio.decode(skin.files.get("HitSong0").file);
+        simphiPlayer.res.HitSong0 = await audio.decode(skin.files.get("HitSong0").file);
     if (skin.files.has("HitSong1"))
-        hook.res.HitSong1 = await audio.decode(skin.files.get("HitSong1").file);
+        simphiPlayer.res.HitSong1 = await audio.decode(skin.files.get("HitSong1").file);
     if (skin.files.has("HitSong2"))
-        hook.res.HitSong2 = await audio.decode(skin.files.get("HitSong2").file);
+        simphiPlayer.res.HitSong2 = await audio.decode(skin.files.get("HitSong2").file);
 
     if (typeof skin.config.colorPerfect === "string" && skin.config.colorPerfect.startsWith("0x"))
         skin.config.colorPerfect = `#${skin.config.colorPerfect.slice(2)}`;
     if (typeof skin.config.colorGood === "string" && skin.config.colorGood.startsWith("0x"))
         skin.config.colorGood = `#${skin.config.colorGood.slice(2)}`;
-    hook.res["JudgeLineMP"] = await imgShader(
-        hook.res["JudgeLine"],
+    simphiPlayer.res["JudgeLineMP"] = await imgShader(
+        simphiPlayer.res["JudgeLine"],
         skin.config.colorPerfect || "#feffa9"
     );
-    hook.res["JudgeLineFC"] = await imgShader(
-        hook.res["JudgeLine"],
+    simphiPlayer.res["JudgeLineFC"] = await imgShader(
+        simphiPlayer.res["JudgeLine"],
         skin.config.colorGood || "#a2eeff"
     );
-    hook.tmps.hitPerfectColor = skin.config.hitFxTinted
+    simphiPlayer.tmps.hitPerfectColor = skin.config.hitFxTinted
         ? hex2rgba(skin.config.colorPerfect) || null
         : null;
-    hook.tmps.hitGoodColor = skin.config.hitFxTinted
+    simphiPlayer.tmps.hitGoodColor = skin.config.hitFxTinted
         ? hex2rgba(skin.config.colorGood) || null
         : null;
-    hook.tmps.hitFxRotate = skin.config.hitFxRotate;
+    simphiPlayer.tmps.hitFxRotate = skin.config.hitFxRotate;
     hook.customResourceMeta.author = skin.config.author || "unknown";
     hook.customResourceMeta.name = skin.config.name || "unknown";
     hook.customResourceMeta.loaded = true;
-    shared.game.loadHandler.r("loadChart");
+    ploading.r("loadChart");
     shared.game.msgHandler.sendMessage(
         shared.game.i18n.t("simphi.prprCustomRes.applied"),
         "success"

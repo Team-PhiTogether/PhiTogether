@@ -1,24 +1,16 @@
 import simphi from "./simphi";
 import { audio } from "@utils/js/aup";
 import {
-    full,
     Timer,
-    getConstructorName,
-    isUndefined,
-    frameTimer,
-    time2Str,
-    orientation,
     FrameAnimater,
 } from "@utils/js/common";
 import { checkSupport } from "./utils/checkSupport";
 import { uploader, ZipReader, readFile } from "./assetsProcessor/reader";
 import { InteractProxy } from "@utils/js/interact";
 import shared from "@utils/js/shared";
-// import { recordMgr } from "@components/recordMgr/recordMgr";
-// import { replayMgr } from "@components/recordMgr/replayMgr";
+import ploading from "@utils/js/ploading.js";
 
 import { loadModYukiOri } from "./plugins/aprfools/loadModYukiOri";
-// import saveAdjustedChart from "./plugins/saveAdjustedChart";
 import videoRecorder from "./plugins/video-recorder";
 import { loadSkinFromBuffer, loadSkinFromDB } from "./plugins/skin";
 import { gauge } from "./plugins/gauge.js";
@@ -53,6 +45,8 @@ const $ = query => document.body.querySelector(query);
 const $$ = query => document.body.querySelectorAll(query);
 
 export const simphiPlayer = {
+    plugins: { videoRecorder },
+
     modify: a => a,
     pressTime: 0,
     before: new Map(),
@@ -448,7 +442,7 @@ self.addEventListener("resize", () => simphiPlayer.stage.resize());
         );
         dones[tag] = (dones[tag] || 0) + 1;
         uploader_done = Object.values(dones).reduce((a, b) => a + b, 0);
-        shared.game.loadHandler.l(
+        ploading.l(
             shared.game.i18n.t("simphi.handleFile.loadingFile", { uploader_done, uploader_total }),
             "loadChart"
         );
@@ -1317,28 +1311,8 @@ simphiPlayer.msgHandler = msgHandler;
 
 simphiPlayer.qwqEnd = simphiPlayer.animationTimer.end;
 simphiPlayer.bgms = simphiPlayer.chartData.bgms;
-// main.inputName = inputName;
 simphiPlayer.oriBuffers = simphiPlayer.chartData.oriBuffers;
 simphiPlayer.selectbgm = simphiPlayer.selectbgm;
 simphiPlayer.selectchart = simphiPlayer.selectchart;
 simphiPlayer.chartsMD5 = simphiPlayer.chartData.chartsMD5;
-// shared.game.simphi.chartsMD5 = main.chartsMD5;
-// shared.game.simphi.selectchart = main.selectchart;
-simphiPlayer.ZipReader = ZipReader;
-simphiPlayer.qwq = simphiPlayer.qwq;
 simphiPlayer.pauseHook = () => simphiPlayer.emitter.eq("play") && simphiPlayer.pause();
-shared.game.simphiPlugins = { videoRecorder };
-Object.defineProperty(simphiPlayer, "time", {
-    get: () => simphiPlayer.timeInfo.timeBgm,
-    set: async v => {
-        if (simphiPlayer.emitter.eq("stop") || simphiPlayer.resultPageData) return;
-        const isPlaying = simphiPlayer.emitter.eq("play");
-        if (isPlaying) await simphiPlayer.pause();
-        simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.timeBgm = v;
-        // app.notes.forEach(a => { a.status = 0;
-        // 	a.scored = 0;
-        // 	a.holdStatus = 1; });
-        // stat.reset();
-        if (isPlaying) await simphiPlayer.pause();
-    },
-});

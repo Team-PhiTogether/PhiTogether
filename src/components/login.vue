@@ -1,6 +1,7 @@
 <script>
     import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
     import { TapTapApi } from "../utils/phizone/taptap";
+    import ploading from "@utils/js/ploading.js";
     import shared from "../utils/js/shared.js";
     export default {
         name: "login",
@@ -75,7 +76,7 @@
                             .catch(() => {});
                     })
                     .catch(e => {
-                        shared.game.loadHandler.r();
+                        ploading.r();
                         msgHandler.failure(e);
                     });
             },

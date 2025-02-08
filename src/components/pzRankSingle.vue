@@ -1,10 +1,7 @@
 <script>
     import shared from "../utils/js/shared.js";
     import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
-
-    const $ = query => document.getElementById(query);
-    const $$ = query => document.body.querySelector(query);
-    const $$$ = query => document.body.querySelectorAll(query);
+    import ploading from "@utils/js/ploading.js";
 
     export default {
         name: "pzRankSingle",
@@ -30,7 +27,7 @@
             this.ct = JSON.parse(sessionStorage.getItem("loadedChart"));
 
             try {
-                shared.game.loadHandler.l("正在加载数据...", "loadrecord");
+                ploading.l("正在加载数据...", "loadrecord");
                 const id = this.$route.query.id;
                 this.data = await phizoneApi.getRecords(this.token, id, 1);
                 //const me = this.userInfo.id;
@@ -41,11 +38,11 @@
             } catch (e) {
                 shared.game.msgHandler.sendMessage("加载数据时遇到错误", "error");
             } finally {
-                shared.game.loadHandler.r("loadrecord");
+                ploading.r("loadrecord");
             }
         },
         deactivated() {
-            shared.game.loadHandler.r("loadrecord");
+            ploading.r("loadrecord");
         },
         methods: {
             async goJustPageAsk() {
@@ -63,12 +60,12 @@
                 if (!link) return;
                 link = link.replace(/page=\d+&?/, "") + `&page=${i}`;
                 try {
-                    shared.game.loadHandler.l("正在加载数据...", "loadrecord");
+                    ploading.l("正在加载数据...", "loadrecord");
                     this.data = await phizoneApi.getRecords(this.token, null, null, link);
                     this.page = i;
                 } catch {
                 } finally {
-                    shared.game.loadHandler.r("loadrecord");
+                    ploading.r("loadrecord");
                 }
             },
 
@@ -100,17 +97,17 @@
             },
             async loadNextPage() {
                 try {
-                    shared.game.loadHandler.l("正在加载数据...", "loadrecord");
+                    ploading.l("正在加载数据...", "loadrecord");
                     this.data = await phizoneApi.getRecords(this.token, null, null, this.data.next);
                     this.page++;
                 } catch {
                 } finally {
-                    shared.game.loadHandler.r("loadrecord");
+                    ploading.r("loadrecord");
                 }
             },
             async loadPrevPage() {
                 try {
-                    shared.game.loadHandler.l("正在加载数据...", "loadrecord");
+                    ploading.l("正在加载数据...", "loadrecord");
                     this.data = await phizoneApi.getRecords(
                         this.token,
                         null,
@@ -120,7 +117,7 @@
                     this.page--;
                 } catch {
                 } finally {
-                    shared.game.loadHandler.r("loadrecord");
+                    ploading.r("loadrecord");
                 }
             },
         },

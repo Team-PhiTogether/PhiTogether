@@ -5,6 +5,7 @@ import { recordMgr } from "./recordMgr/recordMgr.js";
 import { checkLocalChart } from "../utils/ptdb/charts";
 import md5 from "md5";
 import { downloadText } from "../utils/js/fileSaver.js";
+import ploading from "@utils/js/ploading.js";
 
 function jitsRenderer(ctx, ctxos, lineScale) {
     if (!shared.game.multiInstance.JITSOpen) return;
@@ -176,13 +177,13 @@ const wsHandler = {
             wsHandler.watchId = null;
         }
         if (shared.game.ptmain.$route.path !== "/playing")
-            shared.game.loadHandler.l(shared.game.ptmain.$t("multiplayer.connection.wsRec"), "wsRec", true);
+            ploading.l(shared.game.ptmain.$t("multiplayer.connection.wsRec"), "wsRec", true);
         setTimeout(() => {
             wsHandler
                 .connect()
                 .then(async () => {
                     wsHandler.watchId = setInterval(wsHandler.watch, wsHandler.watchInterval);
-                    shared.game.loadHandler.r("wsRec");
+                    ploading.r("wsRec");
                     shared.game.msgHandler.sendMessage(shared.game.ptmain.$t("multiplayer.connection.reconnected"));
                     await shared.game.multiInstance.recoverRoomStage();
                 })
@@ -199,7 +200,7 @@ const wsHandler = {
         this.watchId = null;
         this.wsRealClosed = true;
         this.ws.close();
-        shared.game.loadHandler.r("wsRec");
+        ploading.r("wsRec");
     },
     send(action, data = null) {
         return new Promise((resolve, reject) => {
@@ -216,7 +217,7 @@ const wsHandler = {
     watch() {
         if (wsHandler.wsTimeout++ > 2) {
             if (shared.game.ptmain.$route.path !== "/playing")
-                shared.game.loadHandler.l(shared.game.ptmain.$t("multiplayer.connection.wsRec"), "wsRec", true);
+                ploading.l(shared.game.ptmain.$t("multiplayer.connection.wsRec"), "wsRec", true);
 
             wsHandler.ws.close();
             wsHandler.wsTimeout = 0;
@@ -494,8 +495,8 @@ export default {
                     shared.game.ptmain.$t("multiplayer.recoverMultiFailed")
                 );
                 localStorage.removeItem("lastMultiInfo");
-                shared.game.loadHandler.r("recoverMulti");
-                shared.game.loadHandler.r("wsRec");
+                ploading.r("recoverMulti");
+                ploading.r("wsRec");
             }
             shared.game.ptmain.gameMode = "multi";
             this.room = lastMultiInfo.room;
@@ -504,7 +505,7 @@ export default {
 
             await this.recoverRoomStage();
 
-            shared.game.loadHandler.r("recoverMulti");
+            ploading.r("recoverMulti");
             this.renewEvents();
             shared.game.graphicHandler.register("whilePlayingHook", jitsRenderer);
             shared.game.ptmain.gameConfig.defaultRankMethod &&
@@ -547,7 +548,7 @@ export default {
             fetch(request)
                 .then((response) => response.json())
                 .then((result) => {
-                    shared.game.loadHandler.r("createRoom");
+                    ploading.r("createRoom");
                     if (result.code != 0) {
                         shared.game.msgHandler.failure(shared.game.ptmain.$t(`serverMsg.${result.msg}`));
                         return;
@@ -603,7 +604,7 @@ export default {
                         shared.game.ptmain.$t("multiplayer.doCreateRoom.failed"),
                         "error"
                     );
-                    shared.game.loadHandler.r("createRoom");
+                    ploading.r("createRoom");
                 });
         },
         doJoinRoom(roomid, server_addr) {
@@ -628,7 +629,7 @@ export default {
             fetch(request)
                 .then((response) => response.json())
                 .then((result) => {
-                    shared.game.loadHandler.r("joinRoom");
+                    ploading.r("joinRoom");
                     if (result.code != 0) {
                         shared.game.msgHandler.failure(shared.game.ptmain.$t(`serverMsg.${result.msg}`));
                         return;
@@ -659,7 +660,7 @@ export default {
                         shared.game.ptmain.$t("multiplayer.joinRoom.failed"),
                         "error"
                     );
-                    shared.game.loadHandler.r("joinRoom");
+                    ploading.r("joinRoom");
                 });
         },
         async actionPlayer(id, name, exited) {
@@ -696,18 +697,18 @@ export default {
             wsHandler.send("kickPlayer", this.user.id);
         },
         lockRoom() {
-            shared.game.loadHandler.l(shared.game.ptmain.$t("multiplayer.lockRoom.locking"), "lockRoom", true);
+            ploading.l(shared.game.ptmain.$t("multiplayer.lockRoom.locking"), "lockRoom", true);
             wsHandler
                 .send("lockRoom")
                 .then(async () => {
-                    shared.game.loadHandler.r("lockRoom");
+                    ploading.r("lockRoom");
                     await shared.game.msgHandler.success(
                         shared.game.ptmain.$t("multiplayer.lockRoom.locked")
                     );
                     shared.game.ptmain.$router.replace("/chartSelect");
                 })
                 .catch(() => {
-                    shared.game.loadHandler.r("lockRoom");
+                    ploading.r("lockRoom");
                     shared.game.msgHandler.sendMessage(shared.game.ptmain.$t("multiplayer.lockRoom.err"), "error");
                 });
         },
@@ -1074,7 +1075,7 @@ export default {
                 }
             }
 
-            shared.game.loadHandler.l(shared.game.ptmain.$t("loadChart.loading"), "loadChart");
+            ploading.l(shared.game.ptmain.$t("loadChart.loading"), "loadChart");
             shared.game.ptmain.loadChart(
                 info.songData,
                 info.chartData,
@@ -1108,20 +1109,20 @@ export default {
             await getPlayToken();
             if (this.owner && this.room.stage === 2) {
                 this.gameStartUI();
-                shared.game.loadHandler.r("loadChart");
+                ploading.r("loadChart");
                 return;
             }
             if (this.room.stage === 3) {
                 this.launchGame();
-                shared.game.loadHandler.r("loadChart");
+                ploading.r("loadChart");
                 return;
             }
             const updateLoadFinish = async () => {
                 try {
                     await wsHandler.send("loadChartFinish");
                 } catch (e) {
-                    shared.game.loadHandler.r("playChart");
-                    shared.game.loadHandler.r("loadChart");
+                    ploading.r("playChart");
+                    ploading.r("loadChart");
                     shared.game.msgHandler.sendMessage(shared.game.ptmain.$t("multiplayer.failed_tryAfter3Sec"), "error");
                     setTimeout(updateLoadFinish, 3000);
                     return;
@@ -1141,7 +1142,7 @@ export default {
                     previewMode: false,
                     adjustOffset: false,
                 });
-                shared.game.loadHandler.r("waitToStartGame");
+                ploading.r("waitToStartGame");
             };
             if (!(this.room.compete_mode && this.owner)) {
                 wsHandler.send("JITS", {
@@ -1191,7 +1192,7 @@ export default {
                         speedInfo,
                     })
                     .then(() => {
-                        shared.game.loadHandler.l(
+                        ploading.l(
                             shared.game.ptmain.$t("multiplayer.waitToStartGame"),
                             "waitToStartGame"
                         );

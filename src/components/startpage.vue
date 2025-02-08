@@ -2,6 +2,7 @@
     import shared from "../utils/js/shared.js";
     import { partyMgr } from "@utils/js/partyMgr";
     import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
+    import ploading from "@utils/js/ploading.js";
     export default {
         name: "startPage",
         data() {
@@ -142,7 +143,7 @@
                     return;
                 }
                 try {
-                    shared.game.loadHandler.l(
+                    ploading.l(
                         this.$t("startPage.loadingUserConfig"),
                         "multiGetJudg"
                     );
@@ -150,7 +151,7 @@
                         shared.game.ptmain.gameConfig.account.tokenInfo.access_token,
                         shared.game.ptmain.gameConfig.account.defaultConfigID
                     );
-                    shared.game.loadHandler.r("multiGetJudg");
+                    ploading.r("multiGetJudg");
                     if (current.goodJudgment != 160 || current.perfectJudgment != 80) {
                         shared.game.msgHandler.failure(this.$t("startPage.judgeRangeMPNotice"));
                         return;
@@ -162,7 +163,7 @@
                         return;
                     }
                 } catch {
-                    shared.game.loadHandler.r("multiGetJudg");
+                    ploading.r("multiGetJudg");
                     shared.game.msgHandler.sendMessage(
                         this.$t("startPage.errLoadingUserConfig"),
                         "error"
@@ -173,7 +174,7 @@
                     if (await shared.game.msgHandler.confirm(this.$t("startPage.restoreMP"))) {
                         const lastMultiInfo = JSON.parse(localStorage.lastMultiInfo);
                         try {
-                            shared.game.loadHandler.l(
+                            ploading.l(
                                 this.$t("startPage.recoverMP"),
                                 "recoverMulti"
                             );
@@ -182,7 +183,7 @@
                             );
                             const result = await resp.json();
                             if (result.code === -2) {
-                                shared.game.loadHandler.r("recoverMulti");
+                                ploading.r("recoverMulti");
                                 await shared.game.msgHandler.warning(
                                     this.$t("startPage.recoverMPFailed")
                                 );
@@ -192,7 +193,7 @@
                                 shared.game.multiInstance.recoverMulti(lastMultiInfo);
                             }
                         } catch {
-                            shared.game.loadHandler.r("recoverMulti");
+                            ploading.r("recoverMulti");
                             shared.game.msgHandler.warning(
                                 this.$t("startPage.recoverMPNetProblem")
                             );

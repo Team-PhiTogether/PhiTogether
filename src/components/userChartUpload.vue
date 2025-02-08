@@ -4,6 +4,7 @@
     import ptdb from "../utils/ptdb";
     import shared from "../utils/js/shared.js";
     import { checkLocalChart } from "../utils/ptdb/charts";
+    import ploading from "@utils/js/ploading.js";
     export default {
         name: "chartupload",
         data() {
@@ -42,7 +43,7 @@
             };
         },
         // deactivated() {
-        //     shared.game.loadHandler.r();
+        //     ploading.r();
         // },
         methods: {
             clearStatAll() {
@@ -179,7 +180,7 @@
                 if (extSong in mimeTable) mimeSong = mimeTable[extSong];
                 if (extIll in mimeTable) mimeIll = mimeTable[extIll];
 
-                shared.game.loadHandler.l(this.$t("userChartUpload.saving"), "saveChart");
+                ploading.l(this.$t("userChartUpload.saving"), "saveChart");
                 ptdb.chart.song
                     .download(
                         {
@@ -206,7 +207,7 @@
                     )
                     .then(ptdb.chart.chart.save)
                     .then(() => {
-                        if (!this.target) shared.game.loadHandler.r("saveChart");
+                        if (!this.target) ploading.r("saveChart");
                         shared.game.msgHandler.sendMessage(this.$t("userChartUpload.success"));
 
                         if (!this.target) {

@@ -2,6 +2,7 @@ import shared from "@utils/js/shared";
 import { msgHandler } from "@utils/js/msgHandler";
 import { getConstructorName } from "@utils/js/common";
 import { Utils } from "@utils/js/utils";
+import ploading from "@utils/js/ploading.js";
 
 const errsToReport = [];
 
@@ -22,7 +23,7 @@ const sysError = (e, error, message) => {
     const errMessage = `[${type}] ${message2.split("\n")[0]}`;
     const errDetail = `[${type}] ${detail}`;
     if (/(orientation|Decoding)/.test(errMessage)) return;
-    shared.game.loadHandler.r();
+    ploading.r();
     msgHandler.sendError(errMessage, Utils.escapeHTML(errDetail));
 
     try {

@@ -33,7 +33,6 @@ ploading.init({
         ploading.tip = tipsHandler.getTip(ploading.msg);
     },
 });
-const loadHandler = ploading;
 if (spec.isPhiTogetherApp) {
     App.addListener("appUrlOpen", (event /* : URLOpenListenerEvent */) => {
         location.href = event.url.replace("https:", "capacitor:");
@@ -365,11 +364,11 @@ const ptAppInstance = createApp({
                 // localStorage.setItem("PhiTogetherSettings", JSON.stringify(newVal));
                 ptdb.gameConfig.save(newVal);
 
-                if (newVal.noUIBlur === loadHandler.useBlur) {
+                if (newVal.noUIBlur === ploading.useBlur) {
                     if (newVal.noUIBlur) document.body.classList.add("noUIBlur");
                     else document.body.classList.remove("noUIBlur");
-                    loadHandler.useBlur = !newVal.noUIBlur;
-                    loadHandler.refreshBlurState();
+                    ploading.useBlur = !newVal.noUIBlur;
+                    ploading.refreshBlurState();
                 }
             },
             deep: true,
@@ -420,7 +419,7 @@ const ptAppInstance = createApp({
         },
         "gameConfig.resourcesType": {
             async handler(newVal, oldVal) {
-                if (loadHandler.currentId) return;
+                if (ploading.currentId) return;
                 if (newVal.startsWith("together-pack") || newVal === "pt-custom") {
                     try {
                         if (oldVal === "prpr-custom") {
@@ -446,8 +445,8 @@ const ptAppInstance = createApp({
                         document.getElementById("select-speed").value
                     ] /
                         12);
-                if (newVal.videoRecorder) shared.game.simphiPlugins.videoRecorder.enable();
-                else shared.game.simphiPlugins.videoRecorder.disable();
+                if (newVal.videoRecorder) this.currentRenderer.plugins.videoRecorder.enable();
+                else this.currentRenderer.plugins.videoRecorder.disable();
             },
         },
         localeValue: {
@@ -555,7 +554,7 @@ const ptAppInstance = createApp({
                                 return;
                             }
                             try {
-                                loadHandler.l(
+                                ploading.l(
                                     this.$t("phizone.modJudgment.modifying"),
                                     "modJudgment"
                                 );
@@ -574,14 +573,14 @@ const ptAppInstance = createApp({
                                     "error"
                                 );
                             } finally {
-                                loadHandler.r("modJudgment");
+                                ploading.r("modJudgment");
                             }
                         }, 500);
                     }, 500);
                 }
             } catch {
                 msgHandler.sendMessage(this.$t("phizone.modJudgment.error"), "error");
-                loadHandler.r("modJudgment");
+                ploading.r("modJudgment");
             }
         },
         async genPlayToken() {
@@ -589,7 +588,7 @@ const ptAppInstance = createApp({
                 const chartData = JSON.parse(sessionStorage.getItem("loadedChart"));
                 const playInfo = JSON.parse(sessionStorage.getItem("pzPlayInfo"));
                 if (chartData.isFromPhiZone && (!playInfo || playInfo.for !== chartData.id)) {
-                    loadHandler.l(this.$t("phizone.scoreUpload.getToken"), "playChart", true, true);
+                    ploading.l(this.$t("phizone.scoreUpload.getToken"), "playChart", true, true);
                     const resp = await phizoneApi.playChart(
                         this.gameConfig.account.tokenInfo.access_token,
                         chartData.id,
@@ -599,9 +598,9 @@ const ptAppInstance = createApp({
                     res.data.for = chartData.id;
                     sessionStorage.setItem("pzPlayInfo", JSON.stringify(res.data));
                 }
-                loadHandler.r("playChart");
+                ploading.r("playChart");
             } catch (e) {
-                loadHandler.r("playChart");
+                ploading.r("playChart");
                 shared.game.msgHandler.failure(this.$t("phizone.scoreUpload.getTokenErr"));
                 return;
             }
@@ -709,7 +708,7 @@ const ptAppInstance = createApp({
                             res(true);
                         })
                         .catch(async e => {
-                            loadHandler.r("uploadScore");
+                            ploading.r("uploadScore");
                             if (
                                 !(await msgHandler.confirm(
                                     this.$t("phizone.scoreUpload.failed"),
@@ -864,8 +863,8 @@ const ptAppInstance = createApp({
 
             // if (this.gameConfig.noUIBlur) {
             //   // document.getElementById("ptTitle").classList.remove("blur");
-            //   loadHandler.useBlur = false;
-            //   loadHandler.refreshBlurState();
+            //   ploading.useBlur = false;
+            //   ploading.refreshBlurState();
             //   document.body.classList.add("noUIBlur");
             // }
 
@@ -955,24 +954,24 @@ const ptAppInstance = createApp({
             }
         },
         updatePrprCustomRespack() {
-            loadHandler.l(this.$t("loadingPage.loadingRes"), "loadResPack");
+            ploading.l(this.$t("loadingPage.loadingRes"), "loadResPack");
             shared.game
                 .loadSkinFromDB(this.gameConfig.prprRespackID)
                 .catch(() =>
                     shared.game.msgHandler.sendMessage(this.$t("simphi.prprCustomRes.err"), "error")
                 )
-                .then(() => loadHandler.r("loadResPack"));
+                .then(() => ploading.r("loadResPack"));
         },
         async simphiLoaded() {
             if (this.afterSimphiLoadedHook) {
-                loadHandler.r("simphiloading");
+                ploading.r("simphiloading");
                 this.afterSimphiLoadedHook();
             } else this.afterSimphiLoadedHook = true;
             this.isSimphiLoaded = true;
             if (this.gameConfig.resourcesType === "prpr-custom") this.updatePrprCustomRespack();
         },
         async loadFromRedirect(searchParams) {
-            loadHandler.l(this.$t("loadChart.loading"), "loadChartfr");
+            ploading.l(this.$t("loadChart.loading"), "loadChartfr");
 
             try {
                 let chartData;
@@ -1071,7 +1070,7 @@ const ptAppInstance = createApp({
                                 let loaded = 0;
                                 for (const response of responses) {
                                     loaded++;
-                                    loadHandler.l(
+                                    ploading.l(
                                         this.$t("loadChart.info", { loaded, resNum }),
                                         "loadSong"
                                     );
@@ -1083,9 +1082,9 @@ const ptAppInstance = createApp({
                             })
                             .catch(e => {
                                 msgHandler.sendMessage(this.$t("loadChart.failed"), "error"),
-                                    loadHandler.r("loadSong");
+                                    ploading.r("loadSong");
                             });
-                    else loadHandler.r("loadChartfr");
+                    else ploading.r("loadChartfr");
 
                     return this.$router.push({
                         path: "/chartUpload",
@@ -1100,11 +1099,11 @@ const ptAppInstance = createApp({
                         },
                     });
                 }
-                loadHandler.l(this.$t("loadChart.loading"), "loadChart");
+                ploading.l(this.$t("loadChart.loading"), "loadChart");
                 this.loadChart(chartData.song, chartData, () => {
-                    loadHandler.r("loadChartfr");
-                    loadHandler.r("playChart");
-                    loadHandler.r("loadChart");
+                    ploading.r("loadChartfr");
+                    ploading.r("playChart");
+                    ploading.r("loadChart");
                     msgHandler.info(this.$t("simphi.askActionForSound")).then(() => {
                         shared.game.ptmain.$router.push({
                             path: "/playing",
@@ -1115,7 +1114,7 @@ const ptAppInstance = createApp({
             } catch (err) {
                 msgHandler.sendMessage(this.$t("loadChart.failedFromPZRedirect"), "error");
                 console.error(err);
-                loadHandler.r("loadChartfr");
+                ploading.r("loadChartfr");
             }
         },
         async pzRefreshLogin() {
@@ -1131,7 +1130,7 @@ const ptAppInstance = createApp({
                     ptBestRecords: {},
                 });
             }
-            // loadHandler.l("正在自动登录到PhiZone", "login");
+            // ploading.l("正在自动登录到PhiZone", "login");
             msgHandler.sendMessage(this.$t("phizone.login.autologgingin"), "info");
             phizoneApi
                 .refreshLogin(
@@ -1144,7 +1143,7 @@ const ptAppInstance = createApp({
                     await this.loadUserRelatedInfo(e.access_token);
                 })
                 .catch(async e => {
-                    // loadHandler.r("login");
+                    // ploading.r("login");
                     msgHandler.sendMessage(this.$t("phizone.login.autologinFailed"), "error");
                     recordMgr.reset(this.gameConfig.account.userBasicInfo);
                 });
@@ -1167,7 +1166,7 @@ const ptAppInstance = createApp({
             });
         },
         loadUserRelatedInfo(access_token) {
-            // loadHandler.l("正在更新用户信息", "login");
+            // ploading.l("正在更新用户信息", "login");
             msgHandler.sendMessage(this.$t("phizone.login.updatingUserInfo"), "info");
             return new Promise((res, rej) => {
                 const account = this.gameConfig.account;
@@ -1201,7 +1200,7 @@ const ptAppInstance = createApp({
                             } catch {
                                 rej(false);
                             } finally {
-                                // loadHandler.r("login");
+                                // ploading.r("login");
                             }
                         });
                         phizoneApi.getUserBestRecords(access_token, e.id).then(async e => {
@@ -1214,7 +1213,7 @@ const ptAppInstance = createApp({
                         });
                     })
                     .catch(e => {
-                        loadHandler.r("login");
+                        ploading.r("login");
                         rej(false);
                     });
             });
@@ -1244,7 +1243,7 @@ const ptAppInstance = createApp({
             if (this.$route.path === "/chartUpload") {
                 shared.game.adjustInfo();
                 $("uploader").classList.remove("disabled");
-                loadHandler.r("loadChart");
+                ploading.r("loadChart");
                 shared.game.userChartUploaded();
                 this.lastLoad = hook.chartsMD5.get(hook.selectchart.value);
                 return;
@@ -1281,7 +1280,7 @@ const ptAppInstance = createApp({
         },
         loadChart(songInfo, chartInfo, callback) {
             if (!this.afterSimphiLoadedHook) {
-                loadHandler.l(this.$t("loadChart.simphiLoading"), "simphiloading");
+                ploading.l(this.$t("loadChart.simphiLoading"), "simphiloading");
                 return (this.afterSimphiLoadedHook = () =>
                     this.loadChart(songInfo, chartInfo, callback));
             }
@@ -1335,7 +1334,7 @@ const ptAppInstance = createApp({
                     };
                     for (const i in responses) {
                         loaded++;
-                        loadHandler.l(this.$t("loadChart.info", { loaded, resNum }), "loadChart");
+                        ploading.l(this.$t("loadChart.info", { loaded, resNum }), "loadChart");
                         uploader.fireLoad(
                             { name: `${chartInfo.id}/${i}` },
                             await responses[i].arrayBuffer()
@@ -1344,7 +1343,7 @@ const ptAppInstance = createApp({
                     if (blobs[3]) {
                         for (const i of blobs[3]) {
                             loaded++;
-                            loadHandler.l(
+                            ploading.l(
                                 this.$t("loadChart.info", { loaded, resNum }),
                                 "loadChart"
                             );
@@ -1357,7 +1356,7 @@ const ptAppInstance = createApp({
                 })
                 .catch(e => {
                     msgHandler.sendMessage(this.$t("loadChart.failed"), "error"),
-                        loadHandler.r("loadChart");
+                        ploading.r("loadChart");
                     console.error(e);
                 });
         },
@@ -1469,7 +1468,6 @@ document.getElementById("app").style.display = "block";
 //全局暴露
 shared.game.ptmain = ptmain;
 shared.game.msgHandler = msgHandler;
-shared.game.loadHandler = loadHandler;
 shared.game.graphicHandler = graphicHandler;
 shared.game.recordMgr = recordMgr;
 shared.game.replayMgr = replayMgr;

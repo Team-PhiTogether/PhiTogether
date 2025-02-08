@@ -1,6 +1,7 @@
 <script>
     import shared from "../utils/js/shared.js";
     import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
+    import ploading from "@utils/js/ploading.js";
 
     const $ = query => document.getElementById(query);
     const $$ = query => document.body.querySelector(query);
@@ -24,7 +25,7 @@
         },
         async mounted() {
             try {
-                shared.game.loadHandler.l(this.$t("playerB20.loadB20"), "loadb20");
+                ploading.l(this.$t("playerB20.loadB20"), "loadb20");
                 const id = this.$route.query.id;
                 this.data = await phizoneApi.getPlayerB20Asv1(
                     shared.game.ptmain.gameConfig.account.tokenInfo.access_token,
@@ -34,11 +35,11 @@
             } catch (e) {
                 shared.game.msgHandler.sendMessage(this.$t("playerB20.error"), "error");
             } finally {
-                shared.game.loadHandler.r("loadb20");
+                ploading.r("loadb20");
             }
         },
         deactivated() {
-            shared.game.loadHandler.r("loadb20");
+            ploading.r("loadb20");
         },
         methods: {
             scoreStr(t) {

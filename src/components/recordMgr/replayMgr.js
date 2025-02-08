@@ -1,6 +1,7 @@
 import shared from "../../utils/js/shared.js";
 import { checkLocalChart } from "../../utils/ptdb/charts.ts";
 import md5 from "md5";
+import ploading from "@utils/js/ploading.js";
 
 export const replayMgr = {
     replaying: false,
@@ -28,7 +29,7 @@ export const replayMgr = {
             }
         }
 
-        shared.game.loadHandler.l(shared.game.ptmain.$t("loadChart.loading"), "loadChart");
+        ploading.l(shared.game.ptmain.$t("loadChart.loading"), "loadChart");
         shared.game.ptmain.loadChart(info.songData, info.chartData, this.loadChartSecond);
     },
     loadChartSecond(songInfo, chartInfo) {
@@ -42,7 +43,7 @@ export const replayMgr = {
         };
         shared.game.app.speed = 2 ** (dict[replayMgr.speedInfo.disp] / 12);
         replayMgr.replaying = true;
-        shared.game.loadHandler.r("loadChart");
+        ploading.r("loadChart");
         shared.game.ptmain.$router.push({ path: "/playing", query: { auto: 1 } });
     },
     read(data) {

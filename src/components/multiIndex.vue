@@ -1,6 +1,7 @@
 <script>
     import shared from "../utils/js/shared.js";
     import { partyMgr } from "@utils/js/partyMgr";
+    import ploading from "@utils/js/ploading.js";
 
     export default {
         name: "multiIndex",
@@ -30,7 +31,7 @@
             this.loadPage();
         },
         deactivated() {
-            shared.game.loadHandler.r("loadRoomInfo");
+            ploading.r("loadRoomInfo");
         },
         methods: {
             doSearch() {
@@ -45,7 +46,7 @@
             },
             async loadPage(by = "none", param1 = "", param2 = "") {
                 try {
-                    shared.game.loadHandler.l(this.$t("multiIndex.loadRoomInfo"), "loadRoomInfo");
+                    ploading.l(this.$t("multiIndex.loadRoomInfo"), "loadRoomInfo");
                     const t = JSON.parse(
                         await (
                             await fetch(
@@ -66,14 +67,14 @@
                         }
                     }
                     this.roomList = t;
-                    shared.game.loadHandler.r("loadRoomInfo");
+                    ploading.r("loadRoomInfo");
                 } catch (e) {
                     console.error(e);
-                    shared.game.loadHandler.r("loadRoomInfo");
+                    ploading.r("loadRoomInfo");
                 }
             },
             joinRoom(roomid) {
-                shared.game.loadHandler.l(this.$t("multiIndex.joining"), "joinRoom");
+                ploading.l(this.$t("multiIndex.joining"), "joinRoom");
                 fetch(
                     `${shared.game.ptmain.gameConfig.mpServerURL}/api/multi/requestRoom/${roomid}?v=${spec.thisVersion}`
                 )
@@ -82,14 +83,14 @@
                         const server_addr = result.server_addr;
                         if (result.code !== 0) {
                             shared.game.msgHandler.failure(this.$t(`serverMsg.${result.msg}`));
-                            shared.game.loadHandler.r("joinRoom");
+                            ploading.r("joinRoom");
                             return;
                         }
                         shared.game.multiInstance.doJoinRoom(roomid, server_addr);
                     })
                     .catch(() => {
                         shared.game.msgHandler.sendMessage(this.$t("multiIndex.err"));
-                        shared.game.loadHandler.r("joinRoom");
+                        ploading.r("joinRoom");
                     });
             },
             createRoom() {
@@ -107,7 +108,7 @@
                 }
                 if (!this.createConfig.description)
                     this.createConfig.description = "No description.";
-                shared.game.loadHandler.l(this.$t("multiIndex.joining"), "createRoom");
+                ploading.l(this.$t("multiIndex.joining"), "createRoom");
                 fetch(
                     `${shared.game.ptmain.gameConfig.mpServerURL}/api/multi/requestRoom/${roomid}?v=${spec.thisVersion}`
                 )
@@ -116,7 +117,7 @@
                         const server_addr = result.server_addr;
                         if (result.code !== -2) {
                             shared.game.msgHandler.failure(this.$t(`serverMsg.${result.msg}`));
-                            shared.game.loadHandler.r("createRoom");
+                            ploading.r("createRoom");
                             return;
                         }
                         shared.game.multiInstance.doCreateRoom(
@@ -128,7 +129,7 @@
                     })
                     .catch(() => {
                         shared.game.msgHandler.sendMessage(this.$t("multiIndex.err"));
-                        shared.game.loadHandler.r("createRoom");
+                        ploading.r("createRoom");
                     });
             },
         },
