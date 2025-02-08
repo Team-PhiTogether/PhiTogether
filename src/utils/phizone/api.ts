@@ -4,8 +4,7 @@ import { PZUserBasicInfo, PZUserTokenInfo, PZPlayConfig } from "./userInfo.type"
 import { SongMeta, SongMetav2, ChartMeta, ChartMetav2 } from "../ptmain/types/SongAndChartMeta";
 import { ChartAsset } from "../ptdb/charts";
 import * as apiErrProcessor from "./apiErrProcessor";
-import { TmodifiedWindow } from "../ptmain/types/modifiedWindow";
-import { simphiPlayer } from "@renderers/sim-phi/playerMain";
+import { TmodifiedMeta, TmodifiedWindow } from "../ptmain/types/modifiedWindow";
 
 enum API_PATH {
     auth = "/auth/token",
@@ -299,7 +298,6 @@ export const PhiZoneAPI = {
     recordEncrypted(stat: PZChartPlayStat, accountInfo: GameConfigAccount) {
         return new Promise((res, rej) => {
             const wi = window as unknown as TmodifiedWindow;
-            const s = simphiPlayer;
             const pzPlayInfo = JSON.parse(sessionStorage.getItem("pzPlayInfo") || "");
             const f = stat.max_combo;
             const d = accountInfo.defaultConfigID;
@@ -312,7 +310,7 @@ export const PhiZoneAPI = {
             const x = stat.bad;
             const e = stat.good_late;
             const a = (accountInfo.userBasicInfo as PZUserBasicInfo).id;
-            const chartmd5 = s.chartsMD5.get(s.selectchart.value);
+            const chartmd5 = wi.hook.chartsMD5.get(wi.hook.selectchart.value);
             const aa = {
                 token: pzPlayInfo.token,
                 maxCombo: f,

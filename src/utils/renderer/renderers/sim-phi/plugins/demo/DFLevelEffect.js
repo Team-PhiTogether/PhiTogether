@@ -1,5 +1,4 @@
 // import obj from './DFLevelEffect.json';
-import { simphiPlayer } from "../../playerMain";
 const obj = {
     exposure: [
         {
@@ -1862,21 +1861,21 @@ export function loadMod() {
         const attr = getAttr(time);
         // for (const [key, value] of Object.entries(attr)) //console.log(`${key}: ${value}`);
         if (attr.blackBgOpacity != null) {
-            simphiPlayer.tmps.customBackDraw = ctxos => {
+            hook.tmps.customBackDraw = ctxos => {
                 ctxos.globalAlpha = attr.blackBgOpacity;
-                ctxos.fillRect(0, 0, simphiPlayer.app.canvasos.width, simphiPlayer.app.canvasos.height);
+                ctxos.fillRect(0, 0, hook.app.canvasos.width, hook.app.canvasos.height);
             };
         }
-        simphiPlayer.filterOptions = attr;
+        hook.filterOptions = attr;
         if (time > 95) {
-            simphiPlayer.tmps.level = "";
-            simphiPlayer.tmps.name = "";
-            simphiPlayer.tmps.showStat = false;
-            simphiPlayer.tmps.progress = -1;
+            hook.tmps.level = "";
+            hook.tmps.name = "";
+            hook.tmps.showStat = false;
+            hook.tmps.progress = -1;
         }
         if (time > 125.2) {
-            simphiPlayer.tmps.combo = "";
-            simphiPlayer.tmps.combo2 = "";
+            hook.tmps.combo = "";
+            hook.tmps.combo2 = "";
         }
         if (time > 125.2 && time < 150) {
             const countDown = attr.countDownTime;
@@ -1885,8 +1884,8 @@ export function loadMod() {
             let countDownText = "";
             if (countDown > 10) countDownText = `00:${countDownSec}`;
             else countDownText = `${countDownSec}.${countDownCentiSec}`;
-            const { wlen, lineScale } = simphiPlayer.app;
-            simphiPlayer.tmps.customForeDraw = ctxos => {
+            const { wlen, lineScale } = hook.app;
+            hook.tmps.customForeDraw = ctxos => {
                 ctxos.globalAlpha = 1;
                 ctxos.fillStyle = "#fff";
                 ctxos.fillRect(

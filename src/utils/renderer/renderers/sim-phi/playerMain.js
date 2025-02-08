@@ -361,70 +361,6 @@ export const simphiPlayer = {
             }
         }
     },
-    async stop() {
-        if (simphiPlayer.emitter.eq("stop")) {
-            if (!simphiPlayer.selectchart.value)
-                return msgHandler.sendError(shared.game.i18n.t("simphi.playErr.noChartSelected"));
-            if (!simphiPlayer.selectbgm.value)
-                return msgHandler.sendError(shared.game.i18n.t("simphi.playErr.noMusicSelected"));
-            simphiPlayer.app.stage.style.display = "block";
-            for (const i of simphiPlayer.before.values()) await i();
-            audio.play(simphiPlayer.res["mute"], { loop: true, isOut: false }); //播放空音频(避免音画不同步)
-            simphiPlayer.app.prerenderChart(
-                simphiPlayer.modify(simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value))
-            ); //fuckqwq
-            const md5 = simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value);
-            simphiPlayer.stat.level = Number(simphiPlayer.chartData.levelText.match(/\d+$/));
-            simphiPlayer.stat.reset(
-                simphiPlayer.app.chart.numOfNotes,
-                md5,
-                simphiPlayer.selectspeed.value
-            );
-            await loadLineData();
-            simphiPlayer.app.bgImage =
-                simphiPlayer.chartData.bgs.get(simphiPlayer.selectbg.value) ||
-                simphiPlayer.res["NoImageWhite"];
-            simphiPlayer.app.bgImageBlur =
-                simphiPlayer.chartData.bgsBlur.get(simphiPlayer.selectbg.value) ||
-                simphiPlayer.res["NoImageWhite"];
-            const bgm = simphiPlayer.chartData.bgms.get(simphiPlayer.selectbgm.value);
-            simphiPlayer.app.bgMusic = bgm.audio;
-            simphiPlayer.app.bgVideo = bgm.video;
-            simphiPlayer.timeInfo.duration = simphiPlayer.app.bgMusic.duration / simphiPlayer.app.speed;
-            simphiPlayer.animationInfo.isInEnd = false;
-            simphiPlayer.animationInfo.isOutStart = false;
-            simphiPlayer.animationInfo.isOutEnd = false;
-            simphiPlayer.timeInfo.timeBgm = 0;
-            if (!simphiPlayer.showTransition.checked) simphiPlayer.animationTimer.in.addTime(3e3);
-            simphiPlayer.stage.resize();
-            simphiPlayer.frameAnimater.start();
-            simphiPlayer.animationTimer.in.play();
-            interact.activate();
-            simphiPlayer.emitter.emit("play");
-        } else {
-            simphiPlayer.emitter.emit("stop");
-            interact.deactive();
-            audio.stop();
-            simphiPlayer.frameAnimater.stop();
-            //清除原有数据
-            simphiPlayer.resultPageData = false;
-            simphiPlayer.fucktemp2 = null;
-            if (simphiPlayer.app.pauseNextTick)
-                clearInterval(simphiPlayer.app.pauseNextTick),
-                    (simphiPlayer.app.pauseTime = 0),
-                    (simphiPlayer.app.pauseNextTick = null);
-            simphiPlayer.hitFeedbackList.clear();
-            simphiPlayer.hitImageList.clear();
-            simphiPlayer.hitWordList.clear();
-            simphiPlayer.animationTimer.in.reset();
-            simphiPlayer.animationTimer.out.reset();
-            simphiPlayer.animationTimer.end.reset();
-            simphiPlayer.timeInfo.curTime = 0;
-            simphiPlayer.timeInfo.curTime_ms = 0;
-            simphiPlayer.timeInfo.duration = 0;
-            for (const i of simphiPlayer.end.values()) await i();
-        }
-    },
 };
 document.oncontextmenu = e => e.preventDefault(); //qwq
 
@@ -981,7 +917,7 @@ window.addEventListener(
             updateLevelText: updateLevelTextOut,
             doFullScreen: simphiPlayer.stage.doFullScreen,
             adjustInfo,
-            qwqStop: simphiPlayer.stop,
+            qwqStop,
             qwqPause: simphiPlayer.pause,
             frameAnimater: simphiPlayer.frameAnimater,
         };
@@ -1237,7 +1173,7 @@ simphiPlayer.emitter.addEventListener(
 simphiPlayer.btnPlay.addEventListener("click", async function () {
     if (this.classList.contains("disabled")) return;
     this.classList.add("disabled");
-    await simphiPlayer.stop();
+    await qwqStop();
     this.classList.remove("disabled");
 });
 simphiPlayer.btnPause.addEventListener("click", async function () {
@@ -1256,11 +1192,75 @@ simphiPlayer.status2.reg(simphiPlayer.selectspeed, "change", target => target.va
 simphiPlayer.status2.reg(simphiPlayer.emitter, "change", (/** @type {Emitter} */ target) =>
     target.eq("pause") ? "Paused" : ""
 );
+async function qwqStop() {
+    if (simphiPlayer.emitter.eq("stop")) {
+        if (!simphiPlayer.selectchart.value)
+            return msgHandler.sendError(shared.game.i18n.t("simphi.playErr.noChartSelected"));
+        if (!simphiPlayer.selectbgm.value)
+            return msgHandler.sendError(shared.game.i18n.t("simphi.playErr.noMusicSelected"));
+        simphiPlayer.app.stage.style.display = "block";
+        for (const i of simphiPlayer.before.values()) await i();
+        audio.play(simphiPlayer.res["mute"], { loop: true, isOut: false }); //播放空音频(避免音画不同步)
+        simphiPlayer.app.prerenderChart(
+            simphiPlayer.modify(simphiPlayer.chartData.charts.get(simphiPlayer.selectchart.value))
+        ); //fuckqwq
+        const md5 = simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value);
+        simphiPlayer.stat.level = Number(simphiPlayer.chartData.levelText.match(/\d+$/));
+        simphiPlayer.stat.reset(
+            simphiPlayer.app.chart.numOfNotes,
+            md5,
+            simphiPlayer.selectspeed.value
+        );
+        await loadLineData();
+        simphiPlayer.app.bgImage =
+            simphiPlayer.chartData.bgs.get(simphiPlayer.selectbg.value) ||
+            simphiPlayer.res["NoImageWhite"];
+        simphiPlayer.app.bgImageBlur =
+            simphiPlayer.chartData.bgsBlur.get(simphiPlayer.selectbg.value) ||
+            simphiPlayer.res["NoImageWhite"];
+        const bgm = simphiPlayer.chartData.bgms.get(simphiPlayer.selectbgm.value);
+        simphiPlayer.app.bgMusic = bgm.audio;
+        simphiPlayer.app.bgVideo = bgm.video;
+        simphiPlayer.timeInfo.duration = simphiPlayer.app.bgMusic.duration / simphiPlayer.app.speed;
+        simphiPlayer.animationInfo.isInEnd = false;
+        simphiPlayer.animationInfo.isOutStart = false;
+        simphiPlayer.animationInfo.isOutEnd = false;
+        simphiPlayer.timeInfo.timeBgm = 0;
+        if (!simphiPlayer.showTransition.checked) simphiPlayer.animationTimer.in.addTime(3e3);
+        simphiPlayer.stage.resize();
+        simphiPlayer.frameAnimater.start();
+        simphiPlayer.animationTimer.in.play();
+        interact.activate();
+        simphiPlayer.emitter.emit("play");
+    } else {
+        simphiPlayer.emitter.emit("stop");
+        interact.deactive();
+        audio.stop();
+        simphiPlayer.frameAnimater.stop();
+        //清除原有数据
+        simphiPlayer.resultPageData = false;
+        simphiPlayer.fucktemp2 = null;
+        if (simphiPlayer.app.pauseNextTick)
+            clearInterval(simphiPlayer.app.pauseNextTick),
+                (simphiPlayer.app.pauseTime = 0),
+                (simphiPlayer.app.pauseNextTick = null);
+        simphiPlayer.hitFeedbackList.clear();
+        simphiPlayer.hitImageList.clear();
+        simphiPlayer.hitWordList.clear();
+        simphiPlayer.animationTimer.in.reset();
+        simphiPlayer.animationTimer.out.reset();
+        simphiPlayer.animationTimer.end.reset();
+        simphiPlayer.timeInfo.curTime = 0;
+        simphiPlayer.timeInfo.curTime_ms = 0;
+        simphiPlayer.timeInfo.duration = 0;
+        for (const i of simphiPlayer.end.values()) await i();
+    }
+}
 simphiPlayer.stat = simphiPlayer.stat;
-self.hook = simphiPlayer;
+export var hook = (self.hook = simphiPlayer);
 const flag0 = "flag{\x71w\x71}";
-simphiPlayer.before.set(flag0, () => {
-    const md5 = simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value);
+hook.before.set(flag0, () => {
+    const md5 = hook.chartsMD5.get(hook.selectchart.value);
     const hashDF = [
         "cdb5987ad81b70e3dc96153af2efaa61",
         "86d23af0cc595a703241536a2d29ee4b",
@@ -1268,16 +1268,16 @@ simphiPlayer.before.set(flag0, () => {
         "0e8ff64e65bf35382e30f980b5eec041",
     ];
     const hashD321 = ["4ddcd5d923007d661911989e79fe8a59"];
-    if (md5 === "ab9d2cc3eb569236ead459ad4caba109") simphiPlayer.now.set(flag0, loadModYukiOri());
+    if (md5 === "ab9d2cc3eb569236ead459ad4caba109") hook.now.set(flag0, loadModYukiOri(hook));
     else if (hashDF.includes(md5) && simphiPlayer.inputName.value === "Distorted Fate ")
         import("./plugins/demo/DFLevelEffect.js").then(({ loadMod }) =>
-            simphiPlayer.now.set(flag0, loadMod())
+            hook.now.set(flag0, loadMod())
         );
     else if (hashD321.includes(md5) && simphiPlayer.inputName.value === "DESTRUCTION 3,2,1 ")
         import("./plugins/demo/321LevelEffect.js").then(({ loadMod }) =>
-            simphiPlayer.now.set(flag0, loadMod())
+            hook.now.set(flag0, loadMod())
         );
-    else simphiPlayer.now.delete(flag0);
+    else hook.now.delete(flag0);
 });
 
 //plugin(filter)
@@ -1291,7 +1291,7 @@ const enableFilter = $id("enableFilter");
             const filter0 = new filter.default(input.value);
             simphiPlayer.filter = (ctx, time, now) => {
                 filter0.apply(ctx.canvas);
-                ctx.drawImage(filter0.getImage(time, now, simphiPlayer.filterOptions), 0, 0);
+                ctx.drawImage(filter0.getImage(time, now, hook.filterOptions), 0, 0);
             };
         } catch (e) {
             console.error(e);

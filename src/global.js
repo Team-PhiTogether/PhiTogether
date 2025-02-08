@@ -444,8 +444,8 @@ const ptAppInstance = createApp({
                         document.getElementById("select-speed").value
                     ] /
                         12);
-                if (newVal.videoRecorder) this.currentRenderer.player.plugins.videoRecorder.enable();
-                else this.currentRenderer.player.plugins.videoRecorder.disable();
+                if (newVal.videoRecorder) this.currentRenderer.plugins.videoRecorder.enable();
+                else this.currentRenderer.plugins.videoRecorder.disable();
             },
         },
         localeValue: {
@@ -1244,7 +1244,7 @@ const ptAppInstance = createApp({
                 $("uploader").classList.remove("disabled");
                 ploading.r("loadChart");
                 shared.game.userChartUploaded();
-                this.lastLoad = this.currentRenderer.player.chartData.chartsMD5.get(this.currentRenderer.player.selectchart.value);
+                this.lastLoad = hook.chartsMD5.get(hook.selectchart.value);
                 return;
             }
 

@@ -5,7 +5,6 @@ import { ZipReader } from "../assetsProcessor/reader";
 import { noteRender } from "../renderer/Notes/render";
 import { simphiPlayer } from "../playerMain";
 import ploading from "@utils/js/ploading.js";
-import shared from "@utils/js/shared";
 
 //plugin(skin)
 export function loadSkinFromBuffer(buffer, init = false, callback) {
@@ -17,7 +16,7 @@ export function loadSkinFromBuffer(buffer, init = false, callback) {
                 handler: async data => files.push(data),
             });
             zip.addEventListener("loadstart", () => {});
-            zip.addEventListener("read", evt => simphiPlayer.handleFile(id, zip.total, null, done));
+            zip.addEventListener("read", evt => hook.handleFile(id, zip.total, null, done));
             zip.read({
                 name: "skin.zip",
                 buffer: buffer,
@@ -217,9 +216,9 @@ export function loadSkinFromBuffer(buffer, init = false, callback) {
                     ? hex2rgba(config.colorGood) || null
                     : null;
                 simphiPlayer.tmps.hitFxRotate = config.hitFxRotate;
-                simphiPlayer.customResourceMeta.author = config.author || "unknown";
-                simphiPlayer.customResourceMeta.name = config.name || "unknown";
-                simphiPlayer.customResourceMeta.loaded = true;
+                hook.customResourceMeta.author = config.author || "unknown";
+                hook.customResourceMeta.name = config.name || "unknown";
+                hook.customResourceMeta.loaded = true;
                 ploading.r("loadChart");
                 const allConfig = {};
                 for (const i in config) allConfig[i] = config[i];
@@ -411,19 +410,19 @@ export async function loadSkinFromDB(id) {
         ? hex2rgba(skin.config.colorGood) || null
         : null;
     simphiPlayer.tmps.hitFxRotate = skin.config.hitFxRotate;
-    simphiPlayer.customResourceMeta.author = skin.config.author || "unknown";
-    simphiPlayer.customResourceMeta.name = skin.config.name || "unknown";
-    simphiPlayer.customResourceMeta.loaded = true;
+    hook.customResourceMeta.author = skin.config.author || "unknown";
+    hook.customResourceMeta.name = skin.config.name || "unknown";
+    hook.customResourceMeta.loaded = true;
     ploading.r("loadChart");
     shared.game.msgHandler.sendMessage(
         shared.game.i18n.t("simphi.prprCustomRes.applied"),
         "success"
     );
 
-    simphiPlayer.customResourceMeta.author = skin.author || "unknown";
-    simphiPlayer.customResourceMeta.name = skin.name || "unknown";
+    hook.customResourceMeta.author = skin.author || "unknown";
+    hook.customResourceMeta.name = skin.name || "unknown";
 
-    simphiPlayer.customResourceMeta.loaded = true;
+    hook.customResourceMeta.loaded = true;
 }
 
 // self.loadSkinFromBuffer = loadSkinFromBuffer; //debug

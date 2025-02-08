@@ -1,5 +1,4 @@
 // import obj from './321LevelEffect.json';
-import { simphiPlayer } from "../../playerMain.js";
 const obj = {
     exposure: [
         {
@@ -673,26 +672,26 @@ export function loadMod() {
         const attr = getAttr(time);
         //for (const [key, value] of Object.entries(attr)) console.log(`${key}: ${value}`);
         if (attr.blackBgOpacity != null) {
-            simphiPlayer.tmps.customBackDraw = ctxos => {
+            hook.tmps.customBackDraw = ctxos => {
                 ctxos.globalAlpha = attr.blackBgOpacity;
-                ctxos.fillRect(0, 0, simphiPlayer.app.canvasos.width, simphiPlayer.app.canvasos.height);
+                ctxos.fillRect(0, 0, hook.app.canvasos.width, hook.app.canvasos.height);
             };
         }
-        simphiPlayer.filterOptions = attr;
+        hook.filterOptions = attr;
         if (time > 105.32) {
-            simphiPlayer.tmps.level = "";
-            simphiPlayer.tmps.name = "";
-            simphiPlayer.tmps.showStat = false;
-            simphiPlayer.tmps.progress = -1;
+            hook.tmps.level = "";
+            hook.tmps.name = "";
+            hook.tmps.showStat = false;
+            hook.tmps.progress = -1;
         }
         if (time > 153.1) {
-            simphiPlayer.tmps.combo = "";
-            simphiPlayer.tmps.combo2 = "";
+            hook.tmps.combo = "";
+            hook.tmps.combo2 = "";
         }
         if (time > 156.15) {
-            simphiPlayer.time = 156.15;
+            hook.time = 156.15;
             if (flag++ === 285)
-                simphiPlayer.fireModal(
+                hook.fireModal(
                     "<p>Phi\x67rOS已崩溃</p>",
                     "<p>模拟结束，谢谢你的参与。<br>愿我们在塔中重聚。</p>"
                 );

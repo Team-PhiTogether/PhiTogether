@@ -11,8 +11,6 @@ export class ChartRenderer {
     startGameplay: Function; // settings
     reset: Function;
 
-    player: any;
-
     constructor({
         name,
         displayName,
@@ -22,8 +20,6 @@ export class ChartRenderer {
         loadChart,
         loadRespack,
         startGameplay,
-
-        player,
         // reset,
     }) {
         this.name = name || "unknown";
@@ -36,7 +32,5 @@ export class ChartRenderer {
             respack: loadRespack,
         };
         this.startGameplay = startGameplay;
-
-        this.player = player;
     }
 }

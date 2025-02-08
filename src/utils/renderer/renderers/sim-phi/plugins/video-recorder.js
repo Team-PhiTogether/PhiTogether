@@ -1,6 +1,3 @@
-import { simphiPlayer } from "../playerMain";
-import { audio } from "@utils/js/aup";
-
 const valert = str => console.error(str);
 let ready = false;
 let manual = false;
@@ -54,7 +51,7 @@ const video = {
                 { once: true }
             );
         });
-        simphiPlayer.app.stage.appendChild(this.container);
+        hook.app.stage.appendChild(this.container);
     },
     destroyUI() {
         if (!this.container) return;
@@ -63,19 +60,23 @@ const video = {
     },
     // msdest: null,
     record() {
-        if (!audio.actx.createMediaStreamDestination) {
+        const {
+            audio: { actx },
+            app: { canvas },
+        } = hook;
+        if (!actx.createMediaStreamDestination) {
             valert("Recording Failed: Your browser does not support MediaStreamDestination");
             return;
         }
-        if (!simphiPlayer.app.canvas.captureStream) {
+        if (!canvas.captureStream) {
             valert(
                 "Recording Failed: Your browser does not support HTMLCanvasElement.captureStream"
             );
             return;
         }
-        if (!this.msdest) this.msdest = audio.actx.createMediaStreamDestination();
+        if (!this.msdest) this.msdest = actx.createMediaStreamDestination();
         if (!this.msdest) return;
-        audio.dest = this.msdest;
+        hook.audio.dest = this.msdest;
         const support = [
             "video/mp4;codecs=avc1",
             "video/mp4;codecs=mp4a",
@@ -84,7 +85,7 @@ const video = {
             "video/webm;codecs=vp9,opus",
             "video/webm;codecs=vp8,opus",
         ].find(n => MediaRecorder.isTypeSupported(n));
-        const cStream = simphiPlayer.app.canvas.captureStream();
+        const cStream = canvas.captureStream();
         const aStream = this.msdest.stream;
         // console.log(aStream.getAudioTracks()[0])
         const mixStream = new MediaStream([
@@ -145,18 +146,18 @@ function callback(checkbox, _container) {
     checkbox.addEventListener("change", () => {
         if (checkbox.checked) {
             video.createUI();
-            simphiPlayer.before.set("video", () => {
+            hook.before.set("video", () => {
                 ready = true;
                 if (!manual) record();
             });
-            simphiPlayer.end.set("video", () => {
+            hook.end.set("video", () => {
                 if (recording) record();
                 ready = false;
             });
         } else {
             video.destroyUI();
-            simphiPlayer.before.delete("video");
-            simphiPlayer.end.delete("video");
+            hook.before.delete("video");
+            hook.end.delete("video");
         }
     });
 }
@@ -193,11 +194,11 @@ const videoRecorder = {
     enable: () => {
         if (videoRecorder._enabled) return;
         video.createUI();
-        simphiPlayer.before.set("video", () => {
+        hook.before.set("video", () => {
             ready = true;
             if (!manual) record();
         });
-        simphiPlayer.end.set("video", () => {
+        hook.end.set("video", () => {
             if (recording) record();
             ready = false;
         });
@@ -206,8 +207,8 @@ const videoRecorder = {
     disable: () => {
         if (!videoRecorder._enabled) return;
         video.destroyUI();
-        simphiPlayer.before.delete("video");
-        simphiPlayer.end.delete("video");
+        hook.before.delete("video");
+        hook.end.delete("video");
         videoRecorder._enabled = false;
     },
 };
