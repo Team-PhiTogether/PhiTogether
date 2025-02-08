@@ -212,7 +212,6 @@ router.beforeEach((to, from) => {
             .querySelectorAll(".textInput")
             .forEach(i => (i.disabled = !(i.disabled = !i.disabled)));
 });
-
 const ptAppInstance = createApp({
     template: document.getElementById("app").innerHTML,
     data() {
@@ -496,7 +495,7 @@ const ptAppInstance = createApp({
                             msgHandler.sendMessage(i18n.global.t("respack.customResApplied"));
                         } catch (e) {
                             console.err(e);
-                            ptmain.gameConfig.resourcesType = oldVal;
+                            ptmain.gameConfig.resourcesType = "together-pack-1";
                         }
                     };
                 },
@@ -631,7 +630,7 @@ const ptAppInstance = createApp({
             // const shouldNotUploadPhiZone = this.noAccountMode || typeof chartData.id !== 'number' || this.gameConfig.autoplay || shared.game.app.speed != 1 || this.gameConfig.fullScreenJudge;
             const isMulti = shared.game.ptmain.gameMode === "multi";
             const uploadPhizone = () => {
-                return new Promise(async res => {
+                return new Promise(async (res, rej) => {
                     scoreLoadingAndResultData.display = false;
 
                     if (
