@@ -1,9 +1,9 @@
 import { audio } from "@utils/js/aup";
-import { imgShader, hex2rgba } from "../assetsProcessor/imgProcessor";
+import { imgShader, hex2rgba } from "../../assetsProcessor/imgProcessor";
 import ptdb from "@utils/ptdb";
-import { ZipReader } from "../assetsProcessor/reader";
-import { noteRender } from "../renderer/Notes/render";
-import { simphiPlayer } from "../playerMain";
+import { ZipReader } from "../../assetsProcessor/reader";
+import { noteRender } from "../../renderer/Notes/render";
+import { simphiPlayer } from "../../playerMain";
 import ploading from "@utils/js/ploading.js";
 
 //plugin(skin)

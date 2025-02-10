@@ -19,9 +19,9 @@ interface NoteRender {
     updateFX(
         img: ImageBitmap,
         scale: number,
-        limitX: number,
-        limitY: number,
-        hideParts: boolean,
+        limitX?: number,
+        limitY?: number,
+        hideParts?: boolean,
         duration?: number
     ): Promise<void>;
 }

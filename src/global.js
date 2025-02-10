@@ -24,6 +24,7 @@ import { Utils } from "@utils/js/utils";
 
 if (import.meta.env.DEV) self.ptdb = ptdb;
 
+document.oncontextmenu = e => e.preventDefault();
 import { renderers } from "@utils/renderer";
 
 var searchParams;
