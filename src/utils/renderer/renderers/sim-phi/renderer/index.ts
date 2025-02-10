@@ -1,12 +1,61 @@
-// import { replayMgr } from "@components/recordMgr/replayMgr.js";
 import shared from "@utils/js/shared.js";
 import { rgb2hex } from "../utils/rgb2hex";
 
 import { normalizeLineEvent, normalizeSpeedEvent } from "./Events";
 import { Chart } from "./Chart";
+import { JudgeLine, JudgelineExtends } from "./Chart/JudgeLine";
+import { Note, NoteExtends } from "./Chart/Note";
 
 export class Renderer {
-    constructor(stage) {
+    public stage: HTMLDivElement;
+    public canvas: HTMLCanvasElement;
+    public ctx: CanvasRenderingContext2D;
+    public canvasos: HTMLCanvasElement;
+    public ctxos: CanvasRenderingContext2D;
+    public isFull: boolean;
+    public speed: number;
+    public chart: any;
+    public lineScale: number;
+    public noteScale: number;
+    public noteScaleRatio: number;
+    public brightness: number;
+    public lastRatio: number | null;
+    public multiHint: boolean;
+    public playMode: number;
+    public musicVolume: number;
+    public soundVolume: number;
+    private _mirrorType: number;
+    public enableFR: boolean;
+    public enableVP: boolean;
+    public bgImage: any;
+    public bgImageBlur: any;
+    public bgMusic: any;
+    public bgVideo: any;
+    public lines: JudgelineExtends[];
+    public notes: NoteExtends[];
+    public taps: NoteExtends[];
+    public drags: NoteExtends[];
+    public flicks: NoteExtends[];
+    public holds: NoteExtends[];
+    public linesReversed: JudgelineExtends[];
+    public notesReversed: NoteExtends[];
+    public tapsReversed: NoteExtends[];
+    public dragsReversed: NoteExtends[];
+    public flicksReversed: NoteExtends[];
+    public holdsReversed: NoteExtends[];
+    public tapholds: NoteExtends[];
+    private lowResFactor: number;
+    public width: number;
+    public height: number;
+    public wlen: number;
+    public hlen: number;
+    public scaleX: number;
+    public scaleY: number;
+    public matX: (x: number) => number;
+    public matY: (y: number) => number;
+    public matR: (r: number) => number;
+
+    constructor(stage: HTMLDivElement) {
         if (!(stage instanceof HTMLDivElement)) throw new Error("Not a container");
         this.stage = stage;
         this.canvas = document.createElement("canvas");
@@ -59,54 +108,41 @@ export class Renderer {
         this.bgImageBlur = null;
         this.bgMusic = null;
         this.bgVideo = null;
-        /** @type {JudgelineExtends[]} */
         this.lines = [];
-        /** @type {NoteExtends[]} */
         this.notes = [];
-        /** @type {NoteExtends[]} */
         this.taps = [];
-        /** @type {NoteExtends[]} */
         this.drags = [];
-        /** @type {NoteExtends[]} */
         this.flicks = [];
-        /** @type {NoteExtends[]} */
         this.holds = [];
-        /** @type {JudgelineExtends[]} */
         this.linesReversed = [];
-        /** @type {NoteExtends[]} */
         this.notesReversed = [];
-        /** @type {NoteExtends[]} */
         this.tapsReversed = [];
-        /** @type {NoteExtends[]} */
         this.dragsReversed = [];
-        /** @type {NoteExtends[]} */
         this.flicksReversed = [];
-        /** @type {NoteExtends[]} */
         this.holdsReversed = [];
-        /** @type {NoteExtends[]} */
         this.tapholds = [];
 
         //qwq2
         this._setLowResFactor(1);
         this.resizeCanvas();
     }
-    init(options) {
+    init(options: any): void {
         /*const _this = this;
     Object.assign(_this, options);*/
     }
     //config
-    setNoteScale(num) {
+    setNoteScale(num: number): void {
         this.noteScale = Number(num) || 1;
         this.noteScaleRatio = (this.canvasos.width * this.noteScale) / 8080; //note、特效缩放
     }
-    _setLowResFactor(num) {
+    _setLowResFactor(num: number): void {
         this.lowResFactor = num * self.devicePixelRatio;
     }
-    setLowResFactor(num) {
+    setLowResFactor(num: number): void {
         this._setLowResFactor(Number(num) || 1);
         this._resizeCanvas();
     }
-    _resizeCanvas() {
+    _resizeCanvas(): void {
         const pt = shared.game.ptmain;
         const { canvas, canvasos, width, height } = this;
         const widthLowRes = width * this.lowResFactor;
@@ -135,7 +171,7 @@ export class Renderer {
                 ? canvasos.height / 18.75
                 : canvasos.width / 14.0625; //判定线、文字缩放
     }
-    resizeCanvas() {
+    resizeCanvas(): void {
         const pt = shared.game.ptmain;
         const { clientWidth: width, clientHeight: height } = this.stage;
         if (
@@ -150,12 +186,12 @@ export class Renderer {
         this.canvas.style.cssText += `;width:${width}px;height:${height}px;top:0px;`; //只有inset还是会溢出
         this._resizeCanvas();
     }
-    mirrorView(code = this._mirrorType) {
+    mirrorView(code: number = this._mirrorType): number {
         const n = (this._mirrorType = 3 & code);
         this.transformView(1 & n ? -1 : 1, 2 & n ? -1 : 1, 0, 0);
         return code;
     }
-    transformView(scaleX = 1, scaleY = 1, offsetX = 0, offsetY = 0) {
+    transformView(scaleX: number = 1, scaleY: number = 1, offsetX: number = 0, offsetY: number = 0): void {
         const { canvasos } = this;
         const xa = canvasos.width * scaleX;
         const xb = (canvasos.width - xa) * 0.5;
@@ -172,7 +208,7 @@ export class Renderer {
         this.scaleY = ty;
     }
     //note预处理
-    prerenderChart(chart) {
+    prerenderChart(chart: any): void {
         this.lines.length = 0;
         this.notes.length = 0;
         this.taps.length = 0;
@@ -183,7 +219,7 @@ export class Renderer {
         const chartNew = new Chart(chart);
         let maxTime = 0;
         //添加realTime
-        const addRealTime = (events, bpm) => {
+        const addRealTime = (events: any[], bpm: number) => {
             for (const i of events) {
                 i.startRealTime = (i.startTime / bpm) * 1.875;
                 i.endRealTime = (i.endTime / bpm) * 1.875;
@@ -193,7 +229,7 @@ export class Renderer {
         };
         //向Renderer添加Note
         /** @param {NoteExtends} note */
-        const addNote = (note, beat32, line, noteId, isAbove) => {
+        const addNote = (note: NoteExtends, beat32: number, line: JudgelineExtends, noteId: number, isAbove: boolean) => {
             note.offsetX = 0;
             note.offsetY = 0;
             note.alpha = 0;
@@ -211,10 +247,10 @@ export class Renderer {
             else if (note.type === 4) this.flicks.push(note);
             if (note.type === 1 || note.type === 3) this.tapholds.push(note);
         };
-        const sortNote = (a, b) =>
+        const sortNote = (a: NoteExtends, b: NoteExtends) =>
             a.realTime - b.realTime || a.lineId - b.lineId || a.noteId - b.noteId;
         //优化events
-        chartNew.judgeLineList.forEach((i, lineId) => (i.lineId = lineId));
+        chartNew.judgeLineList.forEach((i: JudgeLine, lineId: number) => ((i as unknown as JudgelineExtends).lineId = lineId));
         for (const i of chartNew.judgeLineList) {
             i.bpm *= this.speed;
             i.offsetX = 0;
@@ -238,9 +274,9 @@ export class Renderer {
             addRealTime(i.judgeLineTextEvents, i.bpm);
             addRealTime(i.judgeLineScaleXEvents, i.bpm);
             addRealTime(i.judgeLineScaleYEvents, i.bpm);
-            this.lines.push(i); //qwq可以定义新类避免函数在循环里定义
-            i.notesAbove.forEach((j, noteId) => addNote(j, 1.875 / i.bpm, i, noteId, true));
-            i.notesBelow.forEach((j, noteId) => addNote(j, 1.875 / i.bpm, i, noteId, false));
+            this.lines.push(i as unknown as JudgelineExtends); //qwq可以定义新类避免函数在循环里定义
+            i.notesAbove.forEach((j: Note, noteId: number) => addNote(j as unknown as NoteExtends, 1.875 / i.bpm, i as unknown as JudgelineExtends, noteId, true));
+            i.notesBelow.forEach((j: Note, noteId: number) => addNote(j as unknown as NoteExtends, 1.875 / i.bpm, i as unknown as JudgelineExtends, noteId, false));
         }
         this.notes.sort(sortNote);
         this.taps.sort(sortNote);
@@ -255,7 +291,7 @@ export class Renderer {
         this.linesReversed = this.lines.slice().reverse();
         this.tapholds.sort(sortNote);
         //多押标记
-        const timeOfMulti = {};
+        const timeOfMulti: { [key: string]: number } = {};
         for (const i of this.notes)
             timeOfMulti[i.realTime.toFixed(6)] = timeOfMulti[i.realTime.toFixed(6)] ? 2 : 1;
         for (const i of this.notes) i.isMulti = timeOfMulti[i.realTime.toFixed(6)] === 2;
@@ -280,7 +316,7 @@ export class Renderer {
         }
         this.chart = chartNew;
     }
-    updateByTime(timeChart) {
+    updateByTime(timeChart: number): void {
         for (const line of this.lines) {
             for (const i of line.judgeLineDisappearEvents) {
                 if (timeChart < i.startRealTime) break;
@@ -313,7 +349,7 @@ export class Renderer {
                     i.start == 0 || i.end == 0
                         ? null
                         : rgb2hex(
-                              i.start.split(",").map((start, index) => {
+                              i.start.split(",").map((start: number, index: number) => {
                                   start = Number(start);
                                   const end = Number(i.end.split(",")[index]);
                                   return Math.round(start + dt * (end - start));
@@ -354,18 +390,18 @@ export class Renderer {
                     (timeChart - i.startRealTime) * i.value * this.speed +
                     (this.enableFR ? i.floorPosition2 : i.floorPosition);
             }
-            const realgetY = i => {
+            const realgetY = (i: NoteExtends) => {
                 if (i.type !== 3) return (i.floorPosition - line.positionY) * i.speed;
                 if (i.realTime < timeChart) return (i.realTime - timeChart) * i.speed * this.speed;
                 return i.floorPosition - line.positionY;
             };
-            const getY = i => {
+            const getY = (i: NoteExtends) => {
                 if (!i.badtime) return realgetY(i);
                 if (performance.now() - i.badtime > 500) delete i.badtime;
                 if (!i.badY) i.badY = realgetY(i);
                 return i.badY;
             };
-            const setAlpha = (i, dx, dy) => {
+            const setAlpha = (i: NoteExtends, dx: number, dy: number) => {
                 i.projectX = line.offsetX + dx * i.cosr;
                 i.offsetX = i.projectX + dy * i.sinr;
                 i.projectY = line.offsetY + dx * i.sinr;
@@ -384,22 +420,22 @@ export class Renderer {
                                 this.scaleY * i.realHoldTime * i.speed * this.speed) **
                                 2; //Math.hypot实测性能较低
                 i.showPoint = false;
-                if (i.badtime);
-                else if (i.realTime > timeChart) {
-                    i.showPoint = true;
-                    i.alpha =
-                        dy <= -1e-3 * this.scaleY || (this.enableVP && realgetY(i) * 0.6 > 2)
-                            ? 0
-                            : i.type === 3 && i.speed === 0
-                              ? 0
-                              : 1;
-                } else {
-                    i.frameCount = i.frameCount == null ? 0 : i.frameCount + 1;
-                    if (i.type === 3) {
+                if (!i.badtime)
+                    if (i.realTime > timeChart) {
                         i.showPoint = true;
-                        i.alpha = i.speed === 0 ? 0 : i.status % 4 === 2 ? 0.45 : 1;
-                    } else i.alpha = Math.max(1 - (timeChart - i.realTime) / 0.16, 0); //过线后0.16s消失
-                }
+                        i.alpha =
+                            dy <= -1e-3 * this.scaleY || (this.enableVP && realgetY(i) * 0.6 > 2)
+                                ? 0
+                                : i.type === 3 && i.speed === 0
+                                ? 0
+                                : 1;
+                    } else {
+                        i.frameCount = i.frameCount == null ? 0 : i.frameCount + 1;
+                        if (i.type === 3) {
+                            i.showPoint = true;
+                            i.alpha = i.speed === 0 ? 0 : i.status % 4 === 2 ? 0.45 : 1;
+                        } else i.alpha = Math.max(1 - (timeChart - i.realTime) / 0.16, 0); //过线后0.16s消失
+                    }
                 i.alpha *= i.realAlpha;
             };
             for (const i of line.notesAbove) {

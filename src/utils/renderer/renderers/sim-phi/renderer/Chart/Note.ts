@@ -1,3 +1,5 @@
+import { JudgelineExtends } from './JudgeLine';
+
 interface NoteParams {
     type?: number | string;
     time?: number | string;
@@ -36,4 +38,38 @@ export class Note {
         this.realAlpha = parseFloat(note.alpha || note.alpha === 0 ? note.alpha as string : '1');
         this.size = note.size || 1;
     }
+}
+
+
+export interface NoteExtends {
+    type: number;
+    time: number;
+    holdTime: number;
+    speed: number;
+    realTime: number;
+    realHoldTime: number;
+    offsetX: number;
+    offsetY: number;
+    alpha: number;
+    line: JudgelineExtends;
+    lineId: number;
+    noteId: number;
+    isAbove: boolean;
+    name: string;
+    isMulti: boolean;
+    nearNotes: NoteExtends[];
+    badtime?: number;
+    badY?: number;
+    projectX: number;
+    projectY: number;
+    cosr: number;
+    sinr: number;
+    visible: boolean;
+    showPoint: boolean;
+    frameCount: number | null;
+    status: number;
+    realAlpha: number;
+    visibleTime: number;
+    positionX: number;
+    floorPosition: number;
 }

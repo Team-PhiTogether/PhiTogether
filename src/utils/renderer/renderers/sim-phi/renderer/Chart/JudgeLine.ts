@@ -1,4 +1,4 @@
-import { Note } from "./Note";
+import { Note, NoteExtends } from "./Note";
 import { LineEvent } from "../Events/LineEvent";
 import { SpeedEvent } from "../Events/SpeedEvent";
 
@@ -38,6 +38,12 @@ export class JudgeLine {
     judgeLineScaleXEvents: LineEvent[];
     judgeLineScaleYEvents: LineEvent[];
 
+    offsetX: number;
+    offsetY: number;
+    alpha: number;
+    rotation: number;
+    positionY: number;
+
     constructor(line: JudgeLineOptions = {}) {
         this.numOfNotes = parseInt(String(line.numOfNotes)) || 0;
         this.numOfNotesAbove = parseInt(String(line.numOfNotesAbove)) || 0;
@@ -76,4 +82,32 @@ export class JudgeLine {
             ? line.judgeLineScaleYEvents.map(i => new LineEvent(i))
             : [];
     }
+}
+
+export interface JudgelineExtends {
+    lineId: number;
+    bpm: number;
+    offsetX: number;
+    offsetY: number;
+    alpha: number;
+    rotation: number;
+    positionY: number;
+    realX: number;
+    realY: number;
+    cosr: number;
+    sinr: number;
+    color: string | null;
+    text: string | null;
+    scaleX: number;
+    scaleY: number;
+    speedEvents: any[];
+    judgeLineDisappearEvents: any[];
+    judgeLineMoveEvents: any[];
+    judgeLineRotateEvents: any[];
+    judgeLineColorEvents: any[];
+    judgeLineTextEvents: any[];
+    judgeLineScaleXEvents: any[];
+    judgeLineScaleYEvents: any[];
+    notesAbove: NoteExtends[];
+    notesBelow: NoteExtends[];
 }
