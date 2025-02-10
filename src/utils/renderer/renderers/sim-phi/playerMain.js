@@ -1020,8 +1020,8 @@ async function qwqStop() {
 simphiPlayer.stat = simphiPlayer.stat;
 export var hook = (self.hook = simphiPlayer);
 const flag0 = "flag{\x71w\x71}";
-hook.before.set(flag0, () => {
-    const md5 = hook.chartsMD5.get(hook.selectchart.value);
+simphiPlayer.before.set(flag0, () => {
+    const md5 = simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value);
     const hashDF = [
         "cdb5987ad81b70e3dc96153af2efaa61",
         "86d23af0cc595a703241536a2d29ee4b",
@@ -1029,16 +1029,16 @@ hook.before.set(flag0, () => {
         "0e8ff64e65bf35382e30f980b5eec041",
     ];
     const hashD321 = ["4ddcd5d923007d661911989e79fe8a59"];
-    if (md5 === "ab9d2cc3eb569236ead459ad4caba109") hook.now.set(flag0, loadModYukiOri(hook));
+    if (md5 === "ab9d2cc3eb569236ead459ad4caba109") simphiPlayer.now.set(flag0, loadModYukiOri(hook));
     else if (hashDF.includes(md5) && simphiPlayer.inputName.value === "Distorted Fate ")
         import("./plugins/demo/DFLevelEffect.js").then(({ loadMod }) =>
-            hook.now.set(flag0, loadMod())
+            simphiPlayer.now.set(flag0, loadMod())
         );
     else if (hashD321.includes(md5) && simphiPlayer.inputName.value === "DESTRUCTION 3,2,1 ")
         import("./plugins/demo/321LevelEffect.js").then(({ loadMod }) =>
-            hook.now.set(flag0, loadMod())
+            simphiPlayer.now.set(flag0, loadMod())
         );
-    else hook.now.delete(flag0);
+    else simphiPlayer.now.delete(flag0);
 });
 
 //plugin(filter)

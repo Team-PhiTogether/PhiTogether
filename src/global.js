@@ -445,8 +445,9 @@ const ptAppInstance = createApp({
                         document.getElementById("select-speed").value
                     ] /
                         12);
-                if (newVal.videoRecorder) this.currentRenderer.plugins.videoRecorder.enable();
-                else this.currentRenderer.plugins.videoRecorder.disable();
+                // if (newVal.videoRecorder) simphiPlayer.plugins.videoRecorder.enable();
+                // else this.currentRenderer.plugins.videoRecorder.disable();
+                // TODO
             },
         },
         localeValue: {
