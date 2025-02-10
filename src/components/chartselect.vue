@@ -634,10 +634,7 @@
             },
             async multiSyncChart() {
                 try {
-                    ploading.l(
-                        this.$t("chartSelect.multiSyncChart.sync"),
-                        "syncChart"
-                    );
+                    ploading.l(this.$t("chartSelect.multiSyncChart.sync"), "syncChart");
                     await shared.game.multiInstance.syncChart(
                         this.selectedSongData,
                         this.ct,

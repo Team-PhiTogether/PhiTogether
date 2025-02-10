@@ -9,12 +9,8 @@ let defaultCRM = {
     name: "PhiTogether Default 1",
     author: "Team PhiTogether",
 };
-// const loadRes = (shared.game.simphi.reloadRes = 
-export async function loadRes(
-    url: string,
-    manual: boolean = false,
-    setAsDefault: boolean = false
-) {
+// const loadRes = (shared.game.simphi.reloadRes =
+export async function loadRes(url: string, manual: boolean = false, setAsDefault: boolean = false) {
     if (!url) {
         if (simphiPlayer.customResourceMeta == defaultCRM) return;
         // if (shared.game.ptmain.gameConfig.resourcesType === "prpr-custom") {

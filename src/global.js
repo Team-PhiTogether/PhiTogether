@@ -555,10 +555,7 @@ const ptAppInstance = createApp({
                                 return;
                             }
                             try {
-                                ploading.l(
-                                    this.$t("phizone.modJudgment.modifying"),
-                                    "modJudgment"
-                                );
+                                ploading.l(this.$t("phizone.modJudgment.modifying"), "modJudgment");
                                 await phizoneApi.patchSpecConfiguration(
                                     this.gameConfig.account.tokenInfo.access_token,
                                     this.gameConfig.account.defaultConfigID,
@@ -1344,10 +1341,7 @@ const ptAppInstance = createApp({
                     if (blobs[3]) {
                         for (const i of blobs[3]) {
                             loaded++;
-                            ploading.l(
-                                this.$t("loadChart.info", { loaded, resNum }),
-                                "loadChart"
-                            );
+                            ploading.l(this.$t("loadChart.info", { loaded, resNum }), "loadChart");
                             uploader.fireLoad(
                                 { name: i.name },
                                 await new Response(i.file).arrayBuffer()

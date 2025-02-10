@@ -5,13 +5,19 @@ import { Utils } from "@utils/js/utils";
 interface MsgHandler {
     nodeText: HTMLElement | null;
     lastMessage: string;
-    sendMessage(msg: string, type: 'error' | 'success' | 'info', system?: boolean): void;
+    sendMessage(msg: string, type: "error" | "success" | "info", system?: boolean): void;
     confirm(msg: string, title?: string, yes?: string, no?: string): Promise<boolean>;
     info(msg: string, title?: string, yes?: string, type?: string): Promise<boolean>;
     success(msg: string, title?: string, yes?: string): Promise<boolean>;
     failure(msg: string, title?: string, yes?: string): Promise<boolean>;
     warning(msg: string, title?: string, yes?: string): Promise<boolean>;
-    prompt(msg: string, title?: string, yes?: string, no?: string, placeholder?: string): Promise<string | null>;
+    prompt(
+        msg: string,
+        title?: string,
+        yes?: string,
+        no?: string,
+        placeholder?: string
+    ): Promise<string | null>;
     msgbox(msg: string, type: string, fatal?: boolean): void;
     sendWarning(msg: string, isHTML?: boolean): void;
     sendError(msg: string, html?: string, fatal?: boolean): boolean;
@@ -20,7 +26,7 @@ interface MsgHandler {
 export const msgHandler: MsgHandler = {
     nodeText: document.getElementById("msg-out"),
     lastMessage: "",
-    sendMessage(msg: string, type: 'error' | 'success' | 'info', system: boolean = true) {
+    sendMessage(msg: string, type: "error" | "success" | "info", system: boolean = true) {
         if (type === "error") {
             Notiflix.Notify.failure(msg, {
                 ID: "msgHandlerErr",
@@ -112,7 +118,13 @@ export const msgHandler: MsgHandler = {
         if (!yes) yes = i18n.global.t("info.ok");
         return this.info(msg, title, yes, "warning");
     },
-    prompt(msg: string, title?: string, yes?: string, no?: string, placeholder: string = ""): Promise<string | null> {
+    prompt(
+        msg: string,
+        title?: string,
+        yes?: string,
+        no?: string,
+        placeholder: string = ""
+    ): Promise<string | null> {
         if (!title) title = i18n.global.t("info.info");
         if (!yes) yes = i18n.global.t("info.confirm");
         if (!no) no = i18n.global.t("info.cancel");

@@ -1,6 +1,6 @@
 import { decodeAlt } from "@utils/imgAny";
 import { simphiPlayer } from "../../playerMain.js";
-import { audio } from "@utils/js/aup"
+import { audio } from "@utils/js/aup";
 const $id = query => document.getElementById(query);
 const $ = query => document.body.querySelector(query);
 const flag0 = "flag{\x71w\x71}";
@@ -19,9 +19,12 @@ export default function () {
             "f5f8c244d317006103b67e1cdf6eb85b",
             "0e8ff64e65bf35382e30f980b5eec041",
         ];
-        if (md5 === "ab9d2cc3eb569236ead459ad4caba109") simphiPlayer.now.set(flag0, loadModYukiOri());
+        if (md5 === "ab9d2cc3eb569236ead459ad4caba109")
+            simphiPlayer.now.set(flag0, loadModYukiOri());
         else if (hashDF.includes(md5) && simphiPlayer.inputName.value === "Distorted Fate ")
-            import("./DFLevelEffect.js").then(({ loadMod }) => simphiPlayer.now.set(flag0, loadMod()));
+            import("./DFLevelEffect.js").then(({ loadMod }) =>
+                simphiPlayer.now.set(flag0, loadMod())
+            );
         // else import('./321LevelEffect.js').then(({ loadMod }) => simphiPlayer.now.set(flag0, loadMod()));
         else simphiPlayer.now.delete(flag0);
     });
@@ -44,7 +47,8 @@ export default function () {
                     const xhr = new XMLHttpRequest();
                     xhr.open("GET", "//i0.hdslb.com/bfs/music/1682346166.jpg", true);
                     xhr.responseType = "blob";
-                    xhr.onprogress = evt => simphiPlayer.uploader.fireProgress(evt.loaded, evt.total);
+                    xhr.onprogress = evt =>
+                        simphiPlayer.uploader.fireProgress(evt.loaded, evt.total);
                     xhr.onloadend = () => createImageBitmap(xhr.response).then(handler);
                     setNoReferrer(() => xhr.send());
                 };

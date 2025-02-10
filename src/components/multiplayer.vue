@@ -1428,8 +1428,9 @@ const showTransition = $("showTransition");
                             v-bind:style="{ color: ((!item.online) ? 'grey' : (item.id === room.owner ? 'red' : 'unset')), display: item.exited === 0 ? 'flex' : 'none' }"
                             v-on:click="actionPlayer(item.id, item.name, item.exited)">
                             <div :style="{ backgroundImage: 'url(' + item.avatar.replace('res.phi.zone', pzResUrlGlobal) + ')', filter: (!item.online) ? 'grayscale(1)' : 'unset', border: '3px solid ' + (item.id === room.owner ? 'red' : 'var(--color-box-border)') }"
-                                class="multi-user-avatar" />
-                            {{ item.name }}
+                                class="multi-user-avatar">
+                                {{ item.name }}
+                            </div>
                         </p>
                     </div>
                 </div>

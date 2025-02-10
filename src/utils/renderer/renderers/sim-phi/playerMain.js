@@ -28,8 +28,8 @@ import { HitEvents } from "./components/HitManager/HitEvents";
 import { HitWord } from "./components/HitManager/HitWord";
 import { HitFeedback } from "./components/HitManager/HitFeedback";
 import { LineImage } from "./components/LineImage";
-import { specialDrag } from "./components/specialDrag";
-import { specialClick } from "./components/specialClick";
+import { specialDrag } from "./components/SpecialDrag";
+import { specialClick } from "./components/SpecialClick";
 import { loadLineData } from "./components/LoadLineData";
 
 import { mainLoop } from "./renderer/Loop";
@@ -70,23 +70,23 @@ export const simphiPlayer = {
         if (await checkSupport()) return;
         const pth = "/src/respack/";
         let pack = "together-pack-1";
-    
+
         shared.game.ptmain.playerLoaded();
-    
+
         let ptSettings;
         try {
             ptSettings = await ptdb.gameConfig.get();
         } catch (e) {
             ptSettings = { resourcesType: "together-pack-1" };
         }
-    
+
         if (ptSettings.resourcesType) {
             if (ptSettings.resourcesType === "pt-custom")
                 loadRes(ptSettings["customResourceLink"], false, true);
             else if (ptSettings.resourcesType.startsWith("together-pack"))
                 loadRes(`/src/respack/${ptSettings.resourcesType}`, false, true);
         }
-    
+
         await Promise.all(
             Object.entries({
                 JudgeLine: "JudgeLine.png",
@@ -103,7 +103,7 @@ export const simphiPlayer = {
                 Retry: "replay.png",
                 Back: "return.png",
                 Loop: "loop.png",
-    
+
                 /* Default Respack Files, now replaced by `loadRes`.
         HitFXRaw: "clickRaw.png",
         Tap: "Tap.png",
@@ -424,7 +424,8 @@ export const simphiPlayer = {
     hitManager: new HitManager(),
 
     async pause() {
-        if (simphiPlayer.btnPause.classList.contains("disabled") || !simphiPlayer.tmps.canPause) return;
+        if (simphiPlayer.btnPause.classList.contains("disabled") || !simphiPlayer.tmps.canPause)
+            return;
         if (simphiPlayer.emitter.eq("stop") || simphiPlayer.resultPageData) return;
         simphiPlayer.btnPause.classList.add("disabled");
         if (simphiPlayer.emitter.eq("play")) {
@@ -476,7 +477,10 @@ export const simphiPlayer = {
                                 simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
                             );
                         simphiPlayer.animationTimer.in.play();
-                        if (simphiPlayer.showTransition.checked && simphiPlayer.animationInfo.isOutStart)
+                        if (
+                            simphiPlayer.showTransition.checked &&
+                            simphiPlayer.animationInfo.isOutStart
+                        )
                             simphiPlayer.animationTimer.out.play();
                         if (
                             simphiPlayer.animationInfo.isInEnd &&
@@ -491,7 +495,10 @@ export const simphiPlayer = {
                     simphiPlayer.btnPause.classList.remove("disabled");
                 }
             }, 1000);
-            if (shared.game.ptmain.gameConfig.reviewWhenResume && simphiPlayer.timeInfo.curTime > 3) {
+            if (
+                shared.game.ptmain.gameConfig.reviewWhenResume &&
+                simphiPlayer.timeInfo.curTime > 3
+            ) {
                 if (simphiPlayer.timeInfo.curTime > 3)
                     simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime -= 3;
                 if (simphiPlayer.app.bgVideo)
@@ -605,11 +612,7 @@ interact.setTouchEvent({
 //hit end
 //初始化
 //初始化(踩坑：监听DOMContentLoaded似乎会阻塞页面导致长时间白屏)
-window.addEventListener(
-    "load",
-    simphiPlayer.constructor,
-    { once: true }
-);
+window.addEventListener("load", simphiPlayer.constructor, { once: true });
 
 simphiPlayer.frameAnimater.setCallback(mainLoop);
 function onPageVisibilityChange() {
@@ -825,7 +828,8 @@ simphiPlayer.before.set(flag0, () => {
         "0e8ff64e65bf35382e30f980b5eec041",
     ];
     const hashD321 = ["4ddcd5d923007d661911989e79fe8a59"];
-    if (md5 === "ab9d2cc3eb569236ead459ad4caba109") simphiPlayer.now.set(flag0, loadModYukiOri(hook));
+    if (md5 === "ab9d2cc3eb569236ead459ad4caba109")
+        simphiPlayer.now.set(flag0, loadModYukiOri(hook));
     else if (hashDF.includes(md5) && simphiPlayer.inputName.value === "Distorted Fate ")
         import("./plugins/demo/DFLevelEffect.js").then(({ loadMod }) =>
             simphiPlayer.now.set(flag0, loadMod())

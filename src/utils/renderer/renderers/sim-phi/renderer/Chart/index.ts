@@ -38,7 +38,7 @@ export class Chart {
 }
 
 function getAdjustedOffset(chart: ChartData): Promise<number> {
-    return new Promise((res) => {
+    return new Promise(res => {
         ptdb.gameConfig
             .get("savedChartOffsets")
             .then((savedChartOffsets: Record<string, number> | null) => {

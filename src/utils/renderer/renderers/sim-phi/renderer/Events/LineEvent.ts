@@ -19,8 +19,12 @@ export class LineEvent {
         event = event ?? {};
         this.startTime = parseInt(event.startTime as string) || 0;
         this.endTime = parseInt(event.endTime as string) || 0;
-        this.start = typeof event.start === "string" ? event.start : parseFloat(event.start as unknown as string) || 0;
-        this.end = typeof event.start === "string" ? event.end : parseFloat(event.end as string) || 0;
+        this.start =
+            typeof event.start === "string"
+                ? event.start
+                : parseFloat(event.start as unknown as string) || 0;
+        this.end =
+            typeof event.start === "string" ? event.end : parseFloat(event.end as string) || 0;
         this.start2 = parseFloat(event.start2 as string) || 0;
         this.end2 = parseFloat(event.end2 as string) || 0;
     }

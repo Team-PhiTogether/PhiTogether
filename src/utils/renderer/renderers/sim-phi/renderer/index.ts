@@ -133,7 +133,12 @@ export class Renderer {
         this.transformView(1 & n ? -1 : 1, 2 & n ? -1 : 1, 0, 0);
         return code;
     }
-    transformView(scaleX: number = 1, scaleY: number = 1, offsetX: number = 0, offsetY: number = 0): void {
+    transformView(
+        scaleX: number = 1,
+        scaleY: number = 1,
+        offsetX: number = 0,
+        offsetY: number = 0
+    ): void {
         const { canvasos } = this;
         const xa = canvasos.width * scaleX;
         const xb = (canvasos.width - xa) * 0.5;
@@ -171,7 +176,13 @@ export class Renderer {
         };
         //向Renderer添加Note
         /** @param {NoteExtends} note */
-        const addNote = (note: NoteExtends, beat32: number, line: JudgelineExtends, noteId: number, isAbove: boolean) => {
+        const addNote = (
+            note: NoteExtends,
+            beat32: number,
+            line: JudgelineExtends,
+            noteId: number,
+            isAbove: boolean
+        ) => {
             note.offsetX = 0;
             note.offsetY = 0;
             note.alpha = 0;
@@ -192,7 +203,9 @@ export class Renderer {
         const sortNote = (a: NoteExtends, b: NoteExtends) =>
             a.realTime - b.realTime || a.lineId - b.lineId || a.noteId - b.noteId;
         //优化events
-        chartNew.judgeLineList.forEach((i: JudgeLine, lineId: number) => ((i as unknown as JudgelineExtends).lineId = lineId));
+        chartNew.judgeLineList.forEach(
+            (i: JudgeLine, lineId: number) => ((i as unknown as JudgelineExtends).lineId = lineId)
+        );
         for (const i of chartNew.judgeLineList) {
             i.bpm *= this.speed;
             i.offsetX = 0;
@@ -217,8 +230,24 @@ export class Renderer {
             addRealTime(i.judgeLineScaleXEvents, i.bpm);
             addRealTime(i.judgeLineScaleYEvents, i.bpm);
             this.lines.push(i as unknown as JudgelineExtends); //qwq可以定义新类避免函数在循环里定义
-            i.notesAbove.forEach((j: Note, noteId: number) => addNote(j as unknown as NoteExtends, 1.875 / i.bpm, i as unknown as JudgelineExtends, noteId, true));
-            i.notesBelow.forEach((j: Note, noteId: number) => addNote(j as unknown as NoteExtends, 1.875 / i.bpm, i as unknown as JudgelineExtends, noteId, false));
+            i.notesAbove.forEach((j: Note, noteId: number) =>
+                addNote(
+                    j as unknown as NoteExtends,
+                    1.875 / i.bpm,
+                    i as unknown as JudgelineExtends,
+                    noteId,
+                    true
+                )
+            );
+            i.notesBelow.forEach((j: Note, noteId: number) =>
+                addNote(
+                    j as unknown as NoteExtends,
+                    1.875 / i.bpm,
+                    i as unknown as JudgelineExtends,
+                    noteId,
+                    false
+                )
+            );
         }
         this.notes.sort(sortNote);
         this.taps.sort(sortNote);
@@ -369,8 +398,8 @@ export class Renderer {
                             dy <= -1e-3 * this.scaleY || (this.enableVP && realgetY(i) * 0.6 > 2)
                                 ? 0
                                 : i.type === 3 && i.speed === 0
-                                ? 0
-                                : 1;
+                                  ? 0
+                                  : 1;
                     } else {
                         i.frameCount = i.frameCount == null ? 0 : i.frameCount + 1;
                         if (i.type === 3) {

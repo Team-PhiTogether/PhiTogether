@@ -1,8 +1,4 @@
-import {
-    imgShader,
-    imgPainter,
-    imgSplit,
-} from "../../assetsProcessor/imgProcessor";
+import { imgShader, imgPainter, imgSplit } from "../../assetsProcessor/imgProcessor";
 import { ScaledNote } from "./scaledNote";
 import { simphiPlayer } from "../../playerMain";
 
@@ -29,7 +25,12 @@ interface NoteRender {
 export const noteRender: NoteRender = {
     note: {},
     hitFX: {},
-    async update(name: string, img: ImageBitmap, scale: number, compacted: boolean = false): Promise<void> {
+    async update(
+        name: string,
+        img: ImageBitmap,
+        scale: number,
+        compacted: boolean = false
+    ): Promise<void> {
         this.note[name] = new ScaledNote(img, scale, compacted);
         if (name === "Tap") {
             this.note["TapBad"] = new ScaledNote(await imgPainter(img, "#6c4343"), scale);

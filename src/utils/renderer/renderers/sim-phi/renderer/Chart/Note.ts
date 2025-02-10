@@ -1,4 +1,4 @@
-import { JudgelineExtends } from './JudgeLine';
+import { JudgelineExtends } from "./JudgeLine";
 
 interface NoteParams {
     type?: number | string;
@@ -35,11 +35,10 @@ export class Note {
         this.holdTime = parseInt(note.holdTime as string) || 0;
         this.speed = parseFloat(note.speed as string) || 0;
         this.floorPosition = parseFloat(note.floorPosition as string) || 0;
-        this.realAlpha = parseFloat(note.alpha || note.alpha === 0 ? note.alpha as string : '1');
+        this.realAlpha = parseFloat(note.alpha || note.alpha === 0 ? (note.alpha as string) : "1");
         this.size = note.size || 1;
     }
 }
-
 
 export interface NoteExtends {
     type: number;

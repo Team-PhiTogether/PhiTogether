@@ -1,9 +1,6 @@
 import { simphiPlayer } from "@/utils/renderer/renderers/sim-phi/playerMain";
 import shared from "@utils/js/shared";
-import {
-    frameTimer,
-    time2Str,
-} from "@utils/js/common";
+import { frameTimer, time2Str } from "@utils/js/common";
 import { tween } from "../utils/tween";
 import { drawRoundRect } from "../utils/canvas";
 import { adjustSize } from "../utils/adjustSize";

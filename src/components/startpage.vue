@@ -143,10 +143,7 @@
                     return;
                 }
                 try {
-                    ploading.l(
-                        this.$t("startPage.loadingUserConfig"),
-                        "multiGetJudg"
-                    );
+                    ploading.l(this.$t("startPage.loadingUserConfig"), "multiGetJudg");
                     const current = await phizoneApi.getSpecConfiguration(
                         shared.game.ptmain.gameConfig.account.tokenInfo.access_token,
                         shared.game.ptmain.gameConfig.account.defaultConfigID
@@ -174,10 +171,7 @@
                     if (await shared.game.msgHandler.confirm(this.$t("startPage.restoreMP"))) {
                         const lastMultiInfo = JSON.parse(localStorage.lastMultiInfo);
                         try {
-                            ploading.l(
-                                this.$t("startPage.recoverMP"),
-                                "recoverMulti"
-                            );
+                            ploading.l(this.$t("startPage.recoverMP"), "recoverMulti");
                             const resp = await fetch(
                                 `${shared.game.ptmain.gameConfig.mpServerURL}/api/multi/requestRoom/${lastMultiInfo.room.id}?v=${spec.thisVersion}`
                             );

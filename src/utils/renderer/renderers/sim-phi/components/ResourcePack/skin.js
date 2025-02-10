@@ -193,11 +193,17 @@ export function loadSkinFromBuffer(buffer, init = false, callback) {
                 }
                 // 读取音频
                 if (entries.has("HitSong0"))
-                    simphiPlayer.res.HitSong0 = await audio.decode(entries.get("HitSong0").buffer.slice(0));
+                    simphiPlayer.res.HitSong0 = await audio.decode(
+                        entries.get("HitSong0").buffer.slice(0)
+                    );
                 if (entries.has("HitSong1"))
-                    simphiPlayer.res.HitSong1 = await audio.decode(entries.get("HitSong1").buffer.slice(0));
+                    simphiPlayer.res.HitSong1 = await audio.decode(
+                        entries.get("HitSong1").buffer.slice(0)
+                    );
                 if (entries.has("HitSong2"))
-                    simphiPlayer.res.HitSong2 = await audio.decode(entries.get("HitSong2").buffer.slice(0));
+                    simphiPlayer.res.HitSong2 = await audio.decode(
+                        entries.get("HitSong2").buffer.slice(0)
+                    );
                 if (typeof config.colorPerfect === "string" && config.colorPerfect.startsWith("0x"))
                     config.colorPerfect = `#${config.colorPerfect.slice(2)}`;
                 if (typeof config.colorGood === "string" && config.colorGood.startsWith("0x"))

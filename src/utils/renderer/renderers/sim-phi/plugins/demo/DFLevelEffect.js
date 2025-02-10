@@ -1864,7 +1864,12 @@ export function loadMod() {
         if (attr.blackBgOpacity != null) {
             simphiPlayer.tmps.customBackDraw = ctxos => {
                 ctxos.globalAlpha = attr.blackBgOpacity;
-                ctxos.fillRect(0, 0, simphiPlayer.app.canvasos.width, simphiPlayer.app.canvasos.height);
+                ctxos.fillRect(
+                    0,
+                    0,
+                    simphiPlayer.app.canvasos.width,
+                    simphiPlayer.app.canvasos.height
+                );
             };
         }
         simphiPlayer.filterOptions = attr;

@@ -82,12 +82,12 @@ uploader.reset = (i: number | false = false): void => {
 
 uploader.addEventListener("change", loadComplete);
 // uploader.addEventListener("progress", function (evt: ProgressEvent<FileReader>) {
-    // //显示加载文件进度
-    // if (!evt.total) return;
-    // const percent = Math.floor((evt.loaded / evt.total) * 100);
-    // msgHandler.sendMessage(
-    //   `加载文件：${percent}% (${bytefm(evt.loaded)}/${bytefm(evt.total)})`
-    // );
+// //显示加载文件进度
+// if (!evt.total) return;
+// const percent = Math.floor((evt.loaded / evt.total) * 100);
+// msgHandler.sendMessage(
+//   `加载文件：${percent}% (${bytefm(evt.loaded)}/${bytefm(evt.total)})`
+// );
 // });
 
 let lastEvtPromise: Promise<void> | null = null;
@@ -98,8 +98,7 @@ uploader.addEventListener("load", async function (evt: FileLoadEvent) {
         file: { name, webkitRelativePath: path },
         buffer,
     } = evt;
-    const isZip =
-        buffer.byteLength > 4 && new DataView(buffer).getUint32(0, false) === 0x504b0304;
+    const isZip = buffer.byteLength > 4 && new DataView(buffer).getUint32(0, false) === 0x504b0304;
     const data = { name: name, buffer, path: path || name };
     if (isZip) {
         lastEvtPromise = zip.read(data);
@@ -110,9 +109,7 @@ uploader.addEventListener("load", async function (evt: FileLoadEvent) {
         }
     } else {
         file_total++;
-        readFile(data, options).then(result =>
-            handleFile("file", file_total, pick(result))
-        );
+        readFile(data, options).then(result => handleFile("file", file_total, pick(result)));
     }
 });
 

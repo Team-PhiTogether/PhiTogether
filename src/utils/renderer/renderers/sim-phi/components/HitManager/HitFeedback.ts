@@ -5,7 +5,7 @@ export class HitFeedback {
     text: string;
     time: number;
 
-    constructor(offsetX: number, offsetY:number, n1: string, n2: string) {
+    constructor(offsetX: number, offsetY: number, n1: string, n2: string) {
         this.offsetX = Number(offsetX);
         this.offsetY = Number(offsetY);
         this.color = String(n1);
