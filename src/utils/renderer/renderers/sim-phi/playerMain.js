@@ -40,6 +40,8 @@ import { loadLineData } from "./components/LoadLineData";
 import { mainLoop } from "./renderer";
 import { noteRender } from "./renderer/Notes/render";
 
+import { getPos } from "./components/OperationHandler/getPos";
+
 const $id = query => document.getElementById(query);
 const $ = query => document.body.querySelector(query);
 const $$ = query => document.body.querySelectorAll(query);
@@ -652,20 +654,7 @@ interact.setTouchEvent({
         }
     },
 });
-/** @param {MouseEvent|Touch} obj */
-function getPos(obj) {
-    const rect = simphiPlayer.app.canvas.getBoundingClientRect();
-    return {
-        x:
-            ((obj.clientX - rect.left) / simphiPlayer.app.canvas.offsetWidth) *
-                simphiPlayer.app.canvas.width -
-            (simphiPlayer.app.canvas.width - simphiPlayer.app.canvasos.width) / 2,
-        y:
-            ((obj.clientY - rect.top) / simphiPlayer.app.canvas.offsetHeight) *
-                simphiPlayer.app.canvas.height -
-            (simphiPlayer.app.canvas.height - simphiPlayer.app.canvasos.height) / 2,
-    };
-}
+
 //hit end
 simphiPlayer.customResourceMeta = {};
 let defaultCRM = {
