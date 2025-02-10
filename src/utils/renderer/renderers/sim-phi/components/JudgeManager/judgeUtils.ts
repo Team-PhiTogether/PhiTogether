@@ -1,4 +1,4 @@
-import { NoteExtends } from "../../renderer/main";
+import { NoteExtends } from "../../renderer";
 import { JudgeEvent } from "./JudgeEvent";
 
 /**
