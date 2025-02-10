@@ -47,6 +47,157 @@ const $ = query => document.body.querySelector(query);
 const $$ = query => document.body.querySelectorAll(query);
 
 export const simphiPlayer = {
+    async constructor() {
+        shared.game = {
+            ...shared.game,
+            init: true,
+            app: simphiPlayer.app,
+            res: simphiPlayer.res,
+            charts: simphiPlayer.chartData.charts,
+            stat: simphiPlayer.stat,
+            hitManager: simphiPlayer.hitManager,
+            judgeManager,
+            stage: simphiPlayer.stage,
+            clearStat: simphiPlayer.clearStat,
+            loadSkinFromBuffer,
+            loadSkinFromDB,
+            updateLevelText: updateLevelTextOut,
+            doFullScreen: simphiPlayer.stage.doFullScreen,
+            adjustInfo,
+            qwqStop,
+            qwqPause: simphiPlayer.pause,
+            frameAnimater: simphiPlayer.frameAnimater,
+        };
+        await shared.game.requestFullscreen();
+        simphiPlayer.app.canvas.classList.add("fade");
+        let loadedNum = 0;
+        let errorNum = 0;
+        if (await checkSupport()) return;
+        const pth = "/src/respack/";
+        let pack = "together-pack-1";
+    
+        shared.game.ptmain.playerLoaded();
+    
+        let ptSettings;
+        try {
+            ptSettings = await ptdb.gameConfig.get();
+        } catch (e) {
+            ptSettings = { resourcesType: "together-pack-1" };
+        }
+    
+        if (ptSettings.resourcesType) {
+            if (ptSettings.resourcesType === "pt-custom")
+                loadRes(ptSettings["customResourceLink"], false, true);
+            else if (ptSettings.resourcesType.startsWith("together-pack"))
+                loadRes(`/src/respack/${ptSettings.resourcesType}`, false, true);
+        }
+    
+        await Promise.all(
+            Object.entries({
+                JudgeLine: "JudgeLine.png",
+                ProgressBar: "ProgressBar.png",
+                Pause: "PauseNew.png",
+                Rank: "Rank.png",
+                FCV: "FCV.png",
+                LevelOver0: "LevelOver0.ogg",
+                LevelOver0_v2: "LevelOver0_v2.ogg",
+                LevelOver1_v2: "LevelOver1_v2.ogg",
+                LevelOver2_v2: "LevelOver2_v2.ogg",
+                LevelOver3_v2: "LevelOver3_v2.ogg",
+                Resume: "play.png",
+                Retry: "replay.png",
+                Back: "return.png",
+                Loop: "loop.png",
+    
+                /* Default Respack Files, now replaced by `loadRes`.
+        HitFXRaw: "clickRaw.png",
+        Tap: "Tap.png",
+        TapHL: "TapHL.png",
+        Drag: "Drag.png",
+        DragHL: "DragHL.png",
+        Flick: "Flick.png",
+        FlickHL: "FlickHL.png",
+        HoldHead: "HoldHead.png",
+        HoldHeadHL: "HoldHeadHL.png",
+        Hold: "Hold.png",
+        HoldHL: "HoldHL.png",
+        HoldEnd: "HoldEnd.png",
+        HitSong0: "HitSong0.ogg",
+        HitSong1: "HitSong1.ogg",
+        HitSong2: "HitSong2.ogg", */
+            }).map(
+                ([name, src], _i, arr) =>
+                    new Promise(resolve => {
+                        const xhr = new XMLHttpRequest();
+                        const source = /* erc(src) ||  */ "/src/respack/shared/" + src;
+                        xhr.open("get", (src = source), true);
+                        xhr.responseType = "arraybuffer";
+                        xhr.send();
+                        xhr.onloadend = async () => {
+                            if (!xhr.response || !xhr.response.byteLength) {
+                                msgHandler.sendError(
+                                    shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [
+                                        ++errorNum,
+                                    ]),
+                                    "",
+                                    true
+                                );
+                            } else {
+                                const a = new DataView(xhr.response, 0, 8);
+                                const header1 = a.getUint32(0);
+                                const header2 = a.getUint32(4);
+                                if (header1 === 0x4f676753)
+                                    simphiPlayer.res[name] = await audio.decode(xhr.response);
+                                else if (header1 === 0x89504e47 && header2 === 0x0d0a1a0a)
+                                    simphiPlayer.res[name] = await createImageBitmap(
+                                        new Blob([xhr.response])
+                                    );
+                                else
+                                    msgHandler.sendError(
+                                        shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [
+                                            ++errorNum,
+                                        ]),
+                                        "",
+                                        true
+                                    );
+                            }
+                            resolve();
+                        };
+                    })
+            )
+        );
+        if (errorNum)
+            return msgHandler.sendError(
+                shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [errorNum])
+            );
+        simphiPlayer.res["NoImageBlack"] = await createImageBitmap(
+            new ImageData(new Uint8ClampedArray(4).fill(0), 1, 1)
+        );
+        simphiPlayer.res["NoImageWhite"] = await createImageBitmap(
+            new ImageData(new Uint8ClampedArray(4).fill(255), 1, 1)
+        );
+        simphiPlayer.res["JudgeLineMP"] = await imgShader(simphiPlayer.res["JudgeLine"], "#feffa9");
+        simphiPlayer.res["JudgeLineFC"] = await imgShader(simphiPlayer.res["JudgeLine"], "#a2eeff");
+        simphiPlayer.res["Ranks"] = await imgSplit(simphiPlayer.res["Rank"]);
+        simphiPlayer.res["Rank"].close();
+        simphiPlayer.res["mute"] = audio.mute(1);
+        if (
+            !(() => {
+                const b = createCanvas(1, 1).getContext("2d");
+                b.drawImage(simphiPlayer.res["JudgeLine"], 0, 0);
+                return b.getImageData(0, 0, 1, 1).data[0];
+            })()
+        )
+            return msgHandler.sendError(shared.game.i18n.t("simphi.loading.imgLoadingError"));
+        // if (ptSettings.resourcesType === "prpr-custom") await loadprprCustomRes();
+        // msgHandler.sendError(shared.game.i18n.t("respack.unavailableNow"));  // diasble custom respack for now
+        shared.game.ptmain.simphiLoaded();
+        $id("uploader").classList.remove("disabled");
+        $id("select").classList.remove("disabled");
+        simphiPlayer.emitter.dispatchEvent(new CustomEvent("change"));
+        simphiPlayer.btnPause.classList.add("disabled");
+    },
+
     plugins: { videoRecorder },
 
     modify: a => a,
@@ -512,156 +663,7 @@ interact.setTouchEvent({
 //初始化(踩坑：监听DOMContentLoaded似乎会阻塞页面导致长时间白屏)
 window.addEventListener(
     "load",
-    async function () {
-        shared.game = {
-            ...shared.game,
-            init: true,
-            app: simphiPlayer.app,
-            res: simphiPlayer.res,
-            charts: simphiPlayer.chartData.charts,
-            stat: simphiPlayer.stat,
-            hitManager: simphiPlayer.hitManager,
-            judgeManager,
-            stage: simphiPlayer.stage,
-            clearStat: simphiPlayer.clearStat,
-            loadSkinFromBuffer,
-            loadSkinFromDB,
-            updateLevelText: updateLevelTextOut,
-            doFullScreen: simphiPlayer.stage.doFullScreen,
-            adjustInfo,
-            qwqStop,
-            qwqPause: simphiPlayer.pause,
-            frameAnimater: simphiPlayer.frameAnimater,
-        };
-        await shared.game.requestFullscreen();
-        simphiPlayer.app.canvas.classList.add("fade");
-        let loadedNum = 0;
-        let errorNum = 0;
-        if (await checkSupport()) return;
-        const pth = "/src/respack/";
-        let pack = "together-pack-1";
-
-        shared.game.ptmain.playerLoaded();
-
-        let ptSettings;
-        try {
-            ptSettings = await ptdb.gameConfig.get();
-        } catch (e) {
-            ptSettings = { resourcesType: "together-pack-1" };
-        }
-
-        if (ptSettings.resourcesType) {
-            if (ptSettings.resourcesType === "pt-custom")
-                loadRes(ptSettings["customResourceLink"], false, true);
-            else if (ptSettings.resourcesType.startsWith("together-pack"))
-                loadRes(`/src/respack/${ptSettings.resourcesType}`, false, true);
-        }
-
-        await Promise.all(
-            Object.entries({
-                JudgeLine: "JudgeLine.png",
-                ProgressBar: "ProgressBar.png",
-                Pause: "PauseNew.png",
-                Rank: "Rank.png",
-                FCV: "FCV.png",
-                LevelOver0: "LevelOver0.ogg",
-                LevelOver0_v2: "LevelOver0_v2.ogg",
-                LevelOver1_v2: "LevelOver1_v2.ogg",
-                LevelOver2_v2: "LevelOver2_v2.ogg",
-                LevelOver3_v2: "LevelOver3_v2.ogg",
-                Resume: "play.png",
-                Retry: "replay.png",
-                Back: "return.png",
-                Loop: "loop.png",
-
-                /* Default Respack Files, now replaced by `loadRes`.
-        HitFXRaw: "clickRaw.png",
-        Tap: "Tap.png",
-        TapHL: "TapHL.png",
-        Drag: "Drag.png",
-        DragHL: "DragHL.png",
-        Flick: "Flick.png",
-        FlickHL: "FlickHL.png",
-        HoldHead: "HoldHead.png",
-        HoldHeadHL: "HoldHeadHL.png",
-        Hold: "Hold.png",
-        HoldHL: "HoldHL.png",
-        HoldEnd: "HoldEnd.png",
-        HitSong0: "HitSong0.ogg",
-        HitSong1: "HitSong1.ogg",
-        HitSong2: "HitSong2.ogg", */
-            }).map(
-                ([name, src], _i, arr) =>
-                    new Promise(resolve => {
-                        const xhr = new XMLHttpRequest();
-                        const source = /* erc(src) ||  */ "/src/respack/shared/" + src;
-                        xhr.open("get", (src = source), true);
-                        xhr.responseType = "arraybuffer";
-                        xhr.send();
-                        xhr.onloadend = async () => {
-                            if (!xhr.response || !xhr.response.byteLength) {
-                                msgHandler.sendError(
-                                    shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [
-                                        ++errorNum,
-                                    ]),
-                                    "",
-                                    true
-                                );
-                            } else {
-                                const a = new DataView(xhr.response, 0, 8);
-                                const header1 = a.getUint32(0);
-                                const header2 = a.getUint32(4);
-                                if (header1 === 0x4f676753)
-                                    simphiPlayer.res[name] = await audio.decode(xhr.response);
-                                else if (header1 === 0x89504e47 && header2 === 0x0d0a1a0a)
-                                    simphiPlayer.res[name] = await createImageBitmap(
-                                        new Blob([xhr.response])
-                                    );
-                                else
-                                    msgHandler.sendError(
-                                        shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [
-                                            ++errorNum,
-                                        ]),
-                                        "",
-                                        true
-                                    );
-                            }
-                            resolve();
-                        };
-                    })
-            )
-        );
-        if (errorNum)
-            return msgHandler.sendError(
-                shared.game.ptmain.$t("simphi.loading.resLoadFailed1", [errorNum])
-            );
-        simphiPlayer.res["NoImageBlack"] = await createImageBitmap(
-            new ImageData(new Uint8ClampedArray(4).fill(0), 1, 1)
-        );
-        simphiPlayer.res["NoImageWhite"] = await createImageBitmap(
-            new ImageData(new Uint8ClampedArray(4).fill(255), 1, 1)
-        );
-        simphiPlayer.res["JudgeLineMP"] = await imgShader(simphiPlayer.res["JudgeLine"], "#feffa9");
-        simphiPlayer.res["JudgeLineFC"] = await imgShader(simphiPlayer.res["JudgeLine"], "#a2eeff");
-        simphiPlayer.res["Ranks"] = await imgSplit(simphiPlayer.res["Rank"]);
-        simphiPlayer.res["Rank"].close();
-        simphiPlayer.res["mute"] = audio.mute(1);
-        if (
-            !(() => {
-                const b = createCanvas(1, 1).getContext("2d");
-                b.drawImage(simphiPlayer.res["JudgeLine"], 0, 0);
-                return b.getImageData(0, 0, 1, 1).data[0];
-            })()
-        )
-            return msgHandler.sendError(shared.game.i18n.t("simphi.loading.imgLoadingError"));
-        // if (ptSettings.resourcesType === "prpr-custom") await loadprprCustomRes();
-        // msgHandler.sendError(shared.game.i18n.t("respack.unavailableNow"));  // diasble custom respack for now
-        shared.game.ptmain.simphiLoaded();
-        $id("uploader").classList.remove("disabled");
-        $id("select").classList.remove("disabled");
-        simphiPlayer.emitter.dispatchEvent(new CustomEvent("change"));
-        simphiPlayer.btnPause.classList.add("disabled");
-    },
+    simphiPlayer.constructor,
     { once: true }
 );
 
