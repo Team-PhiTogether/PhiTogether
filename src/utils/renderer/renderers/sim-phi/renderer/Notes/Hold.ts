@@ -1,8 +1,9 @@
 import { simphiPlayer } from "@/utils/renderer/renderers/sim-phi/playerMain";
 import shared from "@utils/js/shared";
 import { noteRender } from "./render";
+import { NoteExtends } from "../Chart/Note";
 
-export function drawHold(note, realTime) {
+export function drawHold(note: NoteExtends, realTime: number): void {
     if (simphiPlayer.app.pauseTime && shared.game.ptmain.gameConfig.reviewWhenResume && note.scored)
         return;
     const HL = note.isMulti && shared.game.ptmain.gameConfig.highLight;

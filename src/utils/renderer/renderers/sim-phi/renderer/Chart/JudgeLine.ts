@@ -110,4 +110,8 @@ export interface JudgelineExtends {
     judgeLineScaleYEvents: any[];
     notesAbove: NoteExtends[];
     notesBelow: NoteExtends[];
+
+    imageL?: HTMLImageElement | HTMLCanvasElement;
+    imageC?: HTMLImageElement | HTMLCanvasElement;
+    imagesColored?: HTMLImageElement | HTMLCanvasElement;
 }

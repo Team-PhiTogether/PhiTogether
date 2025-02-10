@@ -2,29 +2,7 @@ import { simphiPlayer } from "@/utils/renderer/renderers/sim-phi/playerMain";
 import shared from "@utils/js/shared";
 import { tween } from "../utils/tween";
 import { imgShader } from "../assetsProcessor/imgProcessor";
-
-interface Line {
-    imageD: number;
-    alpha: number;
-    attachUI?: string;
-    offsetX: number;
-    offsetY: number;
-    cosr: number;
-    sinr: number;
-    imageU: boolean;
-    imageS: number;
-    imageW: number;
-    imageH: number;
-    imageA: number;
-    scaleX?: number;
-    scaleY?: number;
-    text?: string;
-    color?: string;
-    imageL: HTMLImageElement[];
-    imageC: boolean;
-    isCustomImage?: boolean;
-    imagesColored: { [key: string]: HTMLImageElement };
-}
+import { JudgelineExtends } from "./Chart/JudgeLine";
 
 //判定线函数，undefined/0:默认,1:非,2:恒成立
 export function drawLine(bool: number, lineScale: number): void {
@@ -122,7 +100,7 @@ export function drawLine(bool: number, lineScale: number): void {
     }
 }
 function getColoredLineImage(
-    line: Line,
+    line: JudgelineExtends,
     hex: string | undefined
 ): HTMLImageElement | Promise<ImageBitmap | HTMLCanvasElement> {
     if (!hex)

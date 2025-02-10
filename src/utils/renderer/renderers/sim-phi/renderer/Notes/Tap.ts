@@ -2,8 +2,9 @@ import { simphiPlayer } from "@/utils/renderer/renderers/sim-phi/playerMain";
 import shared from "@utils/js/shared";
 import { clip } from "@renderers/sim-phi/utils/clip";
 import { noteRender } from "./render";
+import { NoteExtends } from "../Chart/Note";
 
-export function drawTap(note) {
+export function drawTap(note: NoteExtends): void {
     if (simphiPlayer.app.pauseTime && shared.game.ptmain.gameConfig.reviewWhenResume && note.scored)
         return;
     const HL = note.isMulti && shared.game.ptmain.gameConfig.highLight;

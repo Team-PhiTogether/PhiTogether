@@ -72,4 +72,6 @@ export interface NoteExtends {
     visibleTime: number;
     positionX: number;
     floorPosition: number;
+    size?: number;
+    scored?: boolean;
 }
