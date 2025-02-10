@@ -1,7 +1,7 @@
 import { simphiPlayer } from "../../playerMain";
 import { noteRender } from "../../renderer/Notes/render";
 import { imgShader } from "../../assetsProcessor/imgProcessor";
-import { msgHandler } from "@utils/js/msgHandler";
+import { msgHandler } from "@/utils/js/msgHandler";
 import { audio } from "@utils/js/aup";
 import shared from "@utils/js/shared";
 

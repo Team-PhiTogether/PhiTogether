@@ -2,10 +2,25 @@ import Notiflix from "notiflix";
 import i18n from "@locales";
 import { Utils } from "@utils/js/utils";
 
-export const msgHandler = {
+interface MsgHandler {
+    nodeText: HTMLElement | null;
+    lastMessage: string;
+    sendMessage(msg: string, type: 'error' | 'success' | 'info', system?: boolean): void;
+    confirm(msg: string, title?: string, yes?: string, no?: string): Promise<boolean>;
+    info(msg: string, title?: string, yes?: string, type?: string): Promise<boolean>;
+    success(msg: string, title?: string, yes?: string): Promise<boolean>;
+    failure(msg: string, title?: string, yes?: string): Promise<boolean>;
+    warning(msg: string, title?: string, yes?: string): Promise<boolean>;
+    prompt(msg: string, title?: string, yes?: string, no?: string, placeholder?: string): Promise<string | null>;
+    msgbox(msg: string, type: string, fatal?: boolean): void;
+    sendWarning(msg: string, isHTML?: boolean): void;
+    sendError(msg: string, html?: string, fatal?: boolean): boolean;
+}
+
+export const msgHandler: MsgHandler = {
     nodeText: document.getElementById("msg-out"),
     lastMessage: "",
-    sendMessage(msg, type, system = true) {
+    sendMessage(msg: string, type: 'error' | 'success' | 'info', system: boolean = true) {
         if (type === "error") {
             Notiflix.Notify.failure(msg, {
                 ID: "msgHandlerErr",
@@ -36,7 +51,7 @@ export const msgHandler = {
             });
         }
     },
-    confirm(msg, title, yes, no) {
+    confirm(msg: string, title?: string, yes?: string, no?: string): Promise<boolean> {
         if (!title) title = i18n.global.t("info.info");
         if (!yes) yes = i18n.global.t("info.yes");
         if (!no) no = i18n.global.t("info.no");
@@ -62,7 +77,7 @@ export const msgHandler = {
             );
         });
     },
-    info(msg, title, yes, type = "info") {
+    info(msg: string, title?: string, yes?: string, type: string = "info"): Promise<boolean> {
         if (!title) title = i18n.global.t("info.info");
         if (!yes) yes = i18n.global.t("info.ok");
         return new Promise(res => {
@@ -82,22 +97,22 @@ export const msgHandler = {
             );
         });
     },
-    success(msg, title, yes) {
+    success(msg: string, title?: string, yes?: string): Promise<boolean> {
         if (!title) title = i18n.global.t("info.info");
         if (!yes) yes = i18n.global.t("info.ok");
         return this.info(msg, title, yes, "success");
     },
-    failure(msg, title, yes) {
+    failure(msg: string, title?: string, yes?: string): Promise<boolean> {
         if (!title) title = i18n.global.t("info.failure");
         if (!yes) yes = i18n.global.t("info.ok");
         return this.info(msg, title, yes, "failure");
     },
-    warning(msg, title, yes) {
+    warning(msg: string, title?: string, yes?: string): Promise<boolean> {
         if (!title) title = i18n.global.t("info.warning");
         if (!yes) yes = i18n.global.t("info.ok");
         return this.info(msg, title, yes, "warning");
     },
-    prompt(msg, title, yes, no, placeholder = "") {
+    prompt(msg: string, title?: string, yes?: string, no?: string, placeholder: string = ""): Promise<string | null> {
         if (!title) title = i18n.global.t("info.info");
         if (!yes) yes = i18n.global.t("info.confirm");
         if (!no) no = i18n.global.t("info.cancel");
@@ -122,14 +137,14 @@ export const msgHandler = {
             );
         });
     },
-    msgbox(msg, type, fatal) {
+    msgbox(msg: string, type: string, fatal?: boolean): void {
         return;
     },
-    sendWarning(msg, isHTML) {
+    sendWarning(msg: string, isHTML?: boolean): void {
         const msgText = isHTML ? msg : Utils.escapeHTML(msg);
         this.msgbox(msgText, "warn");
     },
-    sendError(msg, html, fatal) {
+    sendError(msg: string, html?: string, fatal?: boolean): boolean {
         if (html) {
             const exp =
                 /([A-Za-z][A-Za-z+-.]{2,}:\/\/|www\.)[^\s\x00-\x20\x7f-\x9f"]{2,}[^\s\x00-\x20\x7f-\x9f"!'),.:;?\]}]/g;

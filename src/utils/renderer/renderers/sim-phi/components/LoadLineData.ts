@@ -1,5 +1,5 @@
 import { simphiPlayer } from "../playerMain";
-import { msgHandler } from "@utils/js/msgHandler";
+import { msgHandler } from "@/utils/js/msgHandler";
 import shared from "@utils/js/shared";
 import { LineImage } from "./LineImage";
 

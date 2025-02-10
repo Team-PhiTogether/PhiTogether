@@ -6,6 +6,7 @@
             "@utils/*": ["src/utils/*"],
             "@components/*": ["src/components/*"],
             "@locales/*": ["src/locales/*"],
+            "@locales": ["src/locales"],
             "@renderers/*": ["src/utils/renderer/renderers/*"]
         }
     }

@@ -1,5 +1,5 @@
 import shared from "@utils/js/shared";
-import { msgHandler } from "@utils/js/msgHandler";
+import { msgHandler } from "@/utils/js/msgHandler";
 import { urls, loadJS } from "../assetsProcessor/loader.js";
 import { audio } from "@/utils/js/aup.js";
 import { isUndefined } from "@utils/js/common.js";

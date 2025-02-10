@@ -6,10 +6,8 @@ import {
     FrameAnimater,
 } from "@utils/js/common";
 import { checkSupport } from "./utils/checkSupport";
-import { uploader, ZipReader, readFile } from "./assetsProcessor/reader";
 import { InteractProxy } from "@utils/js/interact";
 import shared from "@utils/js/shared";
-import ploading from "@utils/js/ploading.js";
 
 import { loadModYukiOri } from "./plugins/aprfools/loadModYukiOri";
 import videoRecorder from "./plugins/video-recorder";
@@ -17,10 +15,11 @@ import { loadSkinFromBuffer, loadSkinFromDB } from "./components/ResourcePack/sk
 import { gauge } from "./plugins/gauge";
 
 import {
-    imgBlur,
     imgShader,
     imgSplit,
 } from "./assetsProcessor/imgProcessor";
+import { handleFile } from "./assetsProcessor/uploader";
+
 import { createCanvas } from "./utils/canvas";
 
 import ptdb from "@utils/ptdb";
@@ -60,6 +59,8 @@ export const simphiPlayer = {
     filter: null,
     filterOptions: {},
     "flag{qwq}": _ => {},
+
+    handleFile,
 
     //qwq[water,demo,democlick]
     qwq: [null, false, null, null, 0, null],
@@ -425,157 +426,7 @@ function adjustInfo() {
 shared.game.stage = simphiPlayer.stage;
 self.addEventListener("resize", () => simphiPlayer.stage.resize());
 //uploader
-{
-    let /** @type {Object<string,number>} */ dones = {};
-    let /** @type {Object<string,number>} */ totals = {};
-    let uploader_done = 0;
-    let uploader_total = 0;
-    /**
-     * @param {string} tag
-     * @param {number} total
-     */
-    const handleFile = async (tag, total, promise, oncomplete = _ => {}) => {
-        if (!totals[tag] || total >= totals[tag]) totals[tag] = total;
-        uploader_total = Object.values(totals).reduce((a, b) => a + b, 0);
-        if (!(promise instanceof Promise)) promise = Promise.resolve();
-        await promise.catch(err =>
-            msgHandler.sendWarning(
-                shared.game.i18n.t("simphi.handleFile.unsupportedFile", [err.cause.name])
-            )
-        );
-        dones[tag] = (dones[tag] || 0) + 1;
-        uploader_done = Object.values(dones).reduce((a, b) => a + b, 0);
-        ploading.l(
-            shared.game.i18n.t("simphi.handleFile.loadingFile", { uploader_done, uploader_total }),
-            "loadChart"
-        );
-        if (dones[tag] === totals[tag]) oncomplete();
-        loadComplete();
-    };
-    simphiPlayer.handleFile = handleFile;
-    let file_total = 0;
-    const options = {
-        createAudioBuffer() {
-            return audio.decode(...arguments);
-        },
-    };
-    const zip = new ZipReader({ handler: data => readFile(data, options) });
-    zip.addEventListener("loadstart", () => {});
-    zip.addEventListener("read", evt => handleFile("zip", zip.total, pick(evt.detail)));
-    $id("uploader-upload").addEventListener("click", uploader.uploadFile);
-    $id("uploader-file").addEventListener("click", uploader.uploadFile);
-    $id("uploader-dir").addEventListener("click", uploader.uploadDir);
-    /** @type {((_:FileList) => void)} */
-    uploader.reset = (i = false) => {
-        dones = {};
-        if (i) totals = { file: i };
-        else totals = {};
-        file_total = 0;
-        uploader_done = 0;
-        uploader_total = 0;
-        zip.reset();
-    };
-    uploader.addEventListener("change", loadComplete);
-    /** @type {((_:ProgressEvent<FileReader>) => void)} */
-    uploader.addEventListener("progress", function (evt) {
-        // //显示加载文件进度
-        // if (!evt.total) return;
-        // const percent = Math.floor((evt.loaded / evt.total) * 100);
-        // msgHandler.sendMessage(
-        //   `加载文件：${percent}% (${bytefm(evt.loaded)}/${bytefm(evt.total)})`
-        // );
-    });
-    let lastEvtPromise = null;
-    uploader.addEventListener(
-        "load",
-        /** @param {(ProgressEvent<FileReader>&{file:File,buffer:ArrayBuffer})} evt*/ async function (
-            evt
-        ) {
-            await lastEvtPromise;
-            lastEvtPromise = null;
-            const {
-                file: { name, webkitRelativePath: path },
-                buffer,
-            } = evt;
-            const isZip =
-                buffer.byteLength > 4 && new DataView(buffer).getUint32(0, false) === 0x504b0304;
-            const data = { name: name, buffer, path: path || name };
-            //检测buffer是否为zip
-            if (isZip) {
-                lastEvtPromise = zip.read(data);
-                await lastEvtPromise;
-                if (totals["file"] > file_total) {
-                    if (dones["file"]) dones["file"]++;
-                    else dones["file"] = 1;
-                }
-            } else {
-                file_total++;
-                readFile(data, options).then(result =>
-                    handleFile("file", file_total, pick(result))
-                );
-            }
-        }
-    );
-    simphiPlayer.uploader = uploader;
-    /**
-     * @typedef {import("../js/reader.js").ReaderData} ReaderData
-     * @param {ReaderData} data
-     */
-    async function pick(data) {
-        switch (data.type) {
-            case "line":
-                simphiPlayer.chartData.chartLineData.push(...data.data);
-                break;
-            case "info":
-                simphiPlayer.chartData.chartInfoData.push(...data.data);
-                break;
-            case "media":
-            case "audio":
-                simphiPlayer.chartData.bgms.set(data.name, data.data);
-                simphiPlayer.selectbgm.appendChild(createOption(data.name, data.name));
-                break;
-            case "image":
-                simphiPlayer.chartData.bgs.set(data.name, data.data);
-                simphiPlayer.chartData.bgsBlur.set(data.name, await imgBlur(data.data));
-                simphiPlayer.selectbg.appendChild(createOption(data.name, data.name));
-                break;
-            case "chart":
-                if (data.msg) data.msg.forEach(v => msgHandler.sendWarning(v));
-                if (data.info) simphiPlayer.chartData.chartInfoData.push(data.info);
-                if (data.line) simphiPlayer.chartData.chartLineData.push(...data.line);
-                let basename = data.name;
-                while (simphiPlayer.chartData.charts.has(basename)) basename += "\n"; //qwq
-                data.data.md5 = data.md5;
-                simphiPlayer.chartData.charts.set(basename, data.data);
-                simphiPlayer.chartData.chartsMD5.set(basename, data.md5);
-                simphiPlayer.selectchart.appendChild(createOption(basename, data.name));
-                break;
-            default:
-                console.error(data["data"]);
-                throw new Error(`Unsupported file: ${data["name"]}`, { cause: data });
-        }
-        if (data.name && data.buffer) simphiPlayer.chartData.oriBuffers.set(data.name, data.buffer);
-    }
-    /**
-     * @param {string} innerhtml
-     * @param {string} value
-     */
-    function createOption(value, innerhtml) {
-        const option = document.createElement("option");
-        const isHidden = /(^|\/)\./.test(innerhtml);
-        option.innerHTML = isHidden ? "" : innerhtml;
-        option.value = value;
-        if (isHidden) option.classList.add("hide");
-        return option;
-    }
 
-    function loadComplete() {
-        if ("skin" in totals) return;
-        if (uploader_done && uploader_done === uploader_total) {
-            shared.game.ptmain.chartLoadedCB();
-        }
-    }
-}
 const interact = new InteractProxy(simphiPlayer.app.canvas);
 //兼容PC鼠标
 interact.setMouseEvent({
@@ -1017,7 +868,6 @@ async function qwqStop() {
         for (const i of simphiPlayer.end.values()) await i();
     }
 }
-simphiPlayer.stat = simphiPlayer.stat;
 export var hook = (self.hook = simphiPlayer);
 const flag0 = "flag{\x71w\x71}";
 simphiPlayer.before.set(flag0, () => {
@@ -1066,7 +916,7 @@ const enableFilter = $id("enableFilter");
     enableFilter.dispatchEvent(new Event("change"));
 })();
 
-simphiPlayer.qwqEnd = simphiPlayer.animationTimer.end;
+// simphiPlayer.qwqEnd = simphiPlayer.animationTimer.end;
 simphiPlayer.bgms = simphiPlayer.chartData.bgms;
 simphiPlayer.oriBuffers = simphiPlayer.chartData.oriBuffers;
 simphiPlayer.selectbgm = simphiPlayer.selectbgm;
