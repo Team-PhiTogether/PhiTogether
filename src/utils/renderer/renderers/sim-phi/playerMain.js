@@ -1,4 +1,5 @@
-import simphi from "./simphi";
+import { Renderer } from "./renderer";
+import { Stat } from "./components/Stat";
 import { audio } from "@utils/js/aup";
 import {
     Timer,
@@ -37,7 +38,7 @@ import { specialDrag } from "./components/specialDrag";
 import { specialClick } from "./components/specialClick";
 import { loadLineData } from "./components/LoadLineData";
 
-import { mainLoop } from "./renderer";
+import { mainLoop } from "./renderer/Loop";
 import { loadRes } from "./components/ResourcePack";
 
 import { getPos } from "./components/OperationHandler/getPos";
@@ -104,8 +105,8 @@ export const simphiPlayer = {
         },
     },
 
-    stat: new simphi.Stat(),
-    app: new simphi.Renderer($id("stage")),
+    stat: new Stat(),
+    app: new Renderer($id("stage")),
 
     status2: {
         text: "",

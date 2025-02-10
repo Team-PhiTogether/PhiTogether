@@ -1,4 +1,4 @@
-import { NoteExtends } from "../../simphi";
+import { NoteExtends } from "../../renderer/main";
 import { JudgeEvent } from "./JudgeEvent";
 
 /**
