@@ -386,7 +386,11 @@ export const simphiPlayer = {
             if (r3 < 0) return;
             for (const j of i.direction) {
                 const ds = j[0] * ((9 * tick) / (8 * tick + 1)); //打击点距离
-                if (!simphiPlayer.customResourceMeta["loaded"]) {
+                if (simphiPlayer.customResourceMeta["hitEvtDrawer"])
+                    eval(
+                        `{ const ctxos = simphiPlayer.app.ctxos; ${simphiPlayer.customResourceMeta["hitEvtDrawer"]} }`
+                    );
+                else {
                     simphiPlayer.app.ctxos.beginPath();
                     simphiPlayer.app.ctxos.arc(
                         ds * Math.cos(j[1]),
@@ -397,10 +401,7 @@ export const simphiPlayer = {
                     );
                     simphiPlayer.app.ctxos.fill();
                     simphiPlayer.app.ctxos.closePath();
-                } else if (simphiPlayer.customResourceMeta["hitEvtDrawer"])
-                    eval(
-                        `{ const ctxos = simphiPlayer.app.ctxos; ${simphiPlayer.customResourceMeta["hitEvtDrawer"]} }`
-                    );
+                }
             }
         },
     }),
