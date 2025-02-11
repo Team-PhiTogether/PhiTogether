@@ -184,7 +184,7 @@ class Chart {
 let kfcFkXqsVw50 = null;
 hook.before.set("kfcFkXqsVw50", () => {
     if (!(kfcFkXqsVw50 instanceof Map)) return;
-    const /** @type {AudioBuffer} */ bgm = hook.bgms.get(hook.selectbgm.value).audio;
+    const /** @type {AudioBuffer} */ bgm = hook.chartData.bgms.get(hook.selectbgm.value).audio;
     for (let i = 0; i < bgm.numberOfChannels; i++) bgm.getChannelData(i).reverse();
     kfcFkXqsVw50.set(bgm, (hook.awawa = !kfcFkXqsVw50.get(bgm)));
     hook.modify = hook.awawa ? a => reverse(a, bgm.duration) : a => a;

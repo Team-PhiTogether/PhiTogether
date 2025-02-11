@@ -789,7 +789,7 @@ const ptAppInstance = createApp({
             //         const meta = JSON.parse(sessionStorage.getItem("chartDetailsData"));
             //         meta.chart = JSON.parse(sessionStorage.getItem("loadedChart"));
             //         formData.append("m", JSON.stringify(meta));
-            //         self.hook.oriBuffers.forEach((v, k) => formData.append("f", new Blob([v]), k));
+            //         self.hook.chartData.oriBuffers.forEach((v, k) => formData.append("f", new Blob([v]), k));
             //         fetch("/record/ctupload", {
             //           method: "POST",
             //           body: formData,

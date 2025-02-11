@@ -786,10 +786,5 @@ const enableFilter = $id("enableFilter");
     enableFilter.dispatchEvent(new Event("change"));
 })();
 
-// simphiPlayer.qwqEnd = simphiPlayer.animationTimer.end;
-simphiPlayer.bgms = simphiPlayer.chartData.bgms;
-simphiPlayer.oriBuffers = simphiPlayer.chartData.oriBuffers;
-simphiPlayer.selectbgm = simphiPlayer.selectbgm;
-simphiPlayer.selectchart = simphiPlayer.selectchart;
 simphiPlayer.pauseHook = () => simphiPlayer.emitter.eq("play") && simphiPlayer.pause();
 simphiPlayer.app.reloadRes = loadRes;

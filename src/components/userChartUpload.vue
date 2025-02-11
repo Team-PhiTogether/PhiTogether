@@ -155,9 +155,9 @@
                     return;
                 }
 
-                const selectedChart = hook.oriBuffers.get(selectchart.value);
-                const selectedBg = hook.oriBuffers.get(selectbg.value);
-                const selectedBgm = hook.oriBuffers.get(selectbgm.value);
+                const selectedChart = hook.chartData.oriBuffers.get(selectchart.value);
+                const selectedBg = hook.chartData.oriBuffers.get(selectbg.value);
+                const selectedBgm = hook.chartData.oriBuffers.get(selectbgm.value);
 
                 const mimeTable = {
                     mp3: "audio/mpeg",
