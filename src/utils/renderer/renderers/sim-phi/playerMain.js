@@ -3,7 +3,6 @@ import { Stat } from "./components/Stat";
 import { audio } from "@utils/js/aup";
 import { Timer, FrameAnimater } from "@utils/js/common";
 import { checkSupport } from "./utils/checkSupport";
-import { InteractProxy } from "@utils/js/interact";
 import shared from "@utils/js/shared";
 
 import { loadModYukiOri } from "./plugins/aprfools/loadModYukiOri";
@@ -28,14 +27,12 @@ import { HitEvents } from "./components/HitManager/HitEvents";
 import { HitWord } from "./components/HitManager/HitWord";
 import { HitFeedback } from "./components/HitManager/HitFeedback";
 import { LineImage } from "./components/LineImage";
-import { specialDrag } from "./components/SpecialDrag";
-import { specialClick } from "./components/SpecialClick";
 import { loadLineData } from "./components/LoadLineData";
+import { OperationHandler } from "./components/OperationHandler";
 
 import { mainLoop } from "./renderer/Loop";
 import { loadRes } from "./components/ResourcePack";
 
-import { getPos } from "./components/OperationHandler/getPos";
 
 const $id = query => document.getElementById(query);
 const $ = query => document.body.querySelector(query);
@@ -530,85 +527,7 @@ shared.game.stage = simphiPlayer.stage;
 self.addEventListener("resize", () => simphiPlayer.stage.resize());
 //uploader
 
-const interact = new InteractProxy(simphiPlayer.app.canvas);
-//兼容PC鼠标
-interact.setMouseEvent({
-    mousedownCallback(evt) {
-        const idx = evt.button;
-        const { x, y } = getPos(evt);
-        if (idx === 1) simphiPlayer.hitManager.activate("mouse", 4, x, y);
-        else if (idx === 2) simphiPlayer.hitManager.activate("mouse", 2, x, y);
-        else simphiPlayer.hitManager.activate("mouse", 1 << idx, x, y);
-        specialClick.qwq(x, y);
-        specialDrag.reg("mouse", x, y);
-    },
-    mousemoveCallback(evt) {
-        const idx = evt.buttons;
-        const { x, y } = getPos(evt);
-        for (let i = 1; i < 32; i <<= 1) {
-            // 同时按住多个键时，只有最后一个键的move事件会触发
-            if (idx & i) simphiPlayer.hitManager.moving("mouse", i, x, y);
-            else simphiPlayer.hitManager.deactivate("mouse", i);
-            specialDrag.update("mouse", x, y);
-        }
-    },
-    mouseupCallback(evt) {
-        const idx = evt.button;
-        if (idx === 1) simphiPlayer.hitManager.deactivate("mouse", 4);
-        else if (idx === 2) simphiPlayer.hitManager.deactivate("mouse", 2);
-        else simphiPlayer.hitManager.deactivate("mouse", 1 << idx);
-        specialDrag.del("mouse");
-    },
-});
-//兼容键盘(喵喵喵?)
-interact.setKeyboardEvent({
-    keydownCallback(evt) {
-        if (simphiPlayer.emitter.eq("stop")) return;
-        if (evt.key === "Shift") simphiPlayer.btnPause.click();
-        if (evt.key === " " && shared.game.ptmain.playConfig.mode === "preview")
-            simphiPlayer.btnPause.click();
-        else if (
-            simphiPlayer.hitManager.list.find(i => i.type === "keyboard" && i.id === evt.code) //按住一个键时，会触发多次keydown事件
-        );
-        else simphiPlayer.hitManager.activate("keyboard", evt.code, NaN, NaN);
-    },
-    keyupCallback(evt) {
-        if (simphiPlayer.emitter.eq("stop")) return;
-        simphiPlayer.hitManager.deactivate("keyboard", evt.code);
-    },
-});
-self.addEventListener("blur", () => simphiPlayer.hitManager.clear("keyboard"));
-//兼容移动设备
-interact.setTouchEvent({
-    touchstartCallback(evt) {
-        for (const i of evt.changedTouches) {
-            const { x, y } = getPos(i);
-            simphiPlayer.hitManager.activate("touch", i.identifier, x, y);
-            specialClick.qwq(x, y);
-            specialDrag.reg(i.identifier, x, y);
-        }
-    },
-    touchmoveCallback(evt) {
-        for (const i of evt.changedTouches) {
-            const { x, y } = getPos(i);
-            simphiPlayer.hitManager.moving("touch", i.identifier, x, y);
-            specialDrag.update(i.identifier, x, y);
-        }
-    },
-    touchendCallback(evt) {
-        for (const i of evt.changedTouches) {
-            simphiPlayer.hitManager.deactivate("touch", i.identifier);
-            specialDrag.del(i.identifier);
-        }
-    },
-    touchcancelCallback(evt) {
-        // if (emitter.eq('play')) qwqPause();
-        for (const i of evt.changedTouches) {
-            simphiPlayer.hitManager.deactivate("touch", i.identifier);
-            specialDrag.del(i.identifier);
-        }
-    },
-});
+const operationHandler = new OperationHandler(simphiPlayer.app.canvas);
 
 //hit end
 //初始化
@@ -792,11 +711,11 @@ async function qwqStop() {
         simphiPlayer.stage.resize();
         simphiPlayer.frameAnimater.start();
         simphiPlayer.animationTimer.in.play();
-        interact.activate();
+        operationHandler.activate();
         simphiPlayer.emitter.emit("play");
     } else {
         simphiPlayer.emitter.emit("stop");
-        interact.deactive();
+        operationHandler.deactivate();
         audio.stop();
         simphiPlayer.frameAnimater.stop();
         //清除原有数据
