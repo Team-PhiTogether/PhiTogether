@@ -6,6 +6,7 @@ import { checkSupport } from "./utils/checkSupport";
 import shared from "@utils/js/shared";
 
 import { SpecialChartsProcessor, flag0 } from "./plugins/SpecialChartsProcessor";
+import { Filter } from "./plugins/Filter";
 import videoRecorder from "./plugins/video-recorder";
 import { loadSkinFromBuffer, loadSkinFromDB } from "./components/ResourcePack/skin";
 import { gauge } from "./plugins/gauge";
@@ -204,6 +205,7 @@ export const simphiPlayer = {
     "flag{qwq}": _ => {},
 
     handleFile,
+    Filter: new Filter(),
 
     //qwq[water,demo,democlick]
     qwq: [null, false, null, null, 0, null],
@@ -744,22 +746,9 @@ simphiPlayer.before.set(flag0, SpecialChartsProcessor.before);
 const enableFilter = $id("enableFilter");
 (function () {
     const input = $id("filterInput");
-    input.addEventListener("change", async function () {
-        if (!input.value) return;
-        const filter = await import("@utils/js/filter.js");
-        try {
-            const filter0 = new filter.default(input.value);
-            simphiPlayer.filter = (ctx, time, now) => {
-                filter0.apply(ctx.canvas);
-                ctx.drawImage(filter0.getImage(time, now, hook.filterOptions), 0, 0);
-            };
-        } catch (e) {
-            console.error(e);
-            simphiPlayer.filter = null;
-        }
-    });
+    input.addEventListener("change", async () => simphiPlayer.Filter.change(input.value));
     enableFilter.addEventListener("change", function () {
-        if (!this.checked) simphiPlayer.filter = null;
+        if (!this.checked) simphiPlayer.disable();
         else input.dispatchEvent(new Event("change"));
     });
     enableFilter.dispatchEvent(new Event("change"));
