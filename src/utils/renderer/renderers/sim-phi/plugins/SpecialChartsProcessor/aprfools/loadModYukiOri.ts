@@ -1,4 +1,4 @@
-import { simphiPlayer } from "../../playerMain";
+import { simphiPlayer } from "../../../playerMain";
 import { audio } from "@utils/js/aup";
 
 export function loadModYukiOri() {

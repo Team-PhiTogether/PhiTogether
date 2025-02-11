@@ -5,7 +5,7 @@ import { Timer, FrameAnimater } from "@utils/js/common";
 import { checkSupport } from "./utils/checkSupport";
 import shared from "@utils/js/shared";
 
-import { loadModYukiOri } from "./plugins/aprfools/loadModYukiOri";
+import { SpecialChartsProcessor, flag0 } from "./plugins/SpecialChartsProcessor";
 import videoRecorder from "./plugins/video-recorder";
 import { loadSkinFromBuffer, loadSkinFromDB } from "./components/ResourcePack/skin";
 import { gauge } from "./plugins/gauge";
@@ -738,28 +738,7 @@ async function qwqStop() {
     }
 }
 export var hook = (self.hook = simphiPlayer);
-const flag0 = "flag{\x71w\x71}";
-simphiPlayer.before.set(flag0, () => {
-    const md5 = simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value);
-    const hashDF = [
-        "cdb5987ad81b70e3dc96153af2efaa61",
-        "86d23af0cc595a703241536a2d29ee4b",
-        "f5f8c244d317006103b67e1cdf6eb85b",
-        "0e8ff64e65bf35382e30f980b5eec041",
-    ];
-    const hashD321 = ["4ddcd5d923007d661911989e79fe8a59"];
-    if (md5 === "ab9d2cc3eb569236ead459ad4caba109")
-        simphiPlayer.now.set(flag0, loadModYukiOri(hook));
-    else if (hashDF.includes(md5) && simphiPlayer.inputName.value === "Distorted Fate ")
-        import("./plugins/demo/DFLevelEffect.js").then(({ loadMod }) =>
-            simphiPlayer.now.set(flag0, loadMod())
-        );
-    else if (hashD321.includes(md5) && simphiPlayer.inputName.value === "DESTRUCTION 3,2,1 ")
-        import("./plugins/demo/321LevelEffect.js").then(({ loadMod }) =>
-            simphiPlayer.now.set(flag0, loadMod())
-        );
-    else simphiPlayer.now.delete(flag0);
-});
+simphiPlayer.before.set(flag0, SpecialChartsProcessor.before);
 
 //plugin(filter)
 const enableFilter = $id("enableFilter");
