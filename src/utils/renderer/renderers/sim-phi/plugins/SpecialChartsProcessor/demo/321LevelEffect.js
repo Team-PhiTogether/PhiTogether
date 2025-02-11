@@ -1,5 +1,5 @@
 // import obj from './321LevelEffect.json';
-import { simphiPlayer } from "../../../playerMain.js";
+import { simphiPlayer } from "../../../playerMain";
 const obj = {
     exposure: [
         {

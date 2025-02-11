@@ -1,5 +1,5 @@
 import { decodeAlt } from "@utils/imgAny";
-import { simphiPlayer } from "../../playerMain.js";
+import { simphiPlayer } from "../../../playerMain.js";
 import { audio } from "@utils/js/aup";
 const $id = query => document.getElementById(query);
 const $ = query => document.body.querySelector(query);
