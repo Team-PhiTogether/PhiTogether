@@ -1,5 +1,5 @@
 // import obj from './DFLevelEffect.json';
-import { simphiPlayer } from "../../playerMain";
+import { simphiPlayer } from "../../../playerMain";
 const obj = {
     exposure: [
         {
