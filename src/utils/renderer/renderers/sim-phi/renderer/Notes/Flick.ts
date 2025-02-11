@@ -17,7 +17,7 @@ export function drawFlick(note: NoteExtends): void {
         note.offsetX,
         note.offsetY
     );
-    if (note.badtime) {
+    if (!note.badtime) {
         simphiPlayer.app.ctxos.globalAlpha =
             note.alpha || (note.showPoint && shared.game.ptmain.gameConfig.showPoint ? 0.45 : 0);
         if (simphiPlayer.qwqwq)
