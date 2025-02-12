@@ -61,6 +61,23 @@ jobs:
               run: |
                   tar -czf build.tar.gz dist/
 
+            - name: Deploy to external repository
+              # if: ${{ !github.event.release.prerelease }}
+              env:
+                  DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+              run: |
+                  git config --global user.email "realtvop@realtvop.top"
+                  git config --global user.name "realtvop by Actions"
+                  git clone https://$DEPLOY_KEY@github.com/realtvop/PT-pages-release.git deploy
+                  cd deploy
+                  rm -rf *
+                  cp -r ../dist/* .
+                  git add .
+                  git commit -m "Release $VERSION"
+                  git push
+                  cd ..
+                  rm -rf deploy
+
             - name: Upload build artifact
               uses: actions/upload-release-asset@v1
               env:
