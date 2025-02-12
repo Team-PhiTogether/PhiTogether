@@ -748,7 +748,7 @@ const enableFilter = $id("enableFilter");
     const input = $id("filterInput");
     input.addEventListener("change", async () => simphiPlayer.Filter.change(input.value));
     enableFilter.addEventListener("change", function () {
-        if (!this.checked) simphiPlayer.disable();
+        if (!this.checked) simphiPlayer.Filter.disable();
         else input.dispatchEvent(new Event("change"));
     });
     enableFilter.dispatchEvent(new Event("change"));

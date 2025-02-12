@@ -31,9 +31,10 @@
     },
     "devDependencies": {
         "@capacitor/cli": "^6.2.0",
-        "@vitejs/plugin-vue": "^4.2.3",
+        "@vitejs/plugin-vue": "^5.2.1",
+        "@vitejs/plugin-vue-jsx": "^4.1.1",
         "prettier": "3.4.2",
-        "vite": "^4.4.9"
+        "vite": "^6.1.0"
     },
     "pnpm": {
         "patchedDependencies": {
