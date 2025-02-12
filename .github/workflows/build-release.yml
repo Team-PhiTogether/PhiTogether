@@ -62,7 +62,7 @@ jobs:
                   tar -czf build.tar.gz dist/
 
             - name: Deploy to external repository
-              # if: ${{ !github.event.release.prerelease }}
+              if: ${{ !github.event.release.prerelease }}
               env:
                   DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
               run: |
