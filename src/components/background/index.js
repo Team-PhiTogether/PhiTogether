@@ -2,7 +2,7 @@ import shared from "@utils/js/shared";
 import { FrameAnimater } from "@utils/js/common";
 
 (function (window) {
-    if (import.meta.env.DEV && import.meta.env.VITE_DISABLE_BG === "true")
+    if (import.meta.env.VITE_DISABLE_BG === "true")
         return (shared.game.bubbleAnimator = {
             start: () => null,
             stop: () => null,
