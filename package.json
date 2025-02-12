@@ -1,7 +1,7 @@
 {
     "name": "phitogether",
     "private": true,
-    "version": "2.2.9-preview-3-test",
+    "version": "2.2.9",
     "type": "module",
     "scripts": {
         "dev": "vite --port 1145",
