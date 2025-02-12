@@ -500,7 +500,7 @@ $id("select-volume").addEventListener("change", evt => {
     const volume = Number(evt.target.value);
     simphiPlayer.app.musicVolume = Math.min(1, 1 / volume);
     simphiPlayer.app.soundVolume = Math.min(1, volume);
-    Promise.resolve().then(simphiPlayer.playController.startOver);
+    Promise.resolve().then(simphiPlayer.playController.pause).then(simphiPlayer.playController.resume);
 });
 // TODO
 const lowRes = $id("lowRes");

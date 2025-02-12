@@ -13,12 +13,12 @@ export const specialClick = {
         async function spClickRT() {
             if (this.gameMode === "multi") return;
             simphiPlayer.playController.pause();
-            if (shared.game.app.pauseNextTick)
-                clearInterval(shared.game.app.pauseNextTick),
-                    (shared.game.app.pauseTime = 0),
-                    (shared.game.app.pauseNextTick = null);
+            if (simphiPlayer.app.pauseNextTick)
+                clearInterval(simphiPlayer.app.pauseNextTick),
+                    (simphiPlayer.app.pauseTime = 0),
+                    (simphiPlayer.app.pauseNextTick = null);
             await shared.game.ptmain.retry();
-            Promise.resolve().then(shared.game.qwqStop).then(shared.game.qwqStop);
+            Promise.resolve().then(() => simphiPlayer.playController.startOver());
         },
         function spClickLB() {
             if (shared.game.isPlayFinished() && shared.game.ptmain.playConfig.mode !== "preview") {
