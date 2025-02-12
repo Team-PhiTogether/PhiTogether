@@ -32,8 +32,8 @@ jobs:
 
             - name: Commit version update
               run: |
-                  git config --global user.email "realtvop@realtvop.top"
-                  git config --global user.name "realtvop by Actions"
+                  git config --global user.email "${{ github.event.release.author.email }}"
+                  git config --global user.name "${{ github.event.release.author.login }}"
                   git add package.json
                   git commit -m "[Release] Update to v$VERSION"
                   git push origin HEAD:main
