@@ -97,7 +97,8 @@ const router = VueRouter.createRouter({
 });
 
 router.beforeEach((to, from) => {
-    $("btn-play").value === "停止" && $("btn-play").click();
+    // $("btn-play").value === "停止" && $("btn-play").click();
+    self.hook && self.hook.playController.stop();
     document.getElementById("pageTitle").innerText = i18n.global
         .t(`pages.${to.path.toLocaleLowerCase()}`)
         .toUpperCase();
@@ -193,9 +194,8 @@ router.beforeEach((to, from) => {
     } else {
         stage.style.display = "block";
         shared.game.app.resizeCanvas();
-        if (to.query.auto) {
-            btnPlay.click();
-        }
+        if (to.query.auto)
+            hook.playController.play();
     }
     const gameAdjustPage = ["/playing"];
     if (gameAdjustPage.includes(from.path) && !gameAdjustPage.includes(to.path)) {
@@ -512,7 +512,8 @@ const ptAppInstance = createApp({
             this.$router.push("/calibrate");
         },
         ptAppPause(i) {
-            btnPause.value == "暂停" && btnPause.click(); //
+            // btnPause.value == "暂停" && btnPause.click(); //
+            hook.playController.pause();
         },
         async modJudgment() {
             try {
@@ -1474,6 +1475,3 @@ self.shared = shared;
 
 const $ = q => document.getElementById(q);
 const stage = $("stage");
-const btnPlay = $("btn-play");
-const btnPause = $("btn-pause");
-const selectflip = $("select-flip");

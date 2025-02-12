@@ -2,16 +2,17 @@ import { simphiPlayer } from "../playerMain";
 import shared from "@utils/js/shared";
 import { loadLineData } from "./LoadLineData";
 import saveAdjustedChart from "../plugins/saveAdjustedChart";
+import { PlayStatus } from "../utils/PlayController";
 
 export const specialClick = {
     time: [0, 0, 0, 0],
     func: [
         function spClickLT() {
-            if (simphiPlayer.emitter.eq("play")) simphiPlayer.btnPause.click();
+            if (simphiPlayer.emitter.eq("play")) simphiPlayer.playController.pause();
         },
         async function spClickRT() {
             if (this.gameMode === "multi") return;
-            simphiPlayer.btnPause.value === "暂停" && simphiPlayer.btnPause.click();
+            simphiPlayer.playController.pause();
             if (shared.game.app.pauseNextTick)
                 clearInterval(shared.game.app.pauseNextTick),
                     (shared.game.app.pauseTime = 0),
@@ -23,7 +24,7 @@ export const specialClick = {
             if (shared.game.isPlayFinished() && shared.game.ptmain.playConfig.mode !== "preview") {
                 shared.game.exportRecord && shared.game.exportRecord();
             } else if (shared.game.ptmain.gameMode === "single") {
-                if (simphiPlayer.btnPause.value == "暂停") return; //btnPause.click();
+                if (simphiPlayer.playController.status === PlayStatus.Playing) return; //btnPause.click();
                 simphiPlayer.selectflip.value = simphiPlayer.app.mirrorView([
                     3 - simphiPlayer.selectflip.value,
                 ]);
@@ -92,7 +93,7 @@ export const specialClick = {
                     imgXs[2] < offsetX &&
                     offsetX < imgXs[3]
                 )
-                    simphiPlayer.btnPause.click();
+                    simphiPlayer.playController.resume();
             }
             if (
                 shared.game.ptmain.playConfig.practiseMode &&

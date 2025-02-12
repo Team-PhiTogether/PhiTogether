@@ -30,7 +30,7 @@ export function mainLoop() {
     } else if (!simphiPlayer.resultPageData) {
         simphiPlayer.resultPageData = true;
         audio.stop();
-        simphiPlayer.btnPause.classList.add("disabled"); //qwq
+        // simphiPlayer.btnPause.classList.add("disabled"); //qwq
         simphiPlayer.app.ctxos.globalCompositeOperation = "source-over";
         simphiPlayer.app.ctxos.resetTransform();
         simphiPlayer.app.ctxos.globalAlpha = 1;
@@ -206,7 +206,7 @@ function loopNoCanvas() {
                 !shared.game.ptmain.playConfig.adjustOffset
             )
         )
-            simphiPlayer.emitter.eq("play") && simphiPlayer.pause();
+            simphiPlayer.emitter.eq("play") && simphiPlayer.playController.pause();
         else simphiPlayer.animationInfo.isOutStart = true;
     if (
         simphiPlayer.showTransition.checked &&

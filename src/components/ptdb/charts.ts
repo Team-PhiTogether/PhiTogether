@@ -6,10 +6,10 @@ import { renderPZApiFromCache } from "@components/cacheutils";
 import md5 from "md5";
 
 export enum ChartSource {
-    Unknown = 0,
-    Local = 1,
-    PhiZone = 2,
-    PhiTogether = 3,
+    Unknown,
+    Local,
+    PhiZone,
+    PhiTogether,
 }
 export interface CachedSong {
     id: string | number;
