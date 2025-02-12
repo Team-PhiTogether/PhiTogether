@@ -1,6 +1,6 @@
 export class PlayController {
     private _status: PlayStatus = PlayStatus.Unprepared;
-    private _operating: boolean = false;
+    public _operating: boolean = false;
     private _eventlisteners: { [key: string]: Function } = {};
 
     constructor() {

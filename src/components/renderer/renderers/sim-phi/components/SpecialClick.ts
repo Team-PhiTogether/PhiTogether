@@ -8,7 +8,7 @@ export const specialClick = {
     time: [0, 0, 0, 0],
     func: [
         function spClickLT() {
-            if (simphiPlayer.emitter.eq("play")) simphiPlayer.playController.pause();
+            simphiPlayer.playController.pause();
         },
         async function spClickRT() {
             if (this.gameMode === "multi") return;

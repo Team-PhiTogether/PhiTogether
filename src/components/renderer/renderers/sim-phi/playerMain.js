@@ -184,7 +184,7 @@ export const simphiPlayer = {
         )
             return msgHandler.sendError(shared.game.i18n.t("simphi.loading.imgLoadingError"));
         // if (ptSettings.resourcesType === "prpr-custom") await loadprprCustomRes();
-        // msgHandler.sendError(shared.game.i18n.t("respack.unavailableNow"));  // diasble custom respack for now
+        // msgHandler.sendError(shared.game.i18n.t("respack.unavailableNow"));  // disable custom respack for now
         shared.game.ptmain.simphiLoaded();
         $id("uploader").classList.remove("disabled");
         $id("select").classList.remove("disabled");
@@ -624,99 +624,99 @@ simphiPlayer.playController.addEventListener(PlayEvent.Play, async function () {
     simphiPlayer.emitter.emit("play");
 });
 simphiPlayer.playController.addEventListener(PlayEvent.Pause, async function () {
-    if (/* simphiPlayer.btnPause.classList.contains("disabled") ||  */!simphiPlayer.tmps.canPause)
+    if (/* simphiPlayer.btnPause.classList.contains("disabled") ||  */!simphiPlayer.tmps.canPause || simphiPlayer.resultPageData)
         return;
-    if (simphiPlayer.emitter.eq("stop") || simphiPlayer.resultPageData) return;
     // simphiPlayer.btnPause.classList.add("disabled");
-    if (simphiPlayer.emitter.eq("play")) {
-        if (simphiPlayer.app.bgVideo) simphiPlayer.app.bgVideo.pause();
-        simphiPlayer.app.pauseBackgroundDimPara1 = null;
-        simphiPlayer.animationTimer.in.pause();
+    if (simphiPlayer.app.bgVideo) simphiPlayer.app.bgVideo.pause();
+    simphiPlayer.app.pauseBackgroundDimPara1 = null;
+    simphiPlayer.animationTimer.in.pause();
+    if (simphiPlayer.showTransition.checked && simphiPlayer.animationInfo.isOutStart)
+        simphiPlayer.animationTimer.out.pause();
+    simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.timeBgm;
+    audio.stop();
+    simphiPlayer.emitter.emit("pause");
+    // simphiPlayer.btnPause.classList.remove("disabled");
+});
+simphiPlayer.playController.addEventListener(PlayEvent.Resume, async function () {
+    if (simphiPlayer.resultPageData)
+        return;
+    if (shared.game.ptmain.playConfig.mode === "preview") {
+        clearInterval(simphiPlayer.app.pauseNextTick);
+        if (simphiPlayer.app.bgVideo)
+            await playVideo(
+                simphiPlayer.app.bgVideo,
+                simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
+            );
+        simphiPlayer.animationTimer.in.play();
         if (simphiPlayer.showTransition.checked && simphiPlayer.animationInfo.isOutStart)
-            simphiPlayer.animationTimer.out.pause();
-        simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.timeBgm;
-        audio.stop();
-        simphiPlayer.emitter.emit("pause");
+            simphiPlayer.animationTimer.out.play();
+        if (simphiPlayer.animationInfo.isInEnd && !simphiPlayer.animationInfo.isOutStart)
+            playBgm(
+                simphiPlayer.app.bgMusic,
+                simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
+            );
+        simphiPlayer.emitter.emit("play");
         // simphiPlayer.btnPause.classList.remove("disabled");
-    } else {
-        if (shared.game.ptmain.playConfig.mode === "preview") {
+        return;
+    }
+    simphiPlayer.app.pauseTime = 3;
+    simphiPlayer.app.pauseBackgroundDimPara1 = performance.now();
+    simphiPlayer.app.pauseNextTick = setInterval(async () => {
+        simphiPlayer.app.pauseTime--;
+        if (simphiPlayer.app.pauseTime <= 0) {
+            simphiPlayer.app.pauseTime = 0;
             clearInterval(simphiPlayer.app.pauseNextTick);
-            if (simphiPlayer.app.bgVideo)
-                await playVideo(
-                    simphiPlayer.app.bgVideo,
-                    simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
-                );
-            simphiPlayer.animationTimer.in.play();
-            if (simphiPlayer.showTransition.checked && simphiPlayer.animationInfo.isOutStart)
-                simphiPlayer.animationTimer.out.play();
-            if (simphiPlayer.animationInfo.isInEnd && !simphiPlayer.animationInfo.isOutStart)
-                playBgm(
-                    simphiPlayer.app.bgMusic,
-                    simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
-                );
-            simphiPlayer.emitter.emit("play");
-            // simphiPlayer.btnPause.classList.remove("disabled");
-            return;
-        }
-        simphiPlayer.app.pauseTime = 3;
-        simphiPlayer.app.pauseBackgroundDimPara1 = performance.now();
-        simphiPlayer.app.pauseNextTick = setInterval(async () => {
-            simphiPlayer.app.pauseTime--;
-            if (simphiPlayer.app.pauseTime <= 0) {
-                simphiPlayer.app.pauseTime = 0;
-                clearInterval(simphiPlayer.app.pauseNextTick);
-                simphiPlayer.app.pauseNextTick = null;
-                simphiPlayer.app.pauseBackgroundDimPara1 = Infinity;
+            simphiPlayer.app.pauseNextTick = null;
+            simphiPlayer.app.pauseBackgroundDimPara1 = Infinity;
+            if (
+                !shared.game.ptmain.gameConfig.reviewWhenResume ||
+                simphiPlayer.timeInfo.curTime <= 3
+            ) {
+                if (simphiPlayer.app.bgVideo)
+                    await playVideo(
+                        simphiPlayer.app.bgVideo,
+                        simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
+                    );
+                simphiPlayer.animationTimer.in.play();
                 if (
-                    !shared.game.ptmain.gameConfig.reviewWhenResume ||
-                    simphiPlayer.timeInfo.curTime <= 3
-                ) {
-                    if (simphiPlayer.app.bgVideo)
-                        await playVideo(
-                            simphiPlayer.app.bgVideo,
-                            simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
-                        );
-                    simphiPlayer.animationTimer.in.play();
-                    if (
-                        simphiPlayer.showTransition.checked &&
-                        simphiPlayer.animationInfo.isOutStart
-                    )
-                        simphiPlayer.animationTimer.out.play();
-                    if (
-                        simphiPlayer.animationInfo.isInEnd &&
-                        !simphiPlayer.animationInfo.isOutStart
-                    )
-                        playBgm(
-                            simphiPlayer.app.bgMusic,
-                            simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
-                        );
-                    simphiPlayer.emitter.emit("play");
-                }
-                // simphiPlayer.btnPause.classList.remove("disabled");
+                    simphiPlayer.showTransition.checked &&
+                    simphiPlayer.animationInfo.isOutStart
+                )
+                    simphiPlayer.animationTimer.out.play();
+                if (
+                    simphiPlayer.animationInfo.isInEnd &&
+                    !simphiPlayer.animationInfo.isOutStart
+                )
+                    playBgm(
+                        simphiPlayer.app.bgMusic,
+                        simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
+                    );
+                simphiPlayer.emitter.emit("play");
             }
-        }, 1000);
-        if (
-            shared.game.ptmain.gameConfig.reviewWhenResume &&
-            simphiPlayer.timeInfo.curTime > 3
-        ) {
-            if (simphiPlayer.timeInfo.curTime > 3)
-                simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime -= 3;
-            if (simphiPlayer.app.bgVideo)
-                await playVideo(
-                    simphiPlayer.app.bgVideo,
-                    simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
-                );
-            simphiPlayer.animationTimer.in.play();
-            if (simphiPlayer.showTransition.checked && simphiPlayer.animationInfo.isOutStart)
-                simphiPlayer.animationTimer.out.play();
-            if (simphiPlayer.animationInfo.isInEnd && !simphiPlayer.animationInfo.isOutStart)
-                playBgm(
-                    simphiPlayer.app.bgMusic,
-                    simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
-                );
-            simphiPlayer.emitter.emit("play");
-            // simphiPlayer.btnPause.classList.add("disabled");
+            // simphiPlayer.btnPause.classList.remove("disabled");
         }
+    }, 1000);
+    if (
+        shared.game.ptmain.gameConfig.reviewWhenResume &&
+        simphiPlayer.timeInfo.curTime > 3
+    ) {
+        if (simphiPlayer.timeInfo.curTime > 3)
+            simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime -= 3;
+        if (simphiPlayer.app.bgVideo)
+            await playVideo(
+                simphiPlayer.app.bgVideo,
+                simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
+            );
+        simphiPlayer.animationTimer.in.play();
+        if (simphiPlayer.showTransition.checked && simphiPlayer.animationInfo.isOutStart)
+            simphiPlayer.animationTimer.out.play();
+        if (simphiPlayer.animationInfo.isInEnd && !simphiPlayer.animationInfo.isOutStart)
+            playBgm(
+                simphiPlayer.app.bgMusic,
+                simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
+            );
+        simphiPlayer.emitter.emit("play");
+        // simphiPlayer.btnPause.classList.add("disabled");
     }
 });
 // simphiPlayer.btnPause.addEventListener("click", async function () {
