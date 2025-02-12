@@ -1,9 +1,9 @@
 <script>
     // 保存自行上传的谱面
 
-    import ptdb from "../utils/ptdb";
-    import shared from "../utils/js/shared.js";
-    import { checkLocalChart } from "../utils/ptdb/charts";
+    import ptdb from "@components/ptdb";
+    import shared from "@utils/js/shared";
+    import { checkLocalChart } from "@components/ptdb/charts";
     import ploading from "@utils/js/ploading.js";
     export default {
         name: "chartupload",

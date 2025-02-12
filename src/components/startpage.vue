@@ -1,7 +1,7 @@
 <script>
-    import shared from "../utils/js/shared.js";
+    import shared from "@utils/js/shared";
     import { partyMgr } from "@utils/js/partyMgr";
-    import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
+    import { PhiZoneAPI as phizoneApi } from "@community/phizone";
     import ploading from "@utils/js/ploading.js";
     export default {
         name: "startPage",

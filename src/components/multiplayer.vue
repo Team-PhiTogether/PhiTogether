@@ -1,10 +1,10 @@
 <script>
-import shared from "../utils/js/shared.js";
+import shared from "@utils/js/shared.js";
 import { partyMgr } from "@utils/js/partyMgr";
 import { recordMgr } from "./recordMgr/recordMgr.js";
-import { checkLocalChart } from "../utils/ptdb/charts";
+import { checkLocalChart } from "@components/ptdb/charts";
 import md5 from "md5";
-import { downloadText } from "../utils/js/fileSaver.js";
+import { downloadText } from "@utils/js/fileSaver.js";
 import ploading from "@utils/js/ploading.js";
 
 function jitsRenderer(ctx, ctxos, lineScale) {

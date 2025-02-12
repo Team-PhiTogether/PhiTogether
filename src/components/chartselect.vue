@@ -2,8 +2,8 @@
     import shared from "@utils/js/shared.js";
     import { audio } from "@utils/js/aup";
     import { partyMgr } from "@utils/js/partyMgr";
-    import ptdb from "@utils/ptdb";
-    import { PhiZoneAPI as phizoneApi } from "@utils/phizone";
+    import ptdb from "@components/ptdb";
+    import { PhiZoneAPI as phizoneApi } from "@community/phizone";
     import ploading from "@utils/js/ploading.js";
     export default {
         name: "chartSelect",

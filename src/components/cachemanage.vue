@@ -1,7 +1,7 @@
 <script>
-    import shared from "../utils/js/shared.js";
+    import shared from "@utils/js/shared.js";
     import md5 from "md5";
-    import ptdb from "../utils/ptdb";
+    import ptdb from "@components/ptdb";
     export default {
         name: "cacheManage",
         data() {

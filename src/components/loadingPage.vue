@@ -1,5 +1,5 @@
 <script>
-    import shared from "../utils/js/shared";
+    import shared from "@utils/js/shared";
     import ploading from "@utils/js/ploading.js";
 
     export default {

@@ -11,7 +11,8 @@ export default defineConfig({
             "@utils": path.resolve(__dirname, "src/utils"),
             "@components": path.resolve(__dirname, "src/components"),
             "@locales": path.resolve(__dirname, "src/locales"),
-            "@renderers": path.resolve(__dirname, "src/utils/renderer/renderers"),
+            "@renderers": path.resolve(__dirname, "src/components/renderer/renderers"),
+            "@community": path.resolve(__dirname, "src/components/community"),
         },
     },
     build: {

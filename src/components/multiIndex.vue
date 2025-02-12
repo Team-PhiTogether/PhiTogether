@@ -1,5 +1,5 @@
 <script>
-    import shared from "../utils/js/shared.js";
+    import shared from "@utils/js/shared";
     import { partyMgr } from "@utils/js/partyMgr";
     import ploading from "@utils/js/ploading.js";
 

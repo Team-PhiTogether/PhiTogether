@@ -1,6 +1,6 @@
 <script>
-    import shared from "../utils/js/shared.js";
-    import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
+    import shared from "@utils/js/shared";
+    import { PhiZoneAPI as phizoneApi } from "@community/phizone";
     import ploading from "@utils/js/ploading.js";
 
     const $ = query => document.getElementById(query);

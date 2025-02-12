@@ -1,8 +1,8 @@
 <script>
-    import { PhiZoneAPI as phizoneApi } from "../utils/phizone";
-    import { TapTapApi } from "../utils/phizone/taptap";
+    import { PhiZoneAPI as phizoneApi } from "@community/phizone";
+    import { TapTapApi } from "@community/phizone/taptap";
     import ploading from "@utils/js/ploading.js";
-    import shared from "../utils/js/shared.js";
+    import shared from "@utils/js/shared";
     export default {
         name: "login",
         data() {

@@ -1,6 +1,6 @@
 <script>
-    import shared from "../utils/js/shared.js";
-    import ptdb from "../utils/ptdb";
+    import shared from "@utils/js/shared.js";
+    import ptdb from "@components/ptdb";
     export default {
         name: "userChartEdit",
         data() {

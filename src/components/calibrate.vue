@@ -1,5 +1,5 @@
 <script>
-    import shared from "../utils/js/shared.js";
+    import shared from "@utils/js/shared";
     export default {
         name: "calibrate",
         data() {
