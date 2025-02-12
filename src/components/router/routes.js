@@ -1,18 +1,18 @@
-import ChartSelectPageComponent from "../chartselect.vue";
-import StartPageComponent from "../startpage.vue";
-import PlayingPageComponent from "../playing.vue";
-import LoginPageComponent from "../login.vue";
-import CalibratePageComponent from "../calibrate.vue";
-import CacheManagePageComponent from "../cachemanage.vue";
-import AboutPageComponent from "../aboutpage.vue";
-import UserChartUploadComponent from "../userChartUpload.vue";
-import UserChartEditComponent from "../userChartEdit.vue";
-import PlayerB20Component from "../playerB20.vue";
-import PZRankSingleComponent from "../pzRankSingle.vue";
-import ReplayPageComponent from "../replayPage.vue";
-import ChangeLogsComponent from "../changelogs.vue";
-import LoadingPageComponent from "../loadingPage.vue";
-import multiIndexPageComponent from "../multiIndex.vue";
+import ChartSelectPageComponent from "../pages/chartselect.vue";
+import StartPageComponent from "../pages/startpage.vue";
+import PlayingPageComponent from "../pages/playing.vue";
+import LoginPageComponent from "../pages/login.vue";
+import CalibratePageComponent from "../pages/calibrate.vue";
+import CacheManagePageComponent from "../pages/cachemanage.vue";
+import AboutPageComponent from "../pages/aboutpage.vue";
+import UserChartUploadComponent from "../pages/userChartUpload.vue";
+import UserChartEditComponent from "../pages/userChartEdit.vue";
+import PlayerB20Component from "../pages/playerB20.vue";
+import PZRankSingleComponent from "../pages/pzRankSingle.vue";
+import ReplayPageComponent from "../pages/replayPage.vue";
+import ChangeLogsComponent from "../pages/changelogs.vue";
+import LoadingPageComponent from "../pages/loadingPage.vue";
+import multiIndexPageComponent from "../pages/multiIndex.vue";
 
 const EmptyPageComponent = { name: "Empty", template: "<span></span>" };
 

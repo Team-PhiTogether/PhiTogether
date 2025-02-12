@@ -1,5 +1,5 @@
-import shared from "../../utils/js/shared.js";
-import { checkLocalChart } from "../../utils/ptdb/charts.ts";
+import shared from "@utils/js/shared.js";
+import { checkLocalChart } from "@components/ptdb/charts.ts";
 import md5 from "md5";
 import ploading from "@utils/js/ploading.js";
 

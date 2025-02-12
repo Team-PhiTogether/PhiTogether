@@ -12,20 +12,20 @@ import multiplayerinst from "@components/multiplayer.vue";
 import { uploader } from "@renderers/sim-phi/assetsProcessor/reader";
 import shared from "@utils/js/shared.js";
 import i18n from "@locales";
-import { PhiZoneAPI as phizoneApi, getUserColor } from "@utils/phizone";
+import { PhiZoneAPI as phizoneApi, getUserColor } from "@community/phizone";
 import ploading from "@utils/js/ploading.js";
 import { full } from "@utils/js/common.js";
 import { tipsHandler } from "@components/tips";
 import { recordMgr } from "@components/recordMgr/recordMgr.js";
 import { replayMgr } from "@components/recordMgr/replayMgr.js";
-import ptdb from "@utils/ptdb";
+import ptdb from "@components/ptdb";
 import "@utils/js/errHandler";
 import { Utils } from "@utils/js/utils";
 
 if (import.meta.env.DEV) self.ptdb = ptdb;
 
 document.oncontextmenu = e => e.preventDefault();
-import { renderers } from "@utils/renderer";
+import { renderers } from "@components/renderer";
 
 var searchParams;
 
@@ -97,7 +97,8 @@ const router = VueRouter.createRouter({
 });
 
 router.beforeEach((to, from) => {
-    $("btn-play").value === "停止" && $("btn-play").click();
+    // $("btn-play").value === "停止" && $("btn-play").click();
+    self.hook && self.hook.playController.stop();
     document.getElementById("pageTitle").innerText = i18n.global
         .t(`pages.${to.path.toLocaleLowerCase()}`)
         .toUpperCase();
@@ -193,9 +194,8 @@ router.beforeEach((to, from) => {
     } else {
         stage.style.display = "block";
         shared.game.app.resizeCanvas();
-        if (to.query.auto) {
-            btnPlay.click();
-        }
+        if (to.query.auto)
+            hook.playController.play();
     }
     const gameAdjustPage = ["/playing"];
     if (gameAdjustPage.includes(from.path) && !gameAdjustPage.includes(to.path)) {
@@ -512,7 +512,8 @@ const ptAppInstance = createApp({
             this.$router.push("/calibrate");
         },
         ptAppPause(i) {
-            btnPause.value == "暂停" && btnPause.click(); //
+            // btnPause.value == "暂停" && btnPause.click(); //
+            hook.playController.pause();
         },
         async modJudgment() {
             try {
@@ -1474,6 +1475,3 @@ self.shared = shared;
 
 const $ = q => document.getElementById(q);
 const stage = $("stage");
-const btnPlay = $("btn-play");
-const btnPause = $("btn-pause");
-const selectflip = $("select-flip");
