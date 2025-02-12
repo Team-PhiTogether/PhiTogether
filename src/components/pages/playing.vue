@@ -1,6 +1,6 @@
 <script>
-    import { recordMgr } from "./recordMgr/recordMgr.js";
-    import { downloadText } from "../utils/js/fileSaver.js";
+    import { recordMgr } from "../recordMgr/recordMgr.js";
+    import { downloadText } from "../../utils/js/fileSaver.js";
 
     export default {
         name: "playing",

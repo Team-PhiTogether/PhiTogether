@@ -1,5 +1,5 @@
 <script>
-    import releaseNotes from "./changelogs";
+    import releaseNotes from "../changelogs";
     export default {
         name: "changelogs",
         data() {
