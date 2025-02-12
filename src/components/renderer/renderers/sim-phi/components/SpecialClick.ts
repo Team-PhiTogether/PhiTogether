@@ -32,14 +32,24 @@ export const specialClick = {
                 shared.game.multiInstance.JITSOpen = !shared.game.multiInstance.JITSOpen;
             }
         },
-        function spClickRB() {
+        async function spClickRB() {
             if (!simphiPlayer.fucktemp2) return;
             if (
                 shared.game.ptmain.$route.path !== "/multipanel" &&
                 shared.game.ptmain.gameMode === "multi"
             )
                 shared.game.multiInstance.showStat();
-            else shared.game.ptmain.spClickRT();
+            else {
+                // async spClickRT() {
+                if (shared.game.ptmain.gameMode === "multi") return;
+                // simphiPlayer.playController.pause();
+                if (simphiPlayer.pauseNextTick)
+                    clearInterval(simphiPlayer.pauseNextTick),
+                        (simphiPlayer.pauseTime = 0),
+                        (simphiPlayer.pauseNextTick = null);
+                await shared.game.ptmain.retry();
+                Promise.resolve().then(() => simphiPlayer.playController.startOver());
+            }
         },
         () => {
             simphiPlayer.hitManager.clear();
