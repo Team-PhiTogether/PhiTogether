@@ -128,14 +128,14 @@ footer {
     visibility: visible;
 }
 
-#uploader-select > label {
+#uploader-select>label {
     font-size: 0.9em;
     padding: 0.15em 0.15em 0.15em 0;
     text-align: left;
     padding: 0.2em 0.6em;
 }
 
-#uploader-select > label:hover {
+#uploader-select>label:hover {
     background-color: #c9e5ca;
 }
 
@@ -177,18 +177,6 @@ footer {
         local("Cairo-Normal"),
         url("/src/core/fonts/cairo-regular.woff") format("woff"),
         url("/src/core/fonts/cairo-regular.ttf") format("truetype");
-}
-
-@font-face {
-    font-family: "PT Root UI";
-    font-style: normal;
-    font-weight: medium;
-    src:
-        local("PT Root UI"),
-        local("PTRoot UI-Normal"),
-        url("/src/core/fonts/pt-root-ui-regular.ttf") format("truetype"),
-        url("/src/core/fonts/pt-root-ui-regular.woff") format("woff"),
-        url("/src/core/fonts/pt-root-ui-regular.woff2") format("woff2");
 }
 
 @font-face {
@@ -239,8 +227,8 @@ a {
 }
 
 a:hover,
-input[type="checkbox"] + label:hover,
-input[type="radio"] + label:hover {
+input[type="checkbox"]+label:hover,
+input[type="radio"]+label:hover {
     background-color: #42aaff28 !important;
 }
 
@@ -250,7 +238,7 @@ a:active {
 
 button,
 input[type="button"],
-input[type="file"] + label {
+input[type="file"]+label {
     background-color: #0066ff65;
     color: #fff;
     border: none;
@@ -267,13 +255,13 @@ input[type="button"]:disabled {
 
 button:hover,
 input[type="button"]:hover,
-input[type="file"] + label:hover {
+input[type="file"]+label:hover {
     background-color: #59b4ff;
 }
 
 button:active,
 input[type="button"]:active,
-input[type="file"] + label:active {
+input[type="file"]+label:active {
     background-color: #59b4ff;
 }
 
@@ -314,28 +302,28 @@ input[type="radio"],
     content: "\e909";
 }
 
-input[type="checkbox"] + label::before {
+input[type="checkbox"]+label::before {
     font: 0.9em icomoon;
     content: "\e907";
     margin-left: 0.2em;
     margin-right: 0.2em;
 }
 
-input[type="checkbox"]:checked + label::before {
+input[type="checkbox"]:checked+label::before {
     font: 0.9em icomoon;
     content: "\e906";
     margin-left: 0.2em;
     margin-right: 0.2em;
 }
 
-input[type="radio"] + label::before {
+input[type="radio"]+label::before {
     font: 0.9em icomoon;
     content: "\e903";
     margin-left: 0.2em;
     margin-right: 0.2em;
 }
 
-input[type="radio"]:checked + label::before {
+input[type="radio"]:checked+label::before {
     font: 0.9em icomoon;
     content: "\e908";
     margin-left: 0.2em;
@@ -504,7 +492,7 @@ input[type="button"] {
     margin-top: 8px;
 }
 
-.namePlate > span {
+.namePlate>span {
     max-width: 90px;
     margin-left: 5px;
     margin-right: 5px;
@@ -526,10 +514,11 @@ img {
     -webkit-user-drag: none;
 }
 
-body.noUIBlur #NotiflixConfirmWrap > div.notiflix-confirm-overlay {
+body.noUIBlur #NotiflixConfirmWrap>div.notiflix-confirm-overlay {
     background: #000000cc !important;
     backdrop-filter: unset !important;
 }
+
 body.noUIBlur .blur {
     backdrop-filter: unset !important;
 }
