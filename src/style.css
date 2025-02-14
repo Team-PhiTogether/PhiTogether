@@ -163,9 +163,7 @@ footer {
     src:
         local("Noto Sans SC"),
         local("NotoSans SC-Normal"),
-        url("/src/core/fonts/noto-sans-sc-regular.woff2") format("woff2"),
-        url("/src/core/fonts/noto-sans-sc-regular.woff") format("woff"),
-        url("/src/core/fonts/noto-sans-sc-regular.ttf") format("truetype");
+        url("/src/core/fonts/noto-sans-sc-regular.woff2") format("woff2");
 }
 
 @font-face {
@@ -175,8 +173,7 @@ footer {
     src:
         local("Cairo"),
         local("Cairo-Normal"),
-        url("/src/core/fonts/cairo-regular.woff") format("woff"),
-        url("/src/core/fonts/cairo-regular.ttf") format("truetype");
+        url("/src/core/fonts/cairo-regular.woff2") format("woff2");
 }
 
 @font-face {
@@ -187,7 +184,7 @@ footer {
     src:
         local("Saira"),
         local("Saira-Normal"),
-        url("/src/core/fonts/Source Han Sans & Saira Hybrid-Regular.ttf") format("truetype");
+        url("/src/core/fonts/Source Han Sans & Saira Hybrid-Regular.woff2") format("woff2");
 }
 
 @font-face {
