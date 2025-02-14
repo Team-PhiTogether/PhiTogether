@@ -9,7 +9,7 @@ const flag0 = "flag{\x71w\x71}";
     import("./reverse.js");
 })();
 hook.before.set(flag0, () => {
-    const md5 = hook.chartsMD5.get(hook.selectchart.value);
+    const md5 = hook.chartData.chartsMD5.get(hook.selectchart.value);
     //console.log(hook.tmps.name);
     const hashDF = [
         "cdb5987ad81b70e3dc96153af2efaa61",

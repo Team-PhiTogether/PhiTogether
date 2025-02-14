@@ -79,7 +79,7 @@
                 const inputIllustrator = $id("input-illustrator");
                 const selectDifficulty = $id("select-difficulty");
                 const selectLevel = $id("select-level");
-                if (hook.chartsMD5.size > 1) {
+                if (hook.chartData.chartsMD5.size > 1) {
                     shared.game.msgHandler.sendMessage(
                         this.$t("userChartUpload.err.haveMultipleCharts"),
                         "error"
@@ -135,7 +135,7 @@
                 }
 
                 // 拼接url
-                const md5 = hook.chartsMD5.get(hook.selectchart.value);
+                const md5 = hook.chartData.chartsMD5.get(hook.selectchart.value);
 
                 // 校验
                 if (this.target && md5 !== this.target) {

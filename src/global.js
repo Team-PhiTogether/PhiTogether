@@ -1244,7 +1244,7 @@ const ptAppInstance = createApp({
                 $("uploader").classList.remove("disabled");
                 ploading.r("loadChart");
                 shared.game.userChartUploaded();
-                this.lastLoad = hook.chartsMD5.get(hook.selectchart.value);
+                this.lastLoad = hook.chartData.chartsMD5.get(hook.selectchart.value);
                 return;
             }
 

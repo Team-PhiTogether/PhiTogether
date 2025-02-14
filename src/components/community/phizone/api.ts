@@ -310,7 +310,7 @@ export const PhiZoneAPI = {
             const x = stat.bad;
             const e = stat.good_late;
             const a = (accountInfo.userBasicInfo as PZUserBasicInfo).id;
-            const chartmd5 = wi.hook.chartsMD5.get(wi.hook.selectchart.value);
+            const chartmd5 = wi.hook.chartData.chartsMD5.get(wi.hook.selectchart.value);
             const aa = {
                 token: pzPlayInfo.token,
                 maxCombo: f,
