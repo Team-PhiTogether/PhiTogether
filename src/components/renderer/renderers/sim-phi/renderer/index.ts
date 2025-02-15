@@ -25,8 +25,6 @@ export class Renderer {
     public musicVolume: number = 1;
     public soundVolume: number = 1;
     private _mirrorType: number = 0;
-    public enableFR: boolean = false;
-    public enableVP: boolean = false;
     public bgImage: any = null;
     public bgImageBlur: any = null;
     public bgMusic: any = null;
@@ -68,23 +66,19 @@ export class Renderer {
         this._setLowResFactor(1);
         this.resizeCanvas();
     }
-    init(options: any): void {
-        /*const _this = this;
-    Object.assign(_this, options);*/
-    }
     //config
     setNoteScale(num: number): void {
         this.noteScale = Number(num) || 1;
         this.noteScaleRatio = (this.canvasos.width * this.noteScale) / 8080; //note、特效缩放
     }
-    _setLowResFactor(num: number): void {
+    private _setLowResFactor(num: number): void {
         this.lowResFactor = num * self.devicePixelRatio;
     }
     setLowResFactor(num: number): void {
         this._setLowResFactor(Number(num) || 1);
         this._resizeCanvas();
     }
-    _resizeCanvas(): void {
+    private _resizeCanvas(): void {
         const pt = shared.game.ptmain;
         const { canvas, canvasos, width, height } = this;
         const widthLowRes = width * this.lowResFactor;
@@ -359,7 +353,7 @@ export class Renderer {
                 if (timeChart > i.endRealTime) continue;
                 line.positionY =
                     (timeChart - i.startRealTime) * i.value * this.speed +
-                    (this.enableFR ? i.floorPosition2 : i.floorPosition);
+                    (shared.game.ptmain.gameConfig.enableFR ? i.floorPosition2 : i.floorPosition);
             }
             const realgetY = (i: NoteExtends) => {
                 if (i.type !== 3) return (i.floorPosition - line.positionY) * i.speed;
@@ -395,7 +389,7 @@ export class Renderer {
                     if (i.realTime > timeChart) {
                         i.showPoint = true;
                         i.alpha =
-                            dy <= -1e-3 * this.scaleY || (this.enableVP && realgetY(i) * 0.6 > 2)
+                            dy <= -1e-3 * this.scaleY || (shared.game.ptmain.gameConfig.enableVP && realgetY(i) * 0.6 > 2)
                                 ? 0
                                 : i.type === 3 && i.speed === 0
                                   ? 0

@@ -488,10 +488,6 @@ const lowRes = $id("lowRes");
 const maxFrame = $id("maxFrame");
 const isMaxFrame = $id("isMaxFrame");
 const isForcedMaxFrame = $id("isForcedMaxFrame");
-const enableVP = $id("enableVP");
-const enableFR = $id("enableFR");
-enableVP.addEventListener("change", evt => (simphiPlayer.app.enableVP = evt.target.checked));
-enableFR.addEventListener("change", evt => (simphiPlayer.app.enableFR = evt.target.checked));
 simphiPlayer.app.playMode = 0;
 lowRes.addEventListener("change", evt => {
     simphiPlayer.app.setLowResFactor(
