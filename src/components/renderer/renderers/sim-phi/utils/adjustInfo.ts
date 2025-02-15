@@ -5,22 +5,21 @@ import shared from "@utils/js/shared";
 export function adjustInfo() {
     for (const i of simphiPlayer.chartData.chartInfoData) {
         if (simphiPlayer.selectchart.value.trim() === i.Chart) {
-            if (i.Name) simphiPlayer.inputName.value = i.Name;
-            if (i.Musician) simphiPlayer.inputArtist.value = i.Musician; //Alternative
-            if (i.Composer) simphiPlayer.inputArtist.value = i.Composer; //Alternative
-            if (i.Artist) simphiPlayer.inputArtist.value = i.Artist;
+            if (i.Name) simphiPlayer.chartInfo.name = i.Name;
+            if (i.Musician) simphiPlayer.chartInfo.composer = i.Musician; //Alternative
+            if (i.Composer) simphiPlayer.chartInfo.composer = i.Composer; //Alternative
+            if (i.Artist) simphiPlayer.chartInfo.composer = i.Artist;
             if (i.Level) {
                 simphiPlayer.chartData.levelText = i.Level;
                 const p = simphiPlayer.chartData.levelText
                     .toLocaleUpperCase()
                     .split("LV.")
                     .map(a => a.trim());
-                if (p[0]) simphiPlayer.selectDifficulty.value = p[0];
-                if (p[1]) simphiPlayer.selectLevel.value = p[1];
+                simphiPlayer.chartInfo.difficultyString = `${p[0] ?? "SP"} Lv.${p[0] ?? "?"}`;
             }
-            if (i.Illustrator) simphiPlayer.inputIllustrator.value = i.Illustrator;
-            if (i.Designer) simphiPlayer.inputCharter.value = i.Designer;
-            if (i.Charter) simphiPlayer.inputCharter.value = i.Charter;
+            if (i.Illustrator) simphiPlayer.chartInfo.illustrator = i.Illustrator;
+            if (i.Designer) simphiPlayer.chartInfo.charter = i.Designer;
+            if (i.Charter) simphiPlayer.chartInfo.charter = i.Charter;
             if (simphiPlayer.chartData.bgms.has(i.Music)) simphiPlayer.selectbgm.value = i.Music;
             if (simphiPlayer.chartData.bgs.has(i.Image)) {
                 simphiPlayer.selectbg.value = i.Image;

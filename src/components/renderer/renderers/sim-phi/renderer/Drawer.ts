@@ -10,6 +10,8 @@ import { gauge } from "../plugins/gauge.js";
 import { drawNotes } from "./Notes";
 import { drawLine } from "./Lines";
 
+import { ChartPlayInfoDefaults } from "@utils/types/ChartPlayInfo";
+
 export function loopCanvas() {
     //尽量不要在这里出现app
     const { lineScale } = simphiPlayer.app;
@@ -348,13 +350,13 @@ export function loopCanvas() {
     // ctxos.textBaseline = "middle";
     simphiPlayer.app.ctxos.font = `${lineScale * 0.63}px Saira`;
     const dxsnm = simphiPlayer.app.ctxos.measureText(
-        simphiPlayer.inputName.value || simphiPlayer.inputName.placeholder
+        simphiPlayer.chartInfo.name ?? ChartPlayInfoDefaults.name
     ).width;
     if (dxsnm > simphiPlayer.app.wlen - lineScale)
         simphiPlayer.app.ctxos.font = `${((lineScale * 0.63) / dxsnm) * (simphiPlayer.app.wlen - lineScale)}px Saira`;
     simphiPlayer.app.ctxos.globalAlpha = simphiPlayer.tmps.statStatus.name.alpha;
     simphiPlayer.app.ctxos.fillText(
-        simphiPlayer.inputName.value || simphiPlayer.inputName.placeholder,
+        simphiPlayer.chartInfo.name ?? ChartPlayInfoDefaults.name,
         lineScale * 0.65 + simphiPlayer.tmps.statStatus.name.offsetX,
         simphiPlayer.app.canvasos.height -
             lineScale * 0.66 +

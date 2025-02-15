@@ -14,11 +14,11 @@ export const SpecialChartsProcessor = {
         const hashD321 = ["4ddcd5d923007d661911989e79fe8a59"];
         if (md5 === "ab9d2cc3eb569236ead459ad4caba109")
             simphiPlayer.now.set(flag0, loadModYukiOri(simphiPlayer));
-        else if (hashDF.includes(md5) && simphiPlayer.inputName.value === "Distorted Fate ")
+        else if (hashDF.includes(md5) && simphiPlayer.chartInfo.name === "Distorted Fate ")
             import("./demo/DFLevelEffect.js").then(({ loadMod }) =>
                 simphiPlayer.now.set(flag0, loadMod())
             );
-        else if (hashD321.includes(md5) && simphiPlayer.inputName.value === "DESTRUCTION 3,2,1 ")
+        else if (hashD321.includes(md5) && simphiPlayer.chartInfo.name === "DESTRUCTION 3,2,1 ")
             import("./demo/321LevelEffect.js").then(({ loadMod }) =>
                 simphiPlayer.now.set(flag0, loadMod())
             );

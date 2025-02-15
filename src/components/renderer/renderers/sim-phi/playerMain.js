@@ -56,7 +56,6 @@ export const simphiPlayer = {
             clearStat: simphiPlayer.clearStat,
             loadSkinFromBuffer,
             loadSkinFromDB,
-            updateLevelText: updateLevelTextOut,
             doFullScreen: simphiPlayer.stage.doFullScreen,
             adjustInfo,
             // qwqStop,
@@ -226,20 +225,20 @@ export const simphiPlayer = {
     playController: new PlayController(),
 
     selectbg: $id("select-bg"),
-    // btnPlay: $id("btn-play"),
-    // btnPause: $id("btn-pause"),
     selectbgm: $id("select-bgm"),
     selectchart: $id("select-chart"),
     selectflip: $id("select-flip"),
     selectspeed: $id("select-speed"),
     showTransition: $id("showTransition"),
 
+    // fuck: going to remove
     inputName: $id("input-name"),
     inputArtist: $id("input-artist"),
     inputCharter: $id("input-charter"),
     inputIllustrator: $id("input-illustrator"),
     selectDifficulty: $id("select-difficulty"),
     selectLevel: $id("select-level"),
+    // kcuf
 
     chartInfo: {
         name: null,
@@ -247,6 +246,9 @@ export const simphiPlayer = {
         illustrator: null,
         charter: null,
         difficultyString: "SP Lv.?",
+    },
+    updateChartInfo(chartInfo) {
+        this.chartInfo = chartInfo;
     },
 
     stage: {
@@ -484,23 +486,6 @@ simphiPlayer.selectspeed.addEventListener("change", evt => {
     const dict = { Slowest: -9, Slower: -4, "": 0, Faster: 3, Fastest: 5 };
     simphiPlayer.app.speed = 2 ** (dict[evt.target.value] / 12);
 });
-const updateLevelText = type => {
-    const diffString = simphiPlayer.selectDifficulty.value || "SP";
-    const levelString = simphiPlayer.selectLevel.value || "?";
-    return [diffString, levelString].join("\u2002Lv.");
-};
-function updateLevelTextOut(i) {
-    simphiPlayer.chartData.levelText = updateLevelText(i);
-}
-updateLevelText();
-simphiPlayer.selectDifficulty.addEventListener(
-    "change",
-    () => (simphiPlayer.chartData.levelText = updateLevelText(0))
-);
-simphiPlayer.selectLevel.addEventListener(
-    "change",
-    () => (simphiPlayer.chartData.levelText = updateLevelText(1))
-);
 $id("select-volume").addEventListener("change", evt => {
     const volume = Number(evt.target.value);
     simphiPlayer.app.musicVolume = Math.min(1, 1 / volume);

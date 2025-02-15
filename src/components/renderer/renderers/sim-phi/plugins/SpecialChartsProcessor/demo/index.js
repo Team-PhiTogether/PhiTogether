@@ -21,7 +21,7 @@ export default function () {
         ];
         if (md5 === "ab9d2cc3eb569236ead459ad4caba109")
             simphiPlayer.now.set(flag0, loadModYukiOri());
-        else if (hashDF.includes(md5) && simphiPlayer.inputName.value === "Distorted Fate ")
+        else if (hashDF.includes(md5) && simphiPlayer.chartInfo.name === "Distorted Fate ")
             import("./DFLevelEffect.js").then(({ loadMod }) =>
                 simphiPlayer.now.set(flag0, loadMod())
             );

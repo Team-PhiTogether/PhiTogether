@@ -1250,23 +1250,15 @@ const ptAppInstance = createApp({
             const chartInfo = JSON.parse(sessionStorage.getItem("loadedChart"));
             const songInfo = JSON.parse(sessionStorage.getItem("chartDetailsData"));
             this.lastLoad = chartInfo.id;
-            const inputName = $("input-name");
-            const inputArtist = $("input-artist");
-            const inputCharter = $("input-charter");
-            const inputIllustrator = $("input-illustrator");
-            const selectDifficulty = $("select-difficulty");
-            const selectLevel = $("select-level");
-            inputName.value = songInfo.name;
-            inputIllustrator.value = songInfo.illustrator;
-            inputArtist.value = songInfo.composer;
-            inputCharter.value = this.cleanStr(chartInfo.charter);
-            if (typeof chartInfo.difficulty === "string") selectLevel.value = chartInfo.difficulty;
-            else
-                selectLevel.value =
-                    chartInfo.difficulty === 0 ? "?" : Math.floor(chartInfo.difficulty).toString();
-            selectDifficulty.value = chartInfo.level;
-            shared.game.updateLevelText(0);
-            shared.game.updateLevelText(1);
+            hook.chartInfo.name = songInfo.name;
+            hook.chartInfo.illustrator = songInfo.illustrator;
+            hook.chartInfo.composer = songInfo.composer;
+            hook.chartInfo.charter = this.cleanStr(chartInfo.charter);
+            hook.chartInfo.difficultyString = `${chartInfo.level} Lv.${
+                typeof chartInfo.difficulty === "string" ? chartInfo.difficulty : (
+                    chartInfo.difficulty === 0 ? "?" : Math.floor(chartInfo.difficulty).toString()
+                )
+            }`;
             let saved;
             saved = localStorage.getItem("PTSavedOffsets");
             if (saved) {

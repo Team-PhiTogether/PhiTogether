@@ -4,6 +4,8 @@ import { drawRoundRect } from "../utils/canvas";
 import { tween } from "../utils/tween";
 import { clip } from "../utils/clip";
 
+import { ChartPlayInfoDefaults } from "@utils/types/ChartPlayInfo";
+
 export function resultPageRenderer(statData) {
     (simphiPlayer.app.ctxos.shadowBlur = 40), (simphiPlayer.app.ctxos.shadowColor = "#000000");
     simphiPlayer.app.ctxos.globalAlpha = 1;
@@ -93,11 +95,11 @@ export function resultPageRenderer(statData) {
     simphiPlayer.app.ctxos.textAlign = "left";
     simphiPlayer.app.ctxos.font = `73.5px Saira`;
     const dxsnm = simphiPlayer.app.ctxos.measureText(
-        simphiPlayer.inputName.value || simphiPlayer.inputName.placeholder
+        simphiPlayer.chartInfo.name ?? ChartPlayInfoDefaults.name
     ).width;
     if (dxsnm > 600) simphiPlayer.app.ctxos.font = `${(73.5 / dxsnm) * 600}px Saira`;
     simphiPlayer.app.ctxos.fillText(
-        simphiPlayer.inputName.value || simphiPlayer.inputName.placeholder,
+        simphiPlayer.chartInfo.name ?? ChartPlayInfoDefaults.name,
         -1920 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 1)) + 2050,
         830
     );

@@ -40,7 +40,7 @@ function downloadRPE(app) {
         dlfilename = `${app.chart.chartRPE.META.id}_adjusted.json`;
     } else if (app.chart.chartPec) {
         text4dl = modifyFirstLine(app.chart.chartPec, (app.chart.offset * 1e3 + 175).toFixed(0));
-        dlfilename = `Chart_${simphiPlayer.inputName.value}_adjusted.pec`;
+        dlfilename = `Chart_${simphiPlayer.chartInfo.name}_adjusted.pec`;
     } else
         return shared.game.msgHandler.sendMessage(
             shared.game.ptmain.$t("simphi.adjustOffset.onlyRPESupport"),

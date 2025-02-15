@@ -18,7 +18,7 @@ hook.before.set(flag0, () => {
         "0e8ff64e65bf35382e30f980b5eec041",
     ];
     if (md5 === "ab9d2cc3eb569236ead459ad4caba109") hook.now.set(flag0, loadModYukiOri());
-    else if (hashDF.includes(md5) && hook.inputName.value === "Distorted Fate ")
+    else if (hashDF.includes(md5) && hook.chartInfo.name === "Distorted Fate ")
         import("./DFLevelEffect.js").then(({ loadMod }) => hook.now.set(flag0, loadMod()));
     // else import('./321LevelEffect.js').then(({ loadMod }) => hook.now.set(flag0, loadMod()));
     else hook.now.delete(flag0);

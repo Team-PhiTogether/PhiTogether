@@ -262,13 +262,6 @@ function loopNoCanvas() {
         (simphiPlayer.qwqwq
             ? simphiPlayer.timeInfo.duration - simphiPlayer.timeInfo.timeBgm
             : simphiPlayer.timeInfo.timeBgm) / simphiPlayer.timeInfo.duration;
-    simphiPlayer.chartInfo.name = simphiPlayer.inputName.value ?? ChartPlayInfoDefaults.name;
-    simphiPlayer.chartInfo.composer = simphiPlayer.inputArtist.value ?? ChartPlayInfoDefaults.charter;
-    simphiPlayer.chartInfo.illustrator =
-        simphiPlayer.inputIllustrator.value ?? ChartPlayInfoDefaults.illustrator;
-    simphiPlayer.chartInfo.charter =
-        simphiPlayer.inputCharter.value ?? ChartPlayInfoDefaults.charter;
-    simphiPlayer.chartInfo.difficultyString = simphiPlayer.chartData.levelText || ChartPlayInfoDefaults.difficultyString;
     if (simphiPlayer.stat.combo > 2) {
         simphiPlayer.tmps.combo = `${simphiPlayer.stat.combo}`;
         simphiPlayer.tmps.combo2 =
