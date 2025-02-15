@@ -106,22 +106,33 @@
                 inputCharter.value = this.$route.query.charter || inputCharter.value;
                 inputIllustrator.value = this.$route.query.illustrator || inputIllustrator.value;
                 selectDifficulty.value = this.$route.query.level || selectDifficulty.value;
-                selectLevel.value = this.$route.query.difficulty || selectLevel.value;
+                selectLevel.value = this.$route.query.difficulty || selectLevel.value; // 定数
 
-                if (
-                    !inputName.value ||
-                    !inputArtist.value ||
-                    !inputIllustrator.value ||
-                    !inputCharter.value ||
-                    !selectDifficulty.value ||
-                    !selectLevel.value
-                )
-                    // if (
+                // if (
+                //     !inputName.value ||
+                //     !inputArtist.value ||
+                //     !inputIllustrator.value ||
+                //     !inputCharter.value ||
+                //     !selectDifficulty.value ||
+                //     !selectLevel.value
+                // )
+                //     // if (
                     //     await shared.game.msgHandler.confirm(
                     //         this.$t("userChartEdit.askToFillWithUK")
                     //     )
                     // ) {
-                    inputName.value = inputName.value || "unknown";
+                if (selectLevel.value.includes(".")) {
+                    const levelNum = parseFloat(selectLevel.value);
+                    if (
+                        !isNaN(levelNum) &&
+                        await shared.game.msgHandler.confirm(
+                            this.$t("userChartEdit.askToRemoveFraction")
+                        )
+                    ) {
+                        selectLevel.value = Math.floor(levelNum).toString();
+                    }
+                }
+                inputName.value = inputName.value || "unknown";
                 inputArtist.value = inputArtist.value || "unknown";
                 inputIllustrator.value = inputIllustrator.value || "unknown";
                 inputCharter.value = inputCharter.value || "unknown";
