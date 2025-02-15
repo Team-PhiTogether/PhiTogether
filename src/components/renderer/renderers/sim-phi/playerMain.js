@@ -12,7 +12,6 @@ import { loadSkinFromBuffer, loadSkinFromDB } from "./components/ResourcePack/sk
 import { gauge } from "./plugins/gauge";
 
 import { imgShader, imgSplit } from "./assetsProcessor/imgProcessor";
-import { uploader } from "./assetsProcessor/reader";
 import { handleFile } from "./assetsProcessor/uploader";
 
 import { createCanvas } from "./utils/canvas";
@@ -726,4 +725,3 @@ const enableFilter = $id("enableFilter");
 simphiPlayer.pauseHook = () =>
     simphiPlayer.emitter.eq("play") && simphiPlayer.playController.pause();
 simphiPlayer.app.reloadRes = loadRes;
-simphiPlayer.uploader = uploader;

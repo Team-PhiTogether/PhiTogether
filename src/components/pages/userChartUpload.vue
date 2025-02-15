@@ -5,6 +5,7 @@
     import shared from "@utils/js/shared";
     import { checkLocalChart } from "@components/ptdb/charts";
     import ploading from "@utils/js/ploading.js";
+    import { uploader } from "@renderers/sim-phi/assetsProcessor/reader";
     export default {
         name: "chartupload",
         data() {
@@ -64,7 +65,7 @@
                 selectDifficulty.value = this.$route.query.level || "";
                 selectLevel.value = this.$route.query.difficulty || "";
                 shared.game.clearStat();
-                hook.uploader.reset();
+                uploader.reset();
                 $id("extraResource").value = "";
                 this.extraResource = null;
             },
@@ -237,7 +238,7 @@
                             };
                             if (this.extraResource) {
                                 shared.game.userChartUploaded = goNext;
-                                hook.uploader.fireLoad({ name: "assets.zip" }, this.extraResource);
+                                uploader.fireLoad({ name: "assets.zip" }, this.extraResource);
                             } else goNext();
                         }
                     });

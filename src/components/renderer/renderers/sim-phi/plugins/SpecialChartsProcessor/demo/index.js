@@ -1,6 +1,7 @@
 import { decodeAlt } from "@utils/imgAny";
 import { simphiPlayer } from "../../../playerMain.js";
 import { audio } from "@utils/js/aup";
+import { uploader } from "../../../assetsProcessor/reader";
 const $id = query => document.getElementById(query);
 const $ = query => document.body.querySelector(query);
 const flag0 = "flag{\x71w\x71}";
@@ -43,12 +44,12 @@ export default function () {
                     btn.onclick = null;
                     btn.remove();
                     const handler = img =>
-                        simphiPlayer.uploader.fireLoad({ name: "demo.zip" }, decodeAlt(img));
+                        uploader.fireLoad({ name: "demo.zip" }, decodeAlt(img));
                     const xhr = new XMLHttpRequest();
                     xhr.open("GET", "//i0.hdslb.com/bfs/music/1682346166.jpg", true);
                     xhr.responseType = "blob";
                     xhr.onprogress = evt =>
-                        simphiPlayer.uploader.fireProgress(evt.loaded, evt.total);
+                        uploader.fireProgress(evt.loaded, evt.total);
                     xhr.onloadend = () => createImageBitmap(xhr.response).then(handler);
                     setNoReferrer(() => xhr.send());
                 };
