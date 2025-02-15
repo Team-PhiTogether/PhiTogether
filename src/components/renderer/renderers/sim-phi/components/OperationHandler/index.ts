@@ -26,4 +26,4 @@ export class OperationHandler {
     deactivate() {
         this.interactProxy.deactive();
     }
-};
+}

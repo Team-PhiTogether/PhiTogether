@@ -22,19 +22,21 @@ export class PlayController {
         if (this._status === PlayStatus.Paused) return this.resume();
     }
     async play() {
-        if (this._operating || [PlayStatus.Playing, PlayStatus.Unprepared].includes(this._status)) return;
+        if (this._operating || [PlayStatus.Playing, PlayStatus.Unprepared].includes(this._status))
+            return;
 
         this._operating = true;
         this._status = PlayStatus.Playing;
-        this._eventlisteners[PlayEvent.Play] && await this._eventlisteners[PlayEvent.Play]();
+        this._eventlisteners[PlayEvent.Play] && (await this._eventlisteners[PlayEvent.Play]());
         this._operating = false;
     }
     async resume() {
-        if (this._operating || [PlayStatus.Playing, PlayStatus.Unprepared].includes(this._status)) return;
+        if (this._operating || [PlayStatus.Playing, PlayStatus.Unprepared].includes(this._status))
+            return;
 
         this._operating = true;
         this._status = PlayStatus.Playing;
-        this._eventlisteners[PlayEvent.Resume] && await this._eventlisteners[PlayEvent.Resume]();
+        this._eventlisteners[PlayEvent.Resume] && (await this._eventlisteners[PlayEvent.Resume]());
         this._operating = false;
     }
     async pause() {
@@ -42,15 +44,16 @@ export class PlayController {
 
         this._operating = true;
         this._status = PlayStatus.Paused;
-        this._eventlisteners[PlayEvent.Pause] && await this._eventlisteners[PlayEvent.Pause]();
+        this._eventlisteners[PlayEvent.Pause] && (await this._eventlisteners[PlayEvent.Pause]());
         this._operating = false;
     }
     async stop() {
-        if (this._operating || [PlayStatus.Unprepared, PlayStatus.Stopped].includes(this._status)) return;
+        if (this._operating || [PlayStatus.Unprepared, PlayStatus.Stopped].includes(this._status))
+            return;
 
         this._operating = true;
         this._status = PlayStatus.Stopped;
-        this._eventlisteners[PlayEvent.Stop] && await this._eventlisteners[PlayEvent.Stop]();
+        this._eventlisteners[PlayEvent.Stop] && (await this._eventlisteners[PlayEvent.Stop]());
         this._operating = false;
     }
     async startOver() {
@@ -58,9 +61,9 @@ export class PlayController {
 
         this._operating = true;
         this._status = PlayStatus.Stopped;
-        this._eventlisteners[PlayEvent.Stop] && await this._eventlisteners[PlayEvent.Stop]();
+        this._eventlisteners[PlayEvent.Stop] && (await this._eventlisteners[PlayEvent.Stop]());
         this._status = PlayStatus.Playing;
-        this._eventlisteners[PlayEvent.Play] && await this._eventlisteners[PlayEvent.Play]();
+        this._eventlisteners[PlayEvent.Play] && (await this._eventlisteners[PlayEvent.Play]());
         this._operating = false;
     }
 }

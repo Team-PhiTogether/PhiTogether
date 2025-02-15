@@ -10,7 +10,8 @@ export const KeyboardCallback: KeyboardCallbacks = {
             simphiPlayer.playController.toggle();
         else if (
             !simphiPlayer.hitManager.list.find(i => i.type === "keyboard" && i.id === evt.code) //按住一个键时，会触发多次keydown事件
-        ) simphiPlayer.hitManager.activate("keyboard", evt.code, NaN, NaN);
+        )
+            simphiPlayer.hitManager.activate("keyboard", evt.code, NaN, NaN);
     },
     keyupCallback(evt) {
         if (simphiPlayer.emitter.eq("stop")) return;

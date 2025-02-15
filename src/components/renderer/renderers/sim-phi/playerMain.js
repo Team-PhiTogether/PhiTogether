@@ -501,7 +501,9 @@ $id("select-volume").addEventListener("change", evt => {
     const volume = Number(evt.target.value);
     simphiPlayer.app.musicVolume = Math.min(1, 1 / volume);
     simphiPlayer.app.soundVolume = Math.min(1, volume);
-    Promise.resolve().then(simphiPlayer.playController.pause).then(simphiPlayer.playController.resume);
+    Promise.resolve()
+        .then(simphiPlayer.playController.pause)
+        .then(simphiPlayer.playController.resume);
 });
 // TODO
 const lowRes = $id("lowRes");
@@ -597,11 +599,7 @@ simphiPlayer.playController.addEventListener(PlayEvent.Play, async function () {
     ); //fuckqwq
     const md5 = simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value);
     simphiPlayer.stat.level = Number(simphiPlayer.chartData.levelText.match(/\d+$/));
-    simphiPlayer.stat.reset(
-        simphiPlayer.app.chart.numOfNotes,
-        md5,
-        simphiPlayer.selectspeed.value
-    );
+    simphiPlayer.stat.reset(simphiPlayer.app.chart.numOfNotes, md5, simphiPlayer.selectspeed.value);
     await loadLineData();
     simphiPlayer.app.bgImage =
         simphiPlayer.chartData.bgs.get(simphiPlayer.selectbg.value) ||
@@ -625,7 +623,11 @@ simphiPlayer.playController.addEventListener(PlayEvent.Play, async function () {
     simphiPlayer.emitter.emit("play");
 });
 simphiPlayer.playController.addEventListener(PlayEvent.Pause, async function () {
-    if (/* simphiPlayer.btnPause.classList.contains("disabled") ||  */!simphiPlayer.tmps.canPause || simphiPlayer.resultPageData)
+    if (
+        /* simphiPlayer.btnPause.classList.contains("disabled") ||  */ !simphiPlayer.tmps
+            .canPause ||
+        simphiPlayer.resultPageData
+    )
         return;
     // simphiPlayer.btnPause.classList.add("disabled");
     if (simphiPlayer.app.bgVideo) simphiPlayer.app.bgVideo.pause();
@@ -639,8 +641,7 @@ simphiPlayer.playController.addEventListener(PlayEvent.Pause, async function () 
     // simphiPlayer.btnPause.classList.remove("disabled");
 });
 simphiPlayer.playController.addEventListener(PlayEvent.Resume, async function () {
-    if (simphiPlayer.resultPageData)
-        return;
+    if (simphiPlayer.resultPageData) return;
     if (shared.game.ptmain.playConfig.mode === "preview") {
         clearInterval(simphiPlayer.app.pauseNextTick);
         if (simphiPlayer.app.bgVideo)
@@ -679,15 +680,9 @@ simphiPlayer.playController.addEventListener(PlayEvent.Resume, async function ()
                         simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
                     );
                 simphiPlayer.animationTimer.in.play();
-                if (
-                    simphiPlayer.showTransition.checked &&
-                    simphiPlayer.animationInfo.isOutStart
-                )
+                if (simphiPlayer.showTransition.checked && simphiPlayer.animationInfo.isOutStart)
                     simphiPlayer.animationTimer.out.play();
-                if (
-                    simphiPlayer.animationInfo.isInEnd &&
-                    !simphiPlayer.animationInfo.isOutStart
-                )
+                if (simphiPlayer.animationInfo.isInEnd && !simphiPlayer.animationInfo.isOutStart)
                     playBgm(
                         simphiPlayer.app.bgMusic,
                         simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
@@ -697,10 +692,7 @@ simphiPlayer.playController.addEventListener(PlayEvent.Resume, async function ()
             // simphiPlayer.btnPause.classList.remove("disabled");
         }
     }, 1000);
-    if (
-        shared.game.ptmain.gameConfig.reviewWhenResume &&
-        simphiPlayer.timeInfo.curTime > 3
-    ) {
+    if (shared.game.ptmain.gameConfig.reviewWhenResume && simphiPlayer.timeInfo.curTime > 3) {
         if (simphiPlayer.timeInfo.curTime > 3)
             simphiPlayer.timeInfo.timeBgm = simphiPlayer.timeInfo.curTime -= 3;
         if (simphiPlayer.app.bgVideo)
@@ -751,6 +743,7 @@ const enableFilter = $id("enableFilter");
     enableFilter.dispatchEvent(new Event("change"));
 })();
 
-simphiPlayer.pauseHook = () => simphiPlayer.emitter.eq("play") && simphiPlayer.playController.pause();
+simphiPlayer.pauseHook = () =>
+    simphiPlayer.emitter.eq("play") && simphiPlayer.playController.pause();
 simphiPlayer.app.reloadRes = loadRes;
 simphiPlayer.uploader = uploader;

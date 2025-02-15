@@ -24,4 +24,4 @@ export const SpecialChartsProcessor = {
             );
         else simphiPlayer.now.delete(flag0);
     },
-}
+};

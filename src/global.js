@@ -194,8 +194,7 @@ router.beforeEach((to, from) => {
     } else {
         stage.style.display = "block";
         shared.game.app.resizeCanvas();
-        if (to.query.auto)
-            hook.playController.play();
+        if (to.query.auto) hook.playController.play();
     }
     const gameAdjustPage = ["/playing"];
     if (gameAdjustPage.includes(from.path) && !gameAdjustPage.includes(to.path)) {

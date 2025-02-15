@@ -8,7 +8,7 @@
             "@locales/*": ["src/locales/*"],
             "@locales": ["src/locales"],
             "@renderers/*": ["src/components/renderer/renderers/*"],
-            "@community/*": ["src/components/community/*"],
+            "@community/*": ["src/components/community/*"]
         }
     }
 }

@@ -714,7 +714,7 @@
                     document.querySelector("#songSelectList").scrollTop = 0;
                     this.showBlank = false;
                     audio.stop();
-                    this.search.name = '';
+                    this.search.name = "";
                 },
             },
             selectChapter: {
