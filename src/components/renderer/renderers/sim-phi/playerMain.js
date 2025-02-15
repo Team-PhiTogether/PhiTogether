@@ -231,15 +231,6 @@ export const simphiPlayer = {
     selectspeed: $id("select-speed"),
     showTransition: $id("showTransition"),
 
-    // fuck: going to remove
-    inputName: $id("input-name"),
-    inputArtist: $id("input-artist"),
-    inputCharter: $id("input-charter"),
-    inputIllustrator: $id("input-illustrator"),
-    selectDifficulty: $id("select-difficulty"),
-    selectLevel: $id("select-level"),
-    // kcuf
-
     chartInfo: {
         name: null,
         composer: null,
