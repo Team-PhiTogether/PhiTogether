@@ -511,7 +511,6 @@ const ptAppInstance = createApp({
             this.$router.push("/calibrate");
         },
         ptAppPause(i) {
-            // btnPause.value == "暂停" && btnPause.click(); //
             hook.playController.pause();
         },
         async modJudgment() {

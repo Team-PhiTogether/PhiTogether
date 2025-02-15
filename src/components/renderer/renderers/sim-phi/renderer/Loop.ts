@@ -32,7 +32,6 @@ export function mainLoop() {
     } else if (!simphiPlayer.resultPageData) {
         simphiPlayer.resultPageData = true;
         audio.stop();
-        // simphiPlayer.btnPause.classList.add("disabled"); //qwq
         simphiPlayer.app.ctxos.globalCompositeOperation = "source-over";
         simphiPlayer.app.ctxos.resetTransform();
         simphiPlayer.app.ctxos.globalAlpha = 1;
