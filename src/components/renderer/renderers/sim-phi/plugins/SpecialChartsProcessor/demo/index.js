@@ -12,7 +12,7 @@ export default function () {
     })();
     simphiPlayer.before.set(flag0, () => {
         const md5 = simphiPlayer.chartData.chartsMD5.get(simphiPlayer.selectchart.value);
-        // console.log(simphiPlayer.tmps.name);
+        // console.log(simphiPlayer.chartInfo.name);
         const hashDF = [
             "cdb5987ad81b70e3dc96153af2efaa61",
             "86d23af0cc595a703241536a2d29ee4b",
@@ -96,7 +96,7 @@ function loadModYukiOri() {
         }
         if (time1 < 168) {
             simphiPlayer.stat.numOfNotes = 305;
-            simphiPlayer.tmps.level = "lN\u2002Lv.I2";
+            simphiPlayer.chartInfo.difficultyString = "lN\u2002Lv.I2";
             simphiPlayer.tmps.progress = time1 / 218;
         } else if (time1 < 169) {
             const progress = 1 - (169 - time1) ** 3; // easeCubicOut

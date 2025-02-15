@@ -33,7 +33,7 @@ export function loadModYukiOri() {
         }
         if (time1 < 168) {
             simphiPlayer.stat.numOfNotes = 305;
-            simphiPlayer.tmps.level = "lN\u2002Lv.I2";
+            simphiPlayer.chartInfo.difficultyString = "lN\u2002Lv.I2";
             simphiPlayer.tmps.progress = time1 / 218;
         } else if (time1 < 169) {
             const progress = 1 - (169 - time1) ** 3; // easeCubicOut

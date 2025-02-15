@@ -157,10 +157,10 @@ export function loopCanvas() {
             simphiPlayer.app.ctxos.globalAlpha = tween.easeOutSine(
                 6 - simphiPlayer.animationTimer.in.second * 2
             );
-        const name = simphiPlayer.tmps.name;
-        const artist = simphiPlayer.tmps.artist;
-        const illustrator = `Illustration designed by ${simphiPlayer.tmps.illustrator}`;
-        const charter = `Level designed by ${simphiPlayer.tmps.charter}`;
+        const name = simphiPlayer.chartInfo.name;
+        const artist = simphiPlayer.chartInfo.composer;
+        const illustrator = `Illustration designed by ${simphiPlayer.chartInfo.illustrator}`;
+        const charter = `Level designed by ${simphiPlayer.chartInfo.charter}`;
         const theme = `Resource Pack ${simphiPlayer.customResourceMeta["name"]} designed by ${simphiPlayer.customResourceMeta["author"]}`;
         simphiPlayer.app.ctxos.textAlign = "center";
         //曲名
@@ -336,7 +336,7 @@ export function loopCanvas() {
         simphiPlayer.app.ctxos.font = `${((lineScale * 0.63) / dxlvl) * (simphiPlayer.app.wlen - lineScale)}px Saira`;
     simphiPlayer.app.ctxos.globalAlpha = simphiPlayer.tmps.statStatus.level.alpha;
     simphiPlayer.app.ctxos.fillText(
-        simphiPlayer.tmps.level,
+        simphiPlayer.chartInfo.difficultyString,
         simphiPlayer.app.canvasos.width -
             lineScale * 0.75 +
             simphiPlayer.tmps.statStatus.level.offsetX,

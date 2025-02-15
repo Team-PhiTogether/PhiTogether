@@ -121,17 +121,17 @@
                     //         this.$t("userChartEdit.askToFillWithUK")
                     //     )
                     // ) {
-                if (selectLevel.value.includes(".")) {
-                    const levelNum = parseFloat(selectLevel.value);
-                    if (
-                        !isNaN(levelNum) &&
-                        await shared.game.msgHandler.confirm(
-                            this.$t("userChartEdit.askToRemoveFraction")
-                        )
-                    ) {
-                        selectLevel.value = Math.floor(levelNum).toString();
-                    }
-                }
+                // if (selectLevel.value.includes(".")) {
+                //     const levelNum = parseFloat(selectLevel.value);
+                //     if (
+                //         !isNaN(levelNum) &&
+                //         await shared.game.msgHandler.confirm(
+                //             this.$t("userChartEdit.askToRemoveFraction")
+                //         )
+                //     ) {
+                //         selectLevel.value = Math.floor(levelNum).toString();
+                //     }
+                // }
                 inputName.value = inputName.value || "unknown";
                 inputArtist.value = inputArtist.value || "unknown";
                 inputIllustrator.value = inputIllustrator.value || "unknown";

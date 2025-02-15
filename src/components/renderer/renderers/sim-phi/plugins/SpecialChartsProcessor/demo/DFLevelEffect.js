@@ -1874,8 +1874,8 @@ export function loadMod() {
         }
         simphiPlayer.filterOptions = attr;
         if (time > 95) {
-            simphiPlayer.tmps.level = "";
-            simphiPlayer.tmps.name = "";
+            simphiPlayer.chartInfo.difficultyString = "";
+            simphiPlayer.chartInfo.name = "";
             simphiPlayer.tmps.showStat = false;
             simphiPlayer.tmps.progress = -1;
         }

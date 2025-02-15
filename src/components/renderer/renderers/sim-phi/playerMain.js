@@ -232,13 +232,22 @@ export const simphiPlayer = {
     selectchart: $id("select-chart"),
     selectflip: $id("select-flip"),
     selectspeed: $id("select-speed"),
+    showTransition: $id("showTransition"),
+
     inputName: $id("input-name"),
     inputArtist: $id("input-artist"),
     inputCharter: $id("input-charter"),
     inputIllustrator: $id("input-illustrator"),
     selectDifficulty: $id("select-difficulty"),
     selectLevel: $id("select-level"),
-    showTransition: $id("showTransition"),
+
+    chartInfo: {
+        name: null,
+        composer: null,
+        illustrator: null,
+        charter: null,
+        difficultyString: "SP Lv.?",
+    },
 
     stage: {
         resize(forced) {
@@ -324,11 +333,6 @@ export const simphiPlayer = {
         bgVideo: null,
         bgMusic: _ => {},
         progress: 0,
-        name: "",
-        artist: "",
-        illustrator: "",
-        charter: "",
-        level: "",
         combo: "",
         combo2: "",
         showStat: false,

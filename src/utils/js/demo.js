@@ -10,7 +10,7 @@ const flag0 = "flag{\x71w\x71}";
 })();
 hook.before.set(flag0, () => {
     const md5 = hook.chartData.chartsMD5.get(hook.selectchart.value);
-    //console.log(hook.tmps.name);
+    //console.log(hook.chartInfo.name);
     const hashDF = [
         "cdb5987ad81b70e3dc96153af2efaa61",
         "86d23af0cc595a703241536a2d29ee4b",
@@ -57,7 +57,7 @@ function loadModYukiOri() {
         }
         if (time1 < 168) {
             hook.stat.numOfNotes = 305;
-            hook.tmps.level = "lN\u2002Lv.I2";
+            hook.chartInfo.difficultyString = "lN\u2002Lv.I2";
             hook.tmps.progress = time1 / 218;
         } else if (time1 < 169) {
             const progress = 1 - (169 - time1) ** 3; // easeCubicOut
