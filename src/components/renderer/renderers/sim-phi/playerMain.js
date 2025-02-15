@@ -464,10 +464,6 @@ $id("select-background-dim").addEventListener(
     "change",
     evt => (simphiPlayer.app.brightness = Number(evt.target.value))
 );
-$id("highLight").addEventListener(
-    "change",
-    evt => (simphiPlayer.app.multiHint = evt.target.checked)
-);
 simphiPlayer.selectflip.addEventListener("change", evt => {
     simphiPlayer.app.mirrorView(evt.target.value);
 });

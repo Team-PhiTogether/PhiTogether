@@ -829,16 +829,10 @@ const ptAppInstance = createApp({
                             shared.game.app.setNoteScale(Number(val));
                         } else if (item == "backgroundDim") {
                             shared.game.app.brightness = Number(val);
-                        } else if (item == "highLight") {
-                            shared.game.app.multiHint = val;
                         } else if (item == "lowRes") {
                             shared.game.app.setLowResFactor(
                                 val ? (window.devicePixelRatio < 2 ? 0.85 : 0.5) : 1
                             );
-                        } else if (item == "enableVP") {
-                            shared.game.app.enableVP = val;
-                        } else if (item == "enableFR") {
-                            shared.game.app.enableFR = val;
                         } else if (item == "maxFrame") {
                             if (ptmain.gameConfig.isMaxFrame)
                                 shared.game.frameAnimater.setFrameRate(

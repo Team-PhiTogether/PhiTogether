@@ -20,7 +20,6 @@ export class Renderer {
     public noteScaleRatio: number = 8e3;
     public brightness: number = 0.6;
     public lastRatio: number | null = null;
-    public multiHint: boolean = true;
     public playMode: number = 1;
     public musicVolume: number = 1;
     public soundVolume: number = 1;
