@@ -690,7 +690,7 @@ export default {
                 return;
             }
             if (this.gaming) {
-                btnPlay.value == "停止" && btnPlay.click();
+                playController.stop();
                 this.gaming = false;
             }
             this.selfExit = true;
@@ -949,7 +949,7 @@ export default {
                         } else
                             (that.exited = true),
                                 (that.room.closed = true),
-                                btnPlay.value == "停止" && btnPlay.click(),
+                                playController.stop(),
                                 that.showStat("playerRank");
                         break;
                     case "exit":
@@ -957,7 +957,7 @@ export default {
                             if (thisevt.extraInfo.type === 1 && !that.selfExit) break;
                             localStorage.removeItem("lastMultiInfo");
                             (that.exited = true),
-                                btnPlay.value == "停止" && btnPlay.click();
+                                playController.stop();
                             shared.game.msgHandler.info(that.$t("multiplayer.exitRoom.exited")).then(async () => {
                                 localStorage.removeItem("lastMultiInfo");
                                 if (that.room.stage == 0) {
@@ -1015,7 +1015,7 @@ export default {
                         }, 10000);
                         break;
                     case "nextTrack":
-                        btnPlay.value == "停止" && btnPlay.click();
+                        playController.stop();
                         that.room.stage = 1;
                         that.chartLoaded = false;
                         that.room.playRound++;
@@ -1349,10 +1349,6 @@ export default {
     },
 };
 
-const selectbg = $("select-bg");
-const selectbgm = $("select-bgm");
-const selectchart = $("select-chart");
-const btnPlay = $("btn-play");
 const showTransition = $("showTransition");
 </script>
 

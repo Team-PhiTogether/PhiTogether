@@ -32,9 +32,9 @@ import { loadLineData } from "./components/LoadLineData";
 import { OperationHandler } from "./components/OperationHandler";
 
 import { mainLoop } from "./renderer/Loop";
-import { loadRes } from "./components/ResourcePack";
+import { loadRes } from "@renderers/sim-phi/components/ResourcePack";
 
-import { PlayController, PlayEvent, PlayStatus } from "./utils/PlayController";
+import { PlayController, PlayEvent } from "./utils/PlayController";
 
 const $id = query => document.getElementById(query);
 const $ = query => document.body.querySelector(query);
@@ -188,7 +188,6 @@ export const simphiPlayer = {
         $id("uploader").classList.remove("disabled");
         $id("select").classList.remove("disabled");
         simphiPlayer.emitter.dispatchEvent(new CustomEvent("change"));
-        // simphiPlayer.btnPause.classList.add("disabled");
         simphiPlayer.playController.ready();
     },
 
@@ -527,9 +526,6 @@ simphiPlayer.emitter.addEventListener(
     "change",
     /** @this {Emitter} */ function () {
         simphiPlayer.app.canvas.classList.toggle("fade", this.eq("stop"));
-        // simphiPlayer.btnPlay.value = this.eq("stop") ? "播放" : "停止";
-        // simphiPlayer.btnPause.value = this.eq("pause") ? "继续" : "暂停";
-        // simphiPlayer.btnPause.classList.toggle("disabled", this.eq("stop"));
         for (const i of $$(".disabled-when-playing"))
             i.classList.toggle("disabled", this.ne("stop"));
         if (this.eq("play"))
@@ -608,7 +604,6 @@ simphiPlayer.playController.addEventListener(PlayEvent.Pause, async function () 
         simphiPlayer.resultPageData
     )
         return;
-    // simphiPlayer.btnPause.classList.add("disabled");
     if (simphiPlayer.app.bgVideo) simphiPlayer.app.bgVideo.pause();
     simphiPlayer.app.pauseBackgroundDimPara1 = null;
     simphiPlayer.animationTimer.in.pause();
@@ -617,7 +612,6 @@ simphiPlayer.playController.addEventListener(PlayEvent.Pause, async function () 
     simphiPlayer.timeInfo.curTime = simphiPlayer.timeInfo.timeBgm;
     audio.stop();
     simphiPlayer.emitter.emit("pause");
-    // simphiPlayer.btnPause.classList.remove("disabled");
 });
 simphiPlayer.playController.addEventListener(PlayEvent.Resume, async function () {
     if (simphiPlayer.resultPageData) return;
@@ -637,7 +631,6 @@ simphiPlayer.playController.addEventListener(PlayEvent.Resume, async function ()
                 simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
             );
         simphiPlayer.emitter.emit("play");
-        // simphiPlayer.btnPause.classList.remove("disabled");
         return;
     }
     simphiPlayer.app.pauseTime = 3;
@@ -668,7 +661,6 @@ simphiPlayer.playController.addEventListener(PlayEvent.Resume, async function ()
                     );
                 simphiPlayer.emitter.emit("play");
             }
-            // simphiPlayer.btnPause.classList.remove("disabled");
         }
     }, 1000);
     if (shared.game.ptmain.gameConfig.reviewWhenResume && simphiPlayer.timeInfo.curTime > 3) {
@@ -688,13 +680,8 @@ simphiPlayer.playController.addEventListener(PlayEvent.Resume, async function ()
                 simphiPlayer.timeInfo.timeBgm * simphiPlayer.app.speed
             );
         simphiPlayer.emitter.emit("play");
-        // simphiPlayer.btnPause.classList.add("disabled");
     }
 });
-// simphiPlayer.btnPause.addEventListener("click", async function () {
-//     if (this.classList.contains("disabled")) return;
-//     await simphiPlayer.pause();
-// });
 simphiPlayer.status2.reg(simphiPlayer.emitter, "change", _ =>
     simphiPlayer.qwqwq ? "Reversed" : ""
 ); //qwq
