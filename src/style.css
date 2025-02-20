@@ -184,6 +184,7 @@ footer {
     src:
         local("Saira"),
         local("Saira-Normal"),
+        url("https://fonts.realtvop.top/Source Han Sans & Saira Hybrid-Regular.woff2") format("woff2"),
         url("/src/core/fonts/Source Han Sans & Saira Hybrid-Regular.woff2") format("woff2");
 }
 
