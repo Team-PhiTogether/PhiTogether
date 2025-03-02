@@ -104,11 +104,11 @@ export function resultPageRenderer(statData) {
         830
     );
     simphiPlayer.app.ctxos.font = `30px Saira`;
-    const dxlvl = simphiPlayer.app.ctxos.measureText(simphiPlayer.chartData.levelText).width;
+    const dxlvl = simphiPlayer.app.ctxos.measureText(simphiPlayer.chartInfo.difficultyString).width;
     if (dxlvl > 150) simphiPlayer.app.ctxos.font = `${(30 / dxlvl) * 150}px Saira`;
     simphiPlayer.app.ctxos.textAlign = "right";
     simphiPlayer.app.ctxos.fillText(
-        simphiPlayer.chartData.levelText,
+        simphiPlayer.chartInfo.difficultyString,
         -1920 * tween.ease10(clip(simphiPlayer.animationTimer.end.second * 1)) + 2860,
         835
     );
