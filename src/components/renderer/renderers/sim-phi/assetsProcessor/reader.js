@@ -264,9 +264,10 @@ export async function readFile(
 }
 
 function splitPath(i) {
-    const j = i.lastIndexOf("/");
+    // 兼容 Windows 的 \ 和 Linux/Mac 的 /
+    const j = Math.max(i.lastIndexOf("/"), i.lastIndexOf("\\"));
     const name = i.slice(j + 1);
-    const path = ~j ? i.slice(0, j) : "";
+    const path = j > -1 ? i.slice(0, j) : "";
     return { name, path };
 }
 
